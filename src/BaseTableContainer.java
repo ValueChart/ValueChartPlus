@@ -71,8 +71,8 @@ public class BaseTableContainer extends Box implements ActionListener {
             header.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(((AttributeCell) table).getColor()), BorderFactory.createEmptyBorder()));
             //header.setBorder(BorderFactory.createLineBorder(((AttributeCell)table).getColor()));			
         } else { //this is for the names (boxes which control weights)
-//            header.setBorder(BorderFactory.createEmptyBorder());
-            header.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            header.setBorder(BorderFactory.createEmptyBorder());
+            //header.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         }
         //header.setBorder (BorderFactory.createBevelBorder(BevelBorder.RAISED));
         add(header);
@@ -892,7 +892,7 @@ public class BaseTableContainer extends Box implements ActionListener {
                 }
             }
             if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
-                if (e.getClickCount() == 2) {
+                if (chart.isSortSelected() && e.getClickCount() == 2) {
                     if (e.getComponent().toString().startsWith("DiscGraph") || e.getComponent().toString().startsWith("ContGraph")) {
                         ((AttributeCell) table).getUtility(((AttributeCell) table).domain);
                     } else {

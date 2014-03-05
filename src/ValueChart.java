@@ -50,6 +50,7 @@ public class ValueChart extends JPanel {
     Vector prims;
     ConstructionView con;
     boolean pump = false;
+    boolean sort = false;
     boolean pump_increase = true;
     boolean show_graph = true;
     int sa_dir = BaseTableContainer.UP;
@@ -497,7 +498,7 @@ public class ValueChart extends JPanel {
         while (!(name = scanReader.scanString()).equals("end")) {
             BaseTableContainer container;
             double hr;
-            if (name.equals("attributes")) { //if keyword=attributes, then read abstract name and ratio
+            if (name.equals("attributes")) { //if keyword=attibutes, then read abstract name and ratio
                 TablePane subpane = new TablePane();
                 name = scanReader.scanString();
                 if (chartTitle == null) {
@@ -633,6 +634,10 @@ public class ValueChart extends JPanel {
 
     public boolean isPumpSelected() {
         return pump;
+    }
+    
+    public boolean isSortSelected() {
+    	return sort;
     }
 
     public int getDirectionSA() {
@@ -788,6 +793,7 @@ public class ValueChart extends JPanel {
         ValueChart ch = new ValueChart(con, filename, type, colwd, true, graph);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
+        ch.sort = sort;
         ch.pump_increase = pump_increase;
         ch.sa_dir = sa_dir;
         ch.getDisplayPanel().setScore(getDisplayPanel().score);
@@ -805,6 +811,7 @@ public class ValueChart extends JPanel {
         ValueChart ch = new ValueChart(con, filename, type, colwd, false, show_graph);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
+        ch.sort = sort;
         ch.pump_increase = pump_increase;
         ch.sa_dir = sa_dir;
         ch.getDisplayPanel().setScore(getDisplayPanel().score);
