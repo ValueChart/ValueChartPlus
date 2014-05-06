@@ -1,20 +1,16 @@
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.GlyphVector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.swing.JPanel;
 import org.icepdf.core.pobjects.OutlineItem;
-import org.icepdf.core.pobjects.Outlines;
 import org.icepdf.ri.common.ComponentKeyBinding;
-import org.icepdf.ri.common.OutlineItemTreeNode;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingViewBuilder;
 import org.icepdf.ri.common.views.DocumentViewControllerImpl;
@@ -406,12 +402,32 @@ public class AttributeCell extends JComponent {
             g.setColor(Color.WHITE);
             g.fillRect(x, 0, colWidth, (int) ((1 - value.weight()) * height));
 
-            g.setFont(new Font("Verdana", Font.BOLD, 10));
+            Font f = new Font("Verdana", Font.BOLD, 10);
+            g.setFont(f);
 
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_QUALITY);
+            
             try {
                 if (entry.getShowFlag()) {
+                	int textx = x+2;
+                	int texty = height-5;
+                    g2.translate(textx, texty);
+                    // draw outline
+                    g.setColor(Color.WHITE);
+                    GlyphVector gv = f.createGlyphVector(g2.getFontRenderContext(), value.stringValue());
+                    Shape shape = gv.getOutline();
+                    g2.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
+                    g2.draw(shape);    
+                    g2.fill(shape);
+                    // draw text
                     g.setColor(Color.BLACK);
-                    g.drawString(value.stringValue(), x + 2, wthresh - 5);
+                    g.drawString(value.stringValue(), 0, 0);
+                    
+                    g2.translate(-textx, -texty);
                 }
             } catch (java.lang.NullPointerException ne) {
             }
