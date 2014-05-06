@@ -17,7 +17,8 @@ import javax.swing.event.MouseInputAdapter;
 public class DisplayPanel extends JComponent {
 
     private static final long serialVersionUID = 1L;
-    boolean score = false;
+//    boolean score = false;
+    boolean score = true; //SANJANA: Changed the score to default display 
     boolean ruler = false;
     private TablePane rootPane;
     private int colWidth = ValueChart.DEFAULT_COL_WIDTH;
@@ -110,13 +111,30 @@ public class DisplayPanel extends JComponent {
                 }
             }
         }
-        int y = colWidth + (colWidth / 4);
+        int y = colWidth + (colWidth / 3);
 
+        //SANJANA: finding the max score
+        double max = 0;
+        for(int j=0; j < numEntries; j++){
+        	double temp = accumulatedRatios[j];
+        	if(temp > max){
+        		max = temp;
+        	}
+        }
+        
         //scores
         if (score) {
             for (int j = 0; j < numEntries; j++) {
-                g.setColor(Color.darkGray);
-                g.drawString(String.valueOf((Math.round(accumulatedRatios[j] * 100))), y, totalHeight - ypos[j] - 5);
+//            	double total = accumulatedRatios[j];
+            	if(accumulatedRatios[j] != max){
+            		g.setColor(Color.darkGray);
+            		g.setFont(new Font("DEFAULT",Font.PLAIN,12));
+            	}            		
+            	else{
+            		g.setColor(Color.RED);
+            		g.setFont(new Font("DEFAULT",Font.BOLD,12));
+            	}            		
+                g.drawString(String.valueOf(Math.round(accumulatedRatios[j] * 100)), y, totalHeight - ypos[j] - 5);
                 y += colWidth;
             }
         }

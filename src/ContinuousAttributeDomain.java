@@ -119,7 +119,14 @@ public class ContinuousAttributeDomain extends AttributeDomain
         //In the future, this function will be useful for people to add/remove domain values
 	public void addKnot (double ord, double val)
 	 {
-	   Knot knot = new Knot (ord, val);
+		Knot knot;
+		if(val > 1.0)
+			knot = new Knot (ord, 1.0);
+		else if(val < 0.0)
+			knot = new Knot (ord, 0.0);
+		else
+			knot = new Knot(ord,val);
+		
 	   if (knotList.size() == 0)
 	    { knotList.add (knot);
 	      return;
@@ -129,17 +136,16 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	   k1 = (Knot)it.next();
 	   int index = 0;
 	   while (ord > k1.ord && it.hasNext())
-	    { 
-			k1 = (Knot)it.next();
-			index++;
+	    { k1 = (Knot)it.next();
+	      index++;
 	    }
 	   if (ord > k1.ord)
-	    {
+	    { 
 		   knotList.add (index+1, knot);
 	    }
 	   else if (ord == k1.ord)
 	    { 
-		   k1.val = val;
+		   	k1.val = val;		   
 	    }
 	   else
 	    { 
@@ -162,6 +168,12 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	public void changeWeight (double ord, double val)
 	 {
 		Knot k = getKnot(ord);
-		k.val = val;
+		if(val > 1.0)
+			k.val = Math.min(val, 1.0);
+		else if(val < 0.0)
+			k.val = Math.max(val, 0.0);
+		else
+			k.val = val;
+//		System.out.println(ord+" "+val+" "+k.val);		
 	 }
 }

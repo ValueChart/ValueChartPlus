@@ -230,7 +230,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	   }
 	
     public void checkAlternativeCount(){
-    	if ((num_alts<2) || ((num_alts>=2)&&(!con.constPane.isEnabledAt(1))) ){//- last part  || !con.getObjPanel().ok
+    	if ((num_alts<2) || ((num_alts>=2)&&(!con.constPane.isEnabledAt(1))) || !con.getObjPanel().ok){//- last part
     		con.constPane.setEnabledAt(2, false);
     		con.constPane.setEnabledAt(3, false); 
     		con.btnOK.setEnabled(false);
@@ -372,7 +372,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     		for (Iterator it2=data.iterator(); it2.hasNext();)
     			if ((it2.next().toString()).equals("")){
                     JOptionPane.showMessageDialog(this,
-                            "All data values must be input before proceedinggggg",
+                            "All data values must be input before proceeding",
                             "Missing data",
                             JOptionPane.WARNING_MESSAGE);                    		
                     		return false;

@@ -144,7 +144,6 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		if (objs == null){
 			repaintDisplay();
 		}
-		System.out.println(objs.size());
 		for (int i=0; i<objs.size(); i++)
 			checkUtility((JObjective)objs.get(i), (JLabel)pnlObjList.getComponent(i));		
 			if (!all_set){

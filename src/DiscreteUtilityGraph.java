@@ -31,6 +31,13 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     AttributeCell acell;
     JPanel pnl;    
     
+    public static Font LABELFONT = new Font("Verdana", Font.PLAIN, 10);
+    public static Font LABELFONT_BOLD = new Font("Verdana", Font.BOLD, 10);
+    public static final AffineTransform ANGLEFONT =
+            AffineTransform.getRotateInstance(-Math.PI / 6.0);
+    public static Font VLABELFONT = LABELFONT.deriveFont(ANGLEFONT);
+    public static Font VLABELFONT_BOLD = LABELFONT_BOLD.deriveFont(ANGLEFONT);
+    
     int getSpacing(int i){
     	int sp = 0;
     	if (items.length > 2)
@@ -94,7 +101,8 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     
     void setGraph(){
         pnl = new JPanel();
-        this.setPreferredSize(new Dimension(275,260));        
+        this.setPreferredSize(new Dimension(275,260));
+//        this.setPreferredSize(new Dimension(500,500));
         pnl.add(this, BorderLayout.CENTER);
     }
 
@@ -262,9 +270,9 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         String temp;
         g.setColor(Color.DARK_GRAY);
         for(int i = 0; i < items.length; i++){
-            Float test = new Float((205 - p[i].y) / 200);
+            Float test = new Float((205 - p[i].y) / 200); //converted domain values
             temp = test.toString();
-            g.drawString(temp.substring(0,3), (p[i].x + 5),p[i].y);
+            g.drawString(( temp.length() >3?temp.substring(0,4):temp.substring(0,3) ), (p[i].x + 5),p[i].y);
             s[i] = p[i].getShape();
         }
         
@@ -284,10 +292,14 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         g.setFont(new Font(null, Font.BOLD, 12));
         String utility_label = new String("Utility");
         g.drawString(utility_label, 10, 110);
-        String utility_upper_bound = new String("1");
-        g.drawString(utility_upper_bound, 35, 15);
-        String utility_lower_bound = new String("0");
-        g.drawString(utility_lower_bound, 35, 205);
+//        String utility_upper_bound = new String("1");
+        String utility_upper_bound = new String("Best");
+//        g.drawString(utility_upper_bound, 35, 15);
+        g.drawString(utility_upper_bound, 10, 15);
+//        String utility_lower_bound = new String("0");
+        String utility_lower_bound = new String("Worst");
+//        g.drawString(utility_lower_bound, 35, 205);
+        g.drawString(utility_lower_bound, 10, 205);
         
         //Drawing the labels from variables passed
         g.setFont(new Font(null, Font.BOLD, 13));
@@ -297,11 +309,18 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         weights = ddomain.getWeights();
         for(int i = 0; i < items.length; i++){
             if((weights[i] == 0.0) || (weights[i] == 1.0)){
-                g.setFont(new Font(null, Font.BOLD, 12));
+                g.setFont(new Font(null, Font.BOLD, 10));
+//            	g.setFont(VLABELFONT_BOLD);
             }
             else{
-                g.setFont(new Font(null, Font.PLAIN, 12));
-            }       
+                g.setFont(new Font(null, Font.PLAIN, 10));
+//            	g.setFont(VLABELFONT);
+            }
+//            if(items[i].length()>10){
+//            	String cut = items[i];
+//            	items[i] = cut.substring(0,10).concat("\n").concat(cut.substring(10,cut.length()));
+//            }
+//          g.drawString(items[i], (((Incre * i) + getSpacing(i) - 3 * (items[i].length()))) + (30 + ((int) (p[i].x - 30) / 2)), ANG_HT);
             g.drawString(items[i],(((Incre * i) + getSpacing(i) - 3 * (items[i].length()))),220);
         }
         
@@ -325,7 +344,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         
         frame.getContentPane().add(this, BorderLayout.NORTH);
         frame.pack();
-        frame.setVisible(true);
+        frame.setVisible(true);        
         
         
     }

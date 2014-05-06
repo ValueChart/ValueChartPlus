@@ -18,7 +18,8 @@ import org.icepdf.ri.common.views.DocumentViewControllerImpl;
 public class ValueChart extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    static public final int DEFAULT_COL_WIDTH = 30;
+//    static public final int DEFAULT_COL_WIDTH = 30;
+    static public final int DEFAULT_COL_WIDTH = 50; //SANJANA: Changed default col width to "Large"
     //*%* Changed display height to make it relative to the screen size
     //static public final int DEFAULT_DISPLAY_HEIGHT = 365;
     static public final int DEFAULT_DISPLAY_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * .44);

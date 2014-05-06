@@ -9,8 +9,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Properties;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.activation.*;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -59,6 +64,9 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         menu.add(menuItem);
         menu.addSeparator();
         menuItem = new MenuEntry("Save"); 
+        //Added to email the individual VC
+        menu.add(menuItem);
+        menuItem = new MenuEntry("Send"); 
         menu.add(menuItem);
         menuItem = new MenuEntry("Snapshot"); 
         menu.add(menuItem);
@@ -98,10 +106,11 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         absMenuItem = new CheckBoxMenuEntry("Absolute Ratios", true); 
         submenu.add(absMenuItem);
         
-        domMenuItem = new CheckBoxMenuEntry("Domain Values"); 
+        domMenuItem = new CheckBoxMenuEntry("Domain Values");        
         submenu.add(domMenuItem);
         
         scoreMenuItem = new CheckBoxMenuEntry("Total Score");  
+        scoreMenuItem.setSelected(true);
         submenu.add(scoreMenuItem);         
         measureMenuItem = new CheckBoxMenuEntry("Score Measure");  
         submenu.add(measureMenuItem);    
@@ -161,8 +170,8 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 				medMenuItem.setSelected(true); break;}   
 			case LARGE:{
 				lgMenuItem.setSelected(true); break;}  
-            case EXTRALARGE:{
-                xlgMenuItem.setSelected(true); break;} 
+                        case EXTRALARGE:{
+                                xlgMenuItem.setSelected(true); break;} 
     	}
     }
     
@@ -188,6 +197,10 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		if ("Save".equals(ae.getActionCommand())){
 			saveFile();
 		}	
+		
+		if ("Send".equals(ae.getActionCommand())){
+			sendFile();
+		}
 		
 		if ("Close".equals(ae.getActionCommand())){
 			System.exit(0);
@@ -286,6 +299,117 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		
 	}
 	
+	//Method to email the individual ValueChart
+	void sendFile() {
+		//Getting the list of vc files
+        File f = new File(".");
+        String files[] = f.list(); 
+        Vector tempFiles = new Vector();
+        for(int i = 0; i<files.length;i++){
+        	if(files[i].endsWith(".vc")){
+        		tempFiles.add(files[i]);
+        	}        	
+        }
+        Object vcFiles[] = new Object[tempFiles.size()];
+        for(int i =0;i<tempFiles.size();i++){
+        	vcFiles[i] = tempFiles.get(i);
+        }        
+        String selectedVC = (String)JOptionPane.showInputDialog(
+                this,
+                "Select your ValueChart:",
+                "Email ValueChart",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                vcFiles,
+                vcFiles[0]);
+        
+        //Send mail on OK
+		if ((selectedVC!= null) && (selectedVC.length() > 0)){
+			
+//			sendEmail(selectedVC);
+			// Recipient's email ID needs to be mentioned.
+		      String to = "sanzana05@gmail.com";
+
+		      // Sender's email ID needs to be mentioned
+		      final String from = "valuechartsplus@gmail.com";
+		      
+		      //Sender's password
+		      final String pwd = "charts@v";
+
+		      // Assuming you are sending email from localhost
+		      String host = "smtp.gmail.com";
+
+		      // Get system properties
+//		      Properties properties = System.getProperties();
+		      Properties props = new Properties();
+
+		      // Setup mail server
+//		      properties.setProperty("mail.smtp.host", host);
+		      props.setProperty("mail.transport.protocol", "smtp");     
+		      props.setProperty("mail.host", "smtp.gmail.com");  
+		      props.put("mail.smtp.auth", "true");  
+		      props.put("mail.smtp.port", "465");  
+		      props.put("mail.debug", "true");  
+		      props.put("mail.smtp.socketFactory.port", "465");  
+		      props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");  
+		      props.put("mail.smtp.socketFactory.fallback", "false"); 
+
+		      // Get the default Session object.
+//		      Session session = Session.getDefaultInstance(props);
+		      Session session = Session.getDefaultInstance(props,  
+		    		    new javax.mail.Authenticator() {
+		    		       protected PasswordAuthentication getPasswordAuthentication() {  
+		    		       return new PasswordAuthentication(from,pwd);  
+		    		   }  
+		    		   });
+
+		      try{
+		         // Create a default MimeMessage object.
+		         MimeMessage message = new MimeMessage(session);
+
+		         // Set From: header field of the header.
+		         message.setFrom(new InternetAddress(from));
+
+		         // Set To: header field of the header.
+		         message.addRecipient(Message.RecipientType.TO,
+		                                  new InternetAddress(to));
+
+		         // Set Subject: header field
+		         message.setSubject("Sending ValueChart - "+selectedVC);
+
+		         // Create the message part 
+		         BodyPart messageBodyPart = new MimeBodyPart();
+
+		         // Fill the message
+		         messageBodyPart.setText("Please find ValueChart attached.");
+		         
+		         // Create a multipart message
+		         Multipart multipart = new MimeMultipart();
+
+		         // Set text message part
+		         multipart.addBodyPart(messageBodyPart);
+
+		         // Part two is attachment
+		         messageBodyPart = new MimeBodyPart();
+		         String filename = selectedVC;
+		         DataSource source = new FileDataSource(filename);
+		         messageBodyPart.setDataHandler(new DataHandler(source));
+		         messageBodyPart.setFileName(filename);
+		         multipart.addBodyPart(messageBodyPart);
+
+		         // Send the complete message parts
+		         message.setContent(multipart );
+
+		         // Send message
+		         Transport.send(message);
+		         System.out.println("Sent message successfully....");
+		         JOptionPane.showMessageDialog(this,"ValueChart sent successfully.","ValueChart Sent",JOptionPane.INFORMATION_MESSAGE);
+		      }catch (MessagingException mex) {
+		         mex.printStackTrace();
+		      }
+		}
+	}
+
 	void saveFile(){
 		File file;
 		int ans = JOptionPane.YES_OPTION;
@@ -321,9 +445,12 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 	void createSnapshot(String name) throws AWTException, IOException {
 		try{
 			JFrame frame = (JFrame)chart.getFrame();
+//			BufferedImage image = new Robot().createScreenCapture( 
+//					   new Rectangle(frame.getX() + 4, frame.getY() + 149, 
+//					   		frame.getWidth() - 7, frame.getHeight() - 152));
 			BufferedImage image = new Robot().createScreenCapture( 
-					   new Rectangle(frame.getX() + 4, frame.getY() + 149, 
-					   		frame.getWidth() - 7, frame.getHeight() - 152));
+					   new Rectangle(frame.getX() + 4, frame.getY(), 
+					   		frame.getWidth() - 7, frame.getHeight()));
 
 			File file = new File(name);
 			ImageIO.write(image, "jpg", file);

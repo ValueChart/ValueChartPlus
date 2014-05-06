@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 
@@ -71,8 +72,8 @@ public class BaseTableContainer extends Box implements ActionListener {
             header.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(((AttributeCell) table).getColor()), BorderFactory.createEmptyBorder()));
             //header.setBorder(BorderFactory.createLineBorder(((AttributeCell)table).getColor()));			
         } else { //this is for the names (boxes which control weights)
-            header.setBorder(BorderFactory.createEmptyBorder());
-            //header.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+//            header.setBorder(BorderFactory.createEmptyBorder());
+            header.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         }
         //header.setBorder (BorderFactory.createBevelBorder(BevelBorder.RAISED));
         add(header);
@@ -266,7 +267,7 @@ public class BaseTableContainer extends Box implements ActionListener {
 
     private void setHeightScale(double s) {
         heightScale = s;
-        propogateHeightScale();
+        propogateHeightScale(); 
     }
 
     public void adjustHeaderForDepth(int depth) {
@@ -339,6 +340,13 @@ public class BaseTableContainer extends Box implements ActionListener {
         //header.setToolTipText (s);
 
         Integer pct = (int)(s * 100);
+        Double pct_d = s * 100.0;
+        
+//        DecimalFormat twoDForm = new DecimalFormat("#.##");
+//        Double pct = Double.valueOf(twoDForm.format(pct_d));
+        
+//        String pct = String.format("%.2f", Double.valueOf(pct_d).toString());
+//        System.out.println(name+" "+heightRatio+" "+heightScale);
         
         if (getHeight() < 30) {
             header.setText("   " + name.replace('_', ' ') + " (" + pct + "%)");
@@ -861,10 +869,12 @@ public class BaseTableContainer extends Box implements ActionListener {
         public void mouseClicked(MouseEvent e) {
             int newY = e.getY() + getLocation().y;	//-current x when dragging
             dragY = newY;							//-(dragX=x when originally pressed) 
-
-            if (chart.isPumpSelected() && pump && e.getClickCount() == 1) {
+//SANJANA: To pump with multiple clicks so that you don't have to wait for a second to pump
+//            if (chart.isPumpSelected() && pump && e.getClickCount() == 1) { 
+            
+            if (chart.isPumpSelected() && pump) {
                 if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
-                    if (e.getClickCount() == 1) {
+//                    if (e.getClickCount() == 1) {
                         if (chart.getDirectionSA() == UP) {
                             chart.last_int.setUndoPump(BaseTableContainer.this, chart.pump_increase ? false : true);
                             pump(BaseTableContainer.this, chart.pump_increase);
@@ -888,16 +898,21 @@ public class BaseTableContainer extends Box implements ActionListener {
                             }
                             realignAll(chart.mainPane);
                         }
-                    }
+//                    }
                 }
             }
             if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
-                if (chart.isSortSelected() && e.getClickCount() == 2) {
-                    if (e.getComponent().toString().startsWith("DiscGraph") || e.getComponent().toString().startsWith("ContGraph")) {
+//                if (chart.isSortSelected() && e.getClickCount() == 2) {
+            	if (e.getClickCount() == 2) {
+            		if(chart.isSortSelected()){
+            			chart.reorderEntries(BaseTableContainer.this);
+            		}
+            		else if (e.getComponent().toString().startsWith("DiscGraph") || e.getComponent().toString().startsWith("ContGraph")) {
                         ((AttributeCell) table).getUtility(((AttributeCell) table).domain);
-                    } else {
-                        chart.reorderEntries(BaseTableContainer.this);
-                    }
+                    } 
+//            		else {
+//                        chart.reorderEntries(BaseTableContainer.this);
+//                    }
                 }
             }
         }

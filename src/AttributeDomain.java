@@ -152,7 +152,7 @@ public abstract class AttributeDomain
 	       }
 	      if (val < 0 || val > 1.0)
 	       { throw new IOException ("Line " + scanReader.getLineNumber() + 
-": weight should be within [0,1]");
+": weight " + val + " should be within [0,1]");
 	       } 
 	      if (domain.getType() == DISCRETE)
 	       { ((DiscreteAttributeDomain)domain).addElement(ordstr, val);

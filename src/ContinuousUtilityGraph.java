@@ -234,7 +234,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         for(int i = 0; i < items.length; i++){
             Float test = new Float((205 - p[i].y) / 200);
             temp = test.toString();
-            g.drawString(temp.substring(0,3), (p[i].x + 5),p[i].y);
+            g.drawString(( temp.length()>3?temp.substring(0,4):temp.substring(0,3) ), (p[i].x + 5),p[i].y);
             s[i] = p[i].getShape();
         }
         
@@ -255,10 +255,14 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         String utility_label = new String("Utility");
         g.setFont(new Font(null, Font.BOLD, 12));
         g.drawString(utility_label, 10, 110);
-        String utility_upper_bound = new String("1");
-        g.drawString(utility_upper_bound, 35, 15);
-        String utility_lower_bound = new String("0");
-        g.drawString(utility_lower_bound, 35, 205);
+//        String utility_upper_bound = new String("1");
+//        g.drawString(utility_upper_bound, 35, 15);
+//        String utility_lower_bound = new String("0");
+//        g.drawString(utility_lower_bound, 35, 205);
+        String utility_upper_bound = new String("Best");
+        g.drawString(utility_upper_bound, 10, 15);
+        String utility_lower_bound = new String("Worst");
+        g.drawString(utility_lower_bound, 10, 205);
         
         //Drawing the labels from variables passed
          g.setFont(new Font(null, Font.BOLD, 12));
@@ -273,7 +277,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
             else{
                 g.setFont(new Font(null, Font.PLAIN, 12));
             }           
-           DecimalFormat df = acell.obj.decimalFormat;            
+           DecimalFormat df = acell.obj.decimalFormat;;            
            g.drawString((df.format(items[i])),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+40 ,220);
         }	
         
@@ -293,6 +297,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         //ContinuousUtilityGraph moving = new ContinuousUtilityGraph();
         //moving
         this.setPreferredSize(new Dimension(275,260));
+//        this.setPreferredSize(new Dimension(500,500));
         
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.pack();

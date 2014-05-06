@@ -1,20 +1,101 @@
-color Obj(0) 0.5 0.0 0.0color Obj(1) 1.0 0.8 0.0
+color Cost 0.0 0.0 0.2
+color IRR 0.0 0.0 0.34901962
+color Sustainability 0.0 0.0 0.5019608
+color Community 0.0 0.0 0.6509804
+color Robustness 0.0 0.0 0.7490196
+
 
 attributes
-	attributes Problem 1.0
-		Obj(0) * { 0.0 0.5, 20.0 0.5, 40.0 0.5, 60.0 0.5, 80.0 0.5, 100.0 0.5 }
-			color=Obj(0) units=xxx end
-		Obj(1) * { 0.0 0.5, 20.0 0.5, 40.0 0.5, 60.0 0.5, 80.0 0.5, 100.0 0.5 }
-			color=Obj(1) units=yyy end
+	attributes LionsGate 1.0
+		Cost 0.457 { 1.0 0.0, 2.0 0.25, 3.0 0.5049999952316284, 4.0 1.0, 5.0 1.0 }
+			color=Cost units=null end
+		IRR 0.040 { "Best" 1.0, "Better" 0.75, "Good" 0.5, "Medium" 0.25, "Worst" 0.0 }
+			color=IRR end
+		Sustainability 0.257 { "Best" 1.0, "Better" 0.75, "Good" 0.5, "Medium" 0.25, "Worst" 0.0 }
+			color=Sustainability end
+		Community 0.2 { 1.0 0.0, 2.0 0.25, 3.0 0.5, 4.0 0.75, 5.0 1.0 }
+			color=Community units=null end
+		Robustness 0.2 { 0.0 0.0, 0.5 0.1, 1.0 0.2, 1.5 0.3, 2.0 0.4, 2.5 0.5, 3.0 0.6, 3.5 0.7, 4.0 0.8, 4.5 0.9, 5.0 1.0 }
+			color=Robustness units=null end
 	 end
 end
 
-entry "Alt(0)"
-	Obj(0) 12.0
-	Obj(1) 90.0
+entry "I'TIDAL"
+	Cost 5.0
+	IRR "Medium"
+	Sustainability "Better"
+	Community 5.0
+	Robustness 4.5
 end
 
-entry "Alt(1)"
-	Obj(0) 30.0
-	Obj(1) 88.0
+entry "LBO"
+	Cost 5.0
+	IRR "Good"
+	Sustainability "Medium"
+	Community 3.0
+	Robustness 4.0
+end
+
+entry "NETWORK"
+	Cost 1.0
+	IRR "Best"
+	Sustainability "Best"
+	Community 4.0
+	Robustness 1.5
+end
+
+entry "ANT_COLONY"
+	Cost 3.0
+	IRR "Best"
+	Sustainability "Better"
+	Community 2.0
+	Robustness 2.5
+end
+
+entry "FLEA_M"
+	Cost 4.0
+	IRR "Worst"
+	Sustainability "Worst"
+	Community 5.0
+	Robustness 3.0
+end
+
+entry "PMM"
+	Cost 5.0
+	IRR "Better"
+	Sustainability "Medium"
+	Community 2.0
+	Robustness 4.0
+end
+
+entry "U_GARDEN"
+	Cost 5.0
+	IRR "Good"
+	Sustainability "Better"
+	Community 4.0
+	Robustness 5.0
+end
+
+entry "U_ECO"
+	Cost 4.0
+	IRR "Better"
+	Sustainability "Good"
+	Community 5.0
+	Robustness 3.5
+end
+
+entry "DD_A"
+	Cost 4.0
+	IRR "Medium"
+	Sustainability "Medium"
+	Community 1.0
+	Robustness 3.0
+end
+
+entry "DD_B"
+	Cost 4.0
+	IRR "Medium"
+	Sustainability "Medium"
+	Community 1.0
+	Robustness 2.5
 end

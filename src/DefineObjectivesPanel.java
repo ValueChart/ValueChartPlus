@@ -323,15 +323,14 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 				ok = false;//-
 			node = node.getNextLeaf();
 		}
-//	if (ok)//-
-//		pnlCon.btnOK.setEnabled(true);
-//	else
-//		pnlCon.btnOK.setEnabled(false);
+	//if (ok)//-
+		//pnlCon.btnOK.setEnabled(true);
+	//else
+		//pnlCon.btnOK.setEnabled(false);
 	}
 	
 	public Vector getPrimitiveObjectives(){
-		setPrimitiveObjectives();	
-//		System.out.println(ok);
+		setPrimitiveObjectives();		
 		return prim_obj;
 	}
 	

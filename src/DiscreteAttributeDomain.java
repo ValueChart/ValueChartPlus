@@ -88,7 +88,13 @@ public class DiscreteAttributeDomain extends AttributeDomain
 
 	//added for utility graph: so position does not change
 	public void changeWeight(String elem, double wt){
-		Entry e = getEntry(elem);
-		e.weight = wt;
+		Entry e = getEntry(elem);		
+		if(wt > 1.0)
+			e.weight = Math.min(wt, 1.0);
+		else if(wt < 0.0)
+			e.weight = Math.max(wt, 0.0);
+		else
+			e.weight = wt;
+//		System.out.println(elem+" "+wt+" "+e.weight);
 	}
 }

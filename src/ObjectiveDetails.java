@@ -135,7 +135,7 @@ public class ObjectiveDetails extends JPanel implements ActionListener{
         //Create and set up the modal dialog window.
         frame = new JDialog(con.frame, "Details");
         frame.setModal(true);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(this, BorderLayout.CENTER);      
         frame.pack();
         frame.setResizable(false);

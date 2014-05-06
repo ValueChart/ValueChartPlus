@@ -42,7 +42,7 @@ public class AttributeCell extends JComponent {
     JPopupMenu attributeMeta = new JPopupMenu(); //***Used for the new popup menu to display images, reports (PDF), etc.
     SwingController[] controller; //Used for each window that controls a pdf document
     JFrame[] window; //the windows created for the attribute, these are used to show the report. They are class variables because we need to toggle visibility from different methods
-    JPanel[] viewerComponentPanel; //the panel for which the frame sits on;
+    JPanel[] viewerComponentPanel; //the panel for which the fram sits on;
 
     public AttributeCell(ValueChart chart, AttributeDomain domain) {
         MouseHandler mouseHandler = new MouseHandler();
@@ -410,7 +410,7 @@ public class AttributeCell extends JComponent {
 
             try {
                 if (entry.getShowFlag()) {
-                    g.setColor(Color.darkGray);
+                    g.setColor(Color.BLACK);
                     g.drawString(value.stringValue(), x + 2, wthresh - 5);
                 }
             } catch (java.lang.NullPointerException ne) {
