@@ -37,7 +37,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     String filename = "test.vc"; // data file name
     String data; // main data string: all data for data file
     Vector colors; // vc primitive objective colors
-    Vector obj_list; // can represent all possible objectives (columns of table)
+    Vector<JObjective> obj_list; // can represent all possible objectives (columns of table)
     Vector alts; // data (rows of table)
 
     int display_type = DEFAULT_DISPLAY;
@@ -54,7 +54,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     public ConstructionView(int i) {
         chart = null; // at first there will be no chart attached
         type = i;
-        obj_list = new Vector();
+        obj_list = new Vector<JObjective>();
         alts = new Vector();
 
         // Set up the Tabbed Panes
@@ -191,7 +191,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         frame = new JDialog(ValueChartsPlus.frame,
                 "ValueCharts - Model Construction");
         frame.setModal(true);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.pack();
         // ValueChart.createMenu();

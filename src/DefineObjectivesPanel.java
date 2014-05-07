@@ -39,8 +39,8 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	int type;
 	int counter;
 	int colorcount = 0;	
-	Vector listed_objs;
-	Vector prim_obj;	
+	Vector<JObjective> listed_objs;
+	Vector<JObjective> prim_obj;	
 	String output = "";	
 	boolean del_mode = false;
 	boolean dnd_mode = true;
@@ -138,7 +138,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	    //hidden objective: the key for alternative list
 	    //this must is added to the listed_objectives vector for later alternative use
 		if (type!=FROM_DATAFILE){
-			listed_objs = new Vector();
+			listed_objs = new Vector<JObjective>();
 			JObjective name_obj = new JObjective("name");
 			name_obj.setType(JObjective.DISCRETE);
 			listed_objs.add(name_obj);
@@ -170,7 +170,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		add(pnlList);	
 	}
 
-	void setFileObjectives(Vector obj){		
+	void setFileObjectives(Vector<JObjective> obj){		
 		listed_objs = obj;	
 		repaintList();
 	}
@@ -213,7 +213,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		for (Enumeration en = root_node.breadthFirstEnumeration(); en.hasMoreElements();)
 			if (en.nextElement().toString().equals(str))
 				return true;
-		for (Iterator it = listed_objs.iterator(); it.hasNext();)
+		for (Iterator<JObjective> it = listed_objs.iterator(); it.hasNext();)
 			if (it.next().toString().equals(str))
 				return true;
 		return false;
@@ -314,7 +314,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	boolean ok;//- 
 	public void setPrimitiveObjectives(){
 	ok = true;//-
-		prim_obj = new Vector();
+		prim_obj = new Vector<JObjective>();
 		DefaultMutableTreeNode node = root_node.getFirstLeaf();
 		while (node != null){
 			JObjective obj = (JObjective)node.getUserObject();
@@ -329,7 +329,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		//pnlCon.btnOK.setEnabled(false);
 	}
 	
-	public Vector getPrimitiveObjectives(){
+	public Vector<JObjective> getPrimitiveObjectives(){
 		setPrimitiveObjectives();		
 		return prim_obj;
 	}
@@ -363,8 +363,8 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		else
 			pnlCon.constPane.setEnabledAt(1, true);
 		double weights=0.0;
-		for (Iterator it = prim_obj.iterator(); it.hasNext();){
-			JObjective obj = (JObjective)it.next();
+		for (Iterator<JObjective> it = prim_obj.iterator(); it.hasNext();){
+			JObjective obj = it.next();
 			if (!obj.getWeight().equals("*"))
 				weights += Double.valueOf(obj.getWeight()).doubleValue();			
 		}
