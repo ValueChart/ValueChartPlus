@@ -8,15 +8,15 @@ import java.util.*;
 public class TablePane extends JLayeredPane {
 
     private static final long serialVersionUID = 1L;
-    Vector rowList = new Vector(10);
+    Vector<BaseTableContainer> rowList = new Vector<BaseTableContainer>(10);
 
     private int[] computeRowHeights(int totalHeight) {
         int[] heights = new int[rowList.size()];
         int i = 0;
         double rsum = 0; 	//ratiosum
         int wsum = 0;		//weightsum
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            double r = ((BaseTableContainer) it.next()).getHeightRatio();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            double r = it.next().getHeightRatio();
             if (r < 0) {
                 return null;
             }
@@ -45,8 +45,8 @@ public class TablePane extends JLayeredPane {
         if (heights != null) {
             int i = 0;
             int y = 0;
-            for (Iterator it = rowList.iterator(); it.hasNext();) {
-                BaseTableContainer comp = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+                BaseTableContainer comp = it.next();
                 comp.setSize(w, heights[i]);
                 y += heights[i];
                 comp.setLocation(comp.getX(), getHeight() - y);

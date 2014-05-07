@@ -58,6 +58,15 @@ public class BaseTableContainer extends Box implements ActionListener {
     int preferredHeaderWidth = 0;
     String weight;
     JPopupMenu popAttribute;
+    private AttributeData data = null;
+
+    public AttributeData getData() {
+        return data;
+    }
+
+    public void setData(AttributeData data) {
+        this.data = data;
+    }
 
     public BaseTableContainer(JComponent table, ValueChart chart) {
         this(table, null, chart, -1);
@@ -339,11 +348,12 @@ public class BaseTableContainer extends Box implements ActionListener {
         //header.setText (s);
         //header.setToolTipText (s);
 
-        Integer pct = (int)(s * 100);
+        s = data.getWeight();
+        //long pct = Math.round(s * 100);
         Double pct_d = s * 100.0;
         
-//        DecimalFormat twoDForm = new DecimalFormat("#.##");
-//        Double pct = Double.valueOf(twoDForm.format(pct_d));
+        DecimalFormat twoDForm = new DecimalFormat("#.##");
+        Double pct = Double.valueOf(twoDForm.format(pct_d));
         
 //        String pct = String.format("%.2f", Double.valueOf(pct_d).toString());
 //        System.out.println(name+" "+heightRatio+" "+heightScale);
@@ -477,6 +487,8 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             Component comp = bTopNei.getParent();
             BaseTableContainer base = bNei;
+            
+            double del = (double)delY/chart.getMainPaneHeight();
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
@@ -487,6 +499,9 @@ public class BaseTableContainer extends Box implements ActionListener {
                         realignPanels(tp, b);
                         b.setRollUpRatio(b.heightRatio * b.heightScale);
                         comp = b.table;
+                        if (b == base) {
+                            b.data.getPrimitive().setWeight(base.data.getWeight() + del);
+                        }
                     }
                     realignPanels(tp, b);
                 }
@@ -504,6 +519,9 @@ public class BaseTableContainer extends Box implements ActionListener {
                         realignPanels(tp, b);
                         b.setRollUpRatio(b.heightRatio * b.heightScale);
                         comp = b.table;
+                        if (b == base) {
+                            b.data.getPrimitive().setWeight(base.data.getWeight() - del);
+                        }
                     }
                     realignPanels(tp, b);
                 }
@@ -523,6 +541,8 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             Component comp = bTopSel.getParent();
             BaseTableContainer base = bSel;
+            
+            double del = (double)delY/chart.getMainPaneHeight();
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
@@ -533,6 +553,9 @@ public class BaseTableContainer extends Box implements ActionListener {
                         realignPanels(tp, b);
                         b.setRollUpRatio(b.heightRatio * b.heightScale);
                         comp = b.table;
+                        if (b == base) {
+                            b.data.getPrimitive().setWeight(base.data.getWeight() + del);
+                        }
                     }
                     realignPanels(tp, b);
                 }
@@ -551,6 +574,9 @@ public class BaseTableContainer extends Box implements ActionListener {
                         realignPanels(tp, b);
                         b.setRollUpRatio(b.heightRatio * b.heightScale);
                         comp = b.table;
+                        if (b == base) {
+                            b.data.getPrimitive().setWeight(base.data.getWeight() - del);
+                        }
                     }
                     realignPanels(tp, b);
                 }
@@ -596,9 +622,15 @@ public class BaseTableContainer extends Box implements ActionListener {
             prev.setSize(adjDim.width, adjDim.height + dy);
             base.computeHeightRatio();
             prev.computeHeightRatio();
+            if (chart != null) {
+                double del = dy/chart.mainPane.getHeight();
+                base.data.getPrimitive().setWeight(base.data.getWeight() - del);
+                prev.data.getPrimitive().setWeight(prev.data.getWeight() + del);
+            }
             base.revalidate();
             prev.revalidate();
             if (chart != null) {
+                chart.updateMainPane();
                 chart.updateDisplay();
             }
         }
@@ -615,11 +647,17 @@ public class BaseTableContainer extends Box implements ActionListener {
             Point adjPos = next.getLocation();
             next.setLocation(adjPos.x, adjPos.y + dy);
             next.setSize(adjDim.width, adjDim.height - dy);
+            if (chart != null) {
+                double del = dy/chart.mainPane.getHeight();
+                base.data.getPrimitive().setWeight(base.data.getWeight() + del);
+                next.data.getPrimitive().setWeight(next.data.getWeight() - del);
+            }
             base.computeHeightRatio();
             base.revalidate();
             next.computeHeightRatio();
             next.revalidate();
             if (chart != null) {
+                chart.updateMainPane();
                 chart.updateDisplay();
             }
         }
@@ -830,7 +868,8 @@ public class BaseTableContainer extends Box implements ActionListener {
             Vector prims = chart.getPrims();
             double othercount = -1;
             for (Iterator it = prims.iterator(); it.hasNext();) {
-                if (((BaseTableContainer) it.next()).rollUpRatio > 0) {
+                BaseTableContainer b = (BaseTableContainer) it.next(); 
+                if (b.data.getWeight() > 0) {
                     othercount = othercount + 1;
                 }
             }
@@ -842,26 +881,24 @@ public class BaseTableContainer extends Box implements ActionListener {
                 BaseTableContainer b = (BaseTableContainer) it.next();
                 //int bsize = b.getHeight(); //height of primitive at start			
                 if (b == base) {
-                    b.setRollUpRatio(b.rollUpRatio + pump);
+                    b.setRollUpRatio(b.data.getWeight() + pump);
+                    b.data.getPrimitive().setWeight(b.data.getWeight() + pump);
                 } else {
                     if (b.rollUpRatio < (pump / othercount)) {
-                        double d = b.getRollUpRatio();
+                        double d = b.data.getWeight();
                         if (b.rollUpRatio != 0) {
                             base.setRollUpRatio(base.rollUpRatio + (pump / othercount - d));
+                            base.data.getPrimitive().setWeight(base.data.getWeight() + (pump / othercount - d));
                         }
                         b.setRollUpRatio(0);
+                        b.data.getPrimitive().setWeight(0);
                     } else {
                         b.setRollUpRatio(b.rollUpRatio - pump / othercount);
+                        b.data.getPrimitive().setWeight(b.data.getWeight() - pump / othercount);
                     }
                 }
             }
-            for (Iterator it = chart.getPrims().iterator(); it.hasNext();) {
-                BaseTableContainer b = (BaseTableContainer) it.next();
-                b.setExactSize(b.getWidth(), (int) Math.round(b.rollUpRatio * chart.mainPane.getHeight()));
-            }
-            for (Iterator it = chart.getPrims().iterator(); it.hasNext();) {
-                upSize((BaseTableContainer) it.next());
-            }
+            chart.updateMainPane();
             realignAll(chart.mainPane);
         }
         //-double-click for sorting by objective: call to reorder	
@@ -966,6 +1003,19 @@ public class BaseTableContainer extends Box implements ActionListener {
         } else if (("Criteria Details in Report").equals(ae.getActionCommand())) {
             //go to the valuechart report
             chart.zoomToReport(this.getName());
+        }
+    }
+    
+    public void updateSize() {
+        if (data == null)
+            return;
+        setExactSize(getWidth(), (int) Math.round(data.getWeight() * chart.mainPane.getHeight()));
+        // abstract
+        if (!(table instanceof AttributeCell)) {
+            for (Iterator it = ((TablePane) table).getRows(); it.hasNext();) {
+                BaseTableContainer comp = (BaseTableContainer) it.next();
+                comp.updateSize();
+            }
         }
     }
 }

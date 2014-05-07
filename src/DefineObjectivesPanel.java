@@ -376,7 +376,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	
 //OUTPUT
 	
-	void writeOutput(DefaultMutableTreeNode node, Vector color){
+	void writeOutput(DefaultMutableTreeNode node, ColorList color){
 		String str = "";
 		for (int i=0; i<=node.getLevel(); i++)
 			str = str + "\t";
@@ -432,7 +432,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		}
 	}
 	
-	public String getObjectiveOutput(Vector color){
+	public String getObjectiveOutput(ColorList color){
 		output = "";
 		writeOutput(root_node, color); 
 		colorcount=0;
