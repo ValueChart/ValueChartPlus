@@ -43,8 +43,8 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	 }
 
         //Returns type.
-	public int getType()
-	 { return CONTINUOUS;
+	public AttributeDomainType getType()
+	 { return AttributeDomainType.CONTINUOUS;
 	 }
 	
         //This function will help you find the weight for a particular element x.

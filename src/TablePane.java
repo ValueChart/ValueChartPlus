@@ -8,7 +8,7 @@ import java.util.*;
 public class TablePane extends JLayeredPane {
 
     private static final long serialVersionUID = 1L;
-    Vector<BaseTableContainer> rowList = new Vector<BaseTableContainer>(10);
+    private Vector<BaseTableContainer> rowList = new Vector<BaseTableContainer>(10);
 
     private int[] computeRowHeights(int totalHeight) {
         int[] heights = new int[rowList.size()];
@@ -57,8 +57,8 @@ public class TablePane extends JLayeredPane {
 
     public int getDepth() {
         int maxsubdepth = 0;
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             if (comp.getTable() instanceof TablePane) {
                 int subdepth = ((TablePane) comp.getTable()).getDepth();
                 if (subdepth > maxsubdepth) {
@@ -70,13 +70,31 @@ public class TablePane extends JLayeredPane {
     }
 
     //**********S/B getRows()!!!!
-    public Iterator getRows() {
+    public Iterator<BaseTableContainer> getRows() {
         return rowList.iterator();
+    }
+    
+    public Vector<BaseTableContainer> getRowList() {
+        return rowList;
+    }
+
+    public BaseTableContainer getRowAt(int i) {
+        if (i >= 0 && i < getRowList().size())
+            return getRowList().get(i);
+        else
+            return null;
+    }
+    
+    public BaseTableContainer getRowLast() {
+        if (getRowList().isEmpty())
+            return null;
+        else
+            return getRowList().get(getRowList().size()-1);
     }
 
     public void adjustAttributesForDepth(int d) {
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             if (comp.getTable() instanceof TablePane) {
                 ((TablePane) comp.getTable()).adjustAttributesForDepth(d - 1);
             } else {
@@ -86,8 +104,8 @@ public class TablePane extends JLayeredPane {
     }
 
     public boolean hasAttribute(String name) {
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             if (comp.getTable() instanceof TablePane) {
                 if (((TablePane) comp.getTable()).hasAttribute(name)) {
                     return true;
@@ -103,8 +121,8 @@ public class TablePane extends JLayeredPane {
 
     public AttributeCell getAttributeCell(String name) {
         AttributeCell cell;
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             if (comp.getTable() instanceof TablePane) {
                 cell = ((TablePane) comp.getTable()).getAttributeCell(name);
                 if (cell != null) {
@@ -121,8 +139,8 @@ public class TablePane extends JLayeredPane {
 
     //-finds the primitive objectives to set alternative entries
     public void fillInEntries(Vector entryList) {
-        for (Iterator it = rowList.iterator(); it.hasNext();) {	//-for each objective
-            BaseTableContainer comp = (BaseTableContainer) it.next();//-iterate through each basetablecontainer
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {	//-for each objective
+            BaseTableContainer comp = it.next();//-iterate through each basetablecontainer
             if (comp.getTable() instanceof TablePane) //-if it is an abstract objective, keep drilling down
             {
                 ((TablePane) comp.getTable()).fillInEntries(entryList);
@@ -134,8 +152,8 @@ public class TablePane extends JLayeredPane {
     }
 
     public void repaintEntries() {
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             if (comp.getTable() instanceof TablePane) {
                 ((TablePane) comp.getTable()).repaintEntries();
             } else {
@@ -161,7 +179,7 @@ public class TablePane extends JLayeredPane {
     public BaseTableContainer prevRow(BaseTableContainer comp) {
         int idx = rowList.indexOf(comp);
         if (idx < rowList.size() - 1) {
-            return (BaseTableContainer) rowList.get(idx + 1);
+            return rowList.get(idx + 1);
         } else {
             return null;
         }
@@ -186,14 +204,12 @@ public class TablePane extends JLayeredPane {
 
     //*********** NEEDS CHANGE FOR ROLLUP
     public void updateForRollUp(int w) {
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-        }
         int xpos = 0;
         double accumulatedWidthRatio = 0;
         int height = -1;
 
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             if (comp.getTable() instanceof TablePane) {
                 ((TablePane) comp.getTable()).updateForRollUp(w);
             }
@@ -226,8 +242,8 @@ public class TablePane extends JLayeredPane {
         int unassigned = 0;
         double hr = 0.0;
         // for each btc in the tp
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             hr = comp.getHeightRatio();
             //at this point widthScales are accurate for abstract
             if (hr != -1) {
@@ -245,8 +261,8 @@ public class TablePane extends JLayeredPane {
         double accumulatedHeightRatio = 0;
         int width = -1;
 
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             //if abstract
             if (comp.getTable() instanceof TablePane) {
                 ((TablePane) comp.getTable()).updateSizesAndHeights();
@@ -277,8 +293,8 @@ public class TablePane extends JLayeredPane {
 
     //used in DisplayPanel to get Vector of attributecells
     public void getAttributeCells(Vector list) {
-        for (Iterator it = rowList.iterator(); it.hasNext();) {
-            BaseTableContainer comp = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {
+            BaseTableContainer comp = it.next();
             if (comp.getTable() instanceof TablePane) {
                 ((TablePane) comp.getTable()).getAttributeCells(list);
             } else {

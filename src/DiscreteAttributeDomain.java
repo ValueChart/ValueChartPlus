@@ -29,8 +29,8 @@ public class DiscreteAttributeDomain extends AttributeDomain
 	   set = new Vector(32);
 	 }
 
-	public int getType()
-	 { return DISCRETE;
+	public AttributeDomainType getType()
+	 { return AttributeDomainType.DISCRETE;
 	 }
 	
 	public Entry getEntry (String elem)

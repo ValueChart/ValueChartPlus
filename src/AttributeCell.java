@@ -144,7 +144,7 @@ public class AttributeCell extends JComponent {
         String best = "";
         String worst = "";
         DecimalFormat df = obj.decimalFormat;
-        if (domain.getType() == AttributeDomain.DISCRETE) {
+        if (domain.getType() == AttributeDomainType.DISCRETE) {
             DiscreteAttributeDomain dd = (DiscreteAttributeDomain) domain;
             String elt[] = dd.getElements();
             double wt[] = dd.getWeights();
@@ -205,7 +205,7 @@ public class AttributeCell extends JComponent {
 
     //This is added to display utility graph
     public void getUtility(AttributeDomain domain) {
-        if (domain.getType() == AttributeDomain.DISCRETE) {
+        if (domain.getType() == AttributeDomainType.DISCRETE) {
             DiscreteAttributeDomain dd =
                     (DiscreteAttributeDomain) domain;
             new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
@@ -218,7 +218,7 @@ public class AttributeCell extends JComponent {
 
     //This will make function call to get utility graph
     public void makeUtility(AttributeDomain domain) {
-        if (domain.getType() == AttributeDomain.DISCRETE) {
+        if (domain.getType() == AttributeDomainType.DISCRETE) {
             DiscreteAttributeDomain dd =
                     (DiscreteAttributeDomain) domain;
             new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);

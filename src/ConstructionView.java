@@ -36,7 +36,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 
     String filename = "test.vc"; // data file name
     String data; // main data string: all data for data file
-    Vector colors; // vc primitive objective colors
+    ColorList colors; // vc primitive objective colors
     Vector<JObjective> obj_list; // can represent all possible objectives (columns of table)
     Vector alts; // data (rows of table)
 
@@ -172,6 +172,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                 chart.closeChart();
         chart = new ValueChart(this, filename, ValueChart.DEFAULT_DISPLAY,
                 ValueChart.DEFAULT_COL_WIDTH, true, true); // TODO
+        chart.newConst();
     }
 
     public void setRowHeight(int ht) {
@@ -192,6 +193,15 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                 "ValueCharts - Model Construction");
         frame.setModal(true);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        WindowListener exitListener = new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                chart.newConst();
+            }
+        };
+        frame.addWindowListener(exitListener);
+        
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.pack();
         // ValueChart.createMenu();
@@ -208,7 +218,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 
     public void createDataFile(String fname) {
         data = ""; // initialize new data string
-        ColorList colors = new ColorList();
+        colors = new ColorList();
         int countblank = 0;
         for (int i = 0; i < pnlObjectives.prim_obj.size(); i++) {
             JObjective obj = (JObjective) pnlObjectives.prim_obj.get(i);
@@ -280,13 +290,13 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                         // can also determine domain here
                         if (unit) {
                             obj.setUnit(st.sval);
-                            obj.setType(JObjective.CONTINUOUS);
+                            obj.setDomainType(AttributeDomainType.CONTINUOUS);
                             unit = false;
                         } else if ((st.sval).equals("unit")) {
                             unit = true;
                         } else {
                             obj = new JObjective(st.sval);
-                            obj.setType(JObjective.DISCRETE); // default to
+                            obj.setDomainType(AttributeDomainType.DISCRETE); // default to
                                                               // discrete,
                                                               // change to
                                                               // continuous if
@@ -307,7 +317,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                         last_line = st.lineno();
                     }
                     JObjective temp = (JObjective) obj_list.get(count2);
-                    if (temp.getType() == 1)
+                    if (temp.getDomainType() == AttributeDomainType.DISCRETE)
                         alt_data.put(temp.getName(), st.sval);
                     else {
                         alt_data.put(temp.getName(), Double.valueOf(st.nval));

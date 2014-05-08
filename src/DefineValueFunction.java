@@ -11,7 +11,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 	protected static JFrame frame;
     static JComponent newContentPane;
 
-    Vector objs;
+    Vector<JObjective> objs;
     JPanel pnlObjList;
     JPanel ugraph;
     JPanel pnlGraph;
@@ -84,11 +84,16 @@ public class DefineValueFunction extends JPanel implements ActionListener{
    
 		//pnlObjList.setSize(con.constPane.getWidth(), 30);
 		// get primitive objective list built in obj tab
-		objs = new Vector();
+		objs = new Vector<JObjective>();
 		objs = con.getObjPanel().getPrimitiveObjectives();
 		
 		for (int i=0; i<objs.size(); i++){
-			JObjective lblObj = new JObjective(objs.get(i).toString());
+		    JObjective obj = objs.get(i);
+		    JObjective lblObj;
+		    if (obj.getData() != null)
+		        lblObj = new JObjective(obj.getData());
+		    else
+		        lblObj = new JObjective(obj.toString());
 			lblObj.setPreferredSize(new Dimension(75, getHeight()/objs.size()));			
 			lblObj.setMaximumSize(new Dimension(75, getHeight()/objs.size()));
 			lblObj.setAlignmentY(TOP_ALIGNMENT); 
@@ -112,7 +117,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		pnlGraph.removeAll();
 		ugraph = new JPanel();
 		ugraph = obj_sel.getUtilityGraph(this);		
-		if (obj_sel.getType()==JObjective.CONTINUOUS){
+		if (obj_sel.getDomainType()==AttributeDomainType.CONTINUOUS){
 			((ContinuousUtilityGraph)(ugraph.getComponent(0))).addMouseListener(mouseListener);
 			((ContinuousUtilityGraph)(ugraph.getComponent(0))).addMouseMotionListener(mouseListener);
 		}
@@ -173,7 +178,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		}
 		
 		else if ("Remove Point".equals(ae.getActionCommand())){
-	    	ContinuousAttributeDomain dom = (ContinuousAttributeDomain) obj_sel.domain;
+	    	ContinuousAttributeDomain dom = (ContinuousAttributeDomain) obj_sel.getDomain();
 	    	dom.removeKnot(dom.getKnots()[rem_i]);
 	    	ugraph.repaint();
 
@@ -230,7 +235,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
         	ansd = (Double.valueOf(ans)).doubleValue();
         	try{
         		if (ansd <= obj_sel.maxC && ansd >= obj_sel.minC){	 
-        			ContinuousAttributeDomain dom = (ContinuousAttributeDomain) obj_sel.domain;
+        			ContinuousAttributeDomain dom = (ContinuousAttributeDomain) obj_sel.getDomain();
         			dom.addKnot(ansd, 0.0);
         		}
 	        	else{
@@ -270,7 +275,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
             else if(SwingUtilities.isRightMouseButton(me)){
             	if("ContinuousUtilityGraph".equals(me.getComponent().getClass().getName())){
         			int i;
-    				ContinuousAttributeDomain cad = (ContinuousAttributeDomain)obj_sel.domain;
+    				ContinuousAttributeDomain cad = (ContinuousAttributeDomain)obj_sel.getDomain();
     				double kts[] = cad.getKnots();			
     				for (i=0; i < kts.length; i++){
     				int ptx = (int)((kts[i]-kts[0])/((kts[(kts.length)-1])-kts[0])*200)+50;

@@ -225,9 +225,9 @@ public class ValueChart extends JPanel {
 
 //CONNECT CONST/INSP
     void setPrims(TablePane pane) {
-        Iterator it;
+        Iterator<BaseTableContainer> it;
         for (it = pane.getRows(); it.hasNext();) {
-            BaseTableContainer btc = (BaseTableContainer) (it.next());
+            BaseTableContainer btc = it.next();
             if (btc.table instanceof AttributeCell) {
                 prims.add(btc);
                 btc.adjustHeaderWidth();//added for rotate
@@ -251,7 +251,7 @@ public class ValueChart extends JPanel {
                     //connect ac and obj
                     ac.obj = obj;
                     obj.acell = ac;
-                    if (obj.domain_type == JObjective.CONTINUOUS) {
+                    if (obj.getDomainType() == AttributeDomainType.CONTINUOUS) {
                         if (obj.getUnit().equals("CAD")) {
                             obj.setDecimalFormat("0.00");
                         }
@@ -270,15 +270,18 @@ public class ValueChart extends JPanel {
     }
 
     void setObjs(TablePane pane, String str) {
-        Iterator it;
+        Iterator<BaseTableContainer> it;
         JObjective obj = null;
         for (it = pane.getRows(); it.hasNext();) {
-            BaseTableContainer btc = (BaseTableContainer) (it.next());
+            BaseTableContainer btc = it.next();
             btc.updateHeader();
             if (str.equals("root")) {
                 con.getObjPanel().lblRoot.setName(btc.getName());
             } else {
-                obj = new JObjective(btc.getName());
+                if (btc.getData() != null)
+                    obj = new JObjective(btc.getData());
+                else
+                    obj = new JObjective(btc.getName());
                 con.getObjPanel().addFromVC(str, obj);
                 objs.add(obj);
                 if (btc.table instanceof AttributeCell) {
@@ -308,7 +311,7 @@ public class ValueChart extends JPanel {
                 } else {
                     AttributeValue val = (AttributeValue) datamap.get(obj.getName());
                     datamap.put(obj.getName(), val.stringValue());
-                    obj.setType(val.domain.getType());
+                    obj.setDomainType(val.domain.getType());
                 }
             }
             alts.add(datamap);
@@ -342,7 +345,7 @@ public class ValueChart extends JPanel {
             BaseTableContainer btc = (BaseTableContainer) it.next();
             btc.setRollUp();
         }
-        ((BaseTableContainer) mainPane.rowList.get(0)).setAbstractRatios();
+        mainPane.getRowAt(0).setAbstractRatios();
         setConnectingFields();
         if (isNew) {
             menuOptions.setSelectedItems();
@@ -368,7 +371,7 @@ public class ValueChart extends JPanel {
             BaseTableContainer btc = (BaseTableContainer) it.next();
             btc.setRollUp();
         }
-        ((BaseTableContainer) mainPane.rowList.get(0)).setAbstractRatios();
+        mainPane.getRowAt(0).setAbstractRatios();
         setConnectingFields();
         if (isNew) {
             menuOptions.setSelectedItems();
@@ -701,7 +704,7 @@ public class ValueChart extends JPanel {
                 }
                 AttributeDomain domain = attributeCell.getDomain();
                 AttributeValue value;
-                if (domain.getType() == AttributeDomain.DISCRETE) {
+                if (domain.getType() == AttributeDomainType.DISCRETE) {
                     String name = scanReader.scanString("%S");
                     value = new AttributeValue(name, domain);
                 } else { // type == AttributeDomain.CONTINUOUS
@@ -1042,7 +1045,7 @@ public class ValueChart extends JPanel {
             last.elt = elt;
             last.domain = domain;
             if (domain != null) {
-                if (domain.getType() == AttributeDomain.DISCRETE) {
+                if (domain.getType() == AttributeDomainType.DISCRETE) {
                     DiscreteAttributeDomain d = ((DiscreteAttributeDomain) domain);
                     last.weight = (d.getEntry(elt)).weight;
                 } else {
@@ -1136,7 +1139,7 @@ public class ValueChart extends JPanel {
     }
 
     void updateMainPane() {
-        for (BaseTableContainer b : mainPane.rowList) {
+        for (BaseTableContainer b : mainPane.getRowList()) {
             b.updateSize();
         }
     }

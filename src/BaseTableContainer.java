@@ -1,12 +1,8 @@
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.border.*;
-
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -95,7 +91,7 @@ public class BaseTableContainer extends Box implements ActionListener {
             if (table instanceof AttributeCell) {
                 AttributeCell ac = (AttributeCell) table;
                 JPanel graph = null;
-                if (ac.getDomain().getType() == AttributeDomain.DISCRETE) {
+                if (ac.getDomain().getType() == AttributeDomainType.DISCRETE) {
                     graph = ac.makeDiscGraph(ac.domain);
                 } else {
                     graph = ac.makeContGraph(ac.domain);
@@ -233,8 +229,8 @@ public class BaseTableContainer extends Box implements ActionListener {
         double wt = 0.0;
         TablePane pt = (TablePane) getParent();
         if (pt.getDepth() != chart.mainPane.getDepth() - 1) {
-            for (Iterator it = pt.getRows(); it.hasNext();) {
-                BaseTableContainer comp = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = pt.getRows(); it.hasNext();) {
+                BaseTableContainer comp = it.next();
                 wt += comp.rollUpRatio;
             }
             BaseTableContainer abs = (BaseTableContainer) pt.getParent();
@@ -251,8 +247,8 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
         if (table instanceof TablePane) {
             TablePane tab = (TablePane) table;
-            for (Iterator it = tab.getRows(); it.hasNext();) {
-                ((BaseTableContainer) it.next()).setAbstractRatios();
+            for (Iterator<BaseTableContainer> it = tab.getRows(); it.hasNext();) {
+                it.next().setAbstractRatios();
             }
         }
     }
@@ -267,8 +263,8 @@ public class BaseTableContainer extends Box implements ActionListener {
 
     private void propogateHeightScale() {
         if (table instanceof TablePane) {
-            for (Iterator it = ((TablePane) table).getRows(); it.hasNext();) {
-                BaseTableContainer comp = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = ((TablePane) table).getRows(); it.hasNext();) {
+                BaseTableContainer comp = it.next();
                 comp.setHeightScale(heightScale * heightRatio);
             }
         }
@@ -307,9 +303,9 @@ public class BaseTableContainer extends Box implements ActionListener {
     private void updateHeadersRecursively() {
         updateHeader();
         if (table instanceof TablePane) {
-            Iterator it;
-            for (it = ((TablePane) table).rowList.iterator(); it.hasNext();) {
-                ((BaseTableContainer) it.next()).updateHeadersRecursively();
+            Iterator<BaseTableContainer> it;
+            for (it = ((TablePane) table).getRows(); it.hasNext();) {
+                it.next().updateHeadersRecursively();
             }
         }
     }
@@ -319,9 +315,9 @@ public class BaseTableContainer extends Box implements ActionListener {
             return 0;
         } else if (table instanceof TablePane) {
             double w = 0;
-            Iterator it;
-            for (it = ((TablePane) table).rowList.iterator(); it.hasNext();) {
-                w += ((BaseTableContainer) it.next()).entryWeight(entry);
+            Iterator<BaseTableContainer> it;
+            for (it = ((TablePane) table).getRows(); it.hasNext();) {
+                w += it.next().entryWeight(entry);
             }
             return w;
         } else {
@@ -492,8 +488,8 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
-                for (Iterator it = tp.getRows(); it.hasNext();) {
-                    BaseTableContainer b = (BaseTableContainer) it.next();
+                for (Iterator<BaseTableContainer> it = tp.getRows(); it.hasNext();) {
+                    BaseTableContainer b = it.next();
                     if (b.isAncestorOf(base) || (b == base)) {
                         b.setExactSize(b.getWidth(), b.getHeight() + delY);
                         realignPanels(tp, b);
@@ -512,8 +508,8 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
-                for (Iterator it = tp.getRows(); it.hasNext();) {
-                    BaseTableContainer b = (BaseTableContainer) it.next();
+                for (Iterator<BaseTableContainer> it = tp.getRows(); it.hasNext();) {
+                    BaseTableContainer b = it.next();
                     if (b.isAncestorOf(base) || (b == base)) {
                         b.setExactSize(b.getWidth(), b.getHeight() - delY);
                         realignPanels(tp, b);
@@ -546,8 +542,8 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
-                for (Iterator it = tp.getRows(); it.hasNext();) {
-                    BaseTableContainer b = (BaseTableContainer) it.next();
+                for (Iterator<BaseTableContainer> it = tp.getRows(); it.hasNext();) {
+                    BaseTableContainer b = it.next();
                     if (b.isAncestorOf(base) || (b == base)) {
                         b.setExactSize(b.getWidth(), b.getHeight() + delY);
                         realignPanels(tp, b);
@@ -567,8 +563,8 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
-                for (Iterator it = tp.getRows(); it.hasNext();) {
-                    BaseTableContainer b = (BaseTableContainer) it.next();
+                for (Iterator<BaseTableContainer> it = tp.getRows(); it.hasNext();) {
+                    BaseTableContainer b = it.next();
                     if (b.isAncestorOf(base) || (b == base)) {
                         b.setExactSize(b.getWidth(), b.getHeight() - delY);
                         realignPanels(tp, b);
@@ -585,8 +581,8 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
 
         void realignAll(TablePane tab) {
-            for (Iterator it = tab.getRows(); it.hasNext();) {
-                BaseTableContainer b = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = tab.getRows(); it.hasNext();) {
+                BaseTableContainer b = it.next();
                 realignPanels(tab, b);
                 if (b.table instanceof TablePane) {
                     realignAll((TablePane) b.table);
@@ -595,7 +591,7 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
 
         public void realignPanels(TablePane t, BaseTableContainer b) {
-            BaseTableContainer p = (BaseTableContainer) t.prevRow(b);
+            BaseTableContainer p = t.prevRow(b);
             if (p == null) {
                 b.setLocation(b.getLocation().x, 0);
             } else {
@@ -817,7 +813,7 @@ public class BaseTableContainer extends Box implements ActionListener {
                 tNei = tTopNei;
                 while (!(bNei.table instanceof AttributeCell)) {
                     tNei = (TablePane) bNei.table;
-                    bNei = (BaseTableContainer) tNei.rowList.get(0);
+                    bNei = tNei.getRowAt(0);
                 }
             }
         }
@@ -842,7 +838,7 @@ public class BaseTableContainer extends Box implements ActionListener {
                 tNei = tTopNei;
                 while (!(bNei.table instanceof AttributeCell)) {
                     tNei = (TablePane) bNei.table;
-                    bNei = (BaseTableContainer) tNei.rowList.get(tNei.rowList.size() - 1);
+                    bNei = tNei.getRowLast();
                 }
             }
         }
@@ -854,8 +850,8 @@ public class BaseTableContainer extends Box implements ActionListener {
                 BaseTableContainer bp = (BaseTableContainer) p.getParent();
                 if (bp.getParent() != chart.mainPane) {
                     int ht = 0;
-                    for (Iterator it = p.getRows(); it.hasNext();) {
-                        ht += ((BaseTableContainer) it.next()).getHeight();
+                    for (Iterator<BaseTableContainer> it = p.getRows(); it.hasNext();) {
+                        ht += it.next().getHeight();
                     }
 
                     bp.setExactSize(bp.getWidth(), ht);
@@ -927,8 +923,8 @@ public class BaseTableContainer extends Box implements ActionListener {
                             }
                             setSize(getWidth() + pump, getHeight());
 
-                            for (Iterator it = par.getRows(); it.hasNext();) {
-                                BaseTableContainer b = (BaseTableContainer) it.next();
+                            for (Iterator<BaseTableContainer> it = par.getRows(); it.hasNext();) {
+                                BaseTableContainer b = it.next();
                                 if (b != BaseTableContainer.this) {
                                     b.setSize(b.getWidth(), b.getHeight() - pump / sibcount);
                                 }
@@ -1012,8 +1008,8 @@ public class BaseTableContainer extends Box implements ActionListener {
         setExactSize(getWidth(), (int) Math.round(data.getWeight() * chart.mainPane.getHeight()));
         // abstract
         if (!(table instanceof AttributeCell)) {
-            for (Iterator it = ((TablePane) table).getRows(); it.hasNext();) {
-                BaseTableContainer comp = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = ((TablePane) table).getRows(); it.hasNext();) {
+                BaseTableContainer comp = it.next();
                 comp.updateSize();
             }
         }

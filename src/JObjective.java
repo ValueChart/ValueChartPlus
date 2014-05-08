@@ -9,11 +9,13 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-
+/**
+ * Represents a single objective to be rendered as a label
+ * TODO: redundant information stored for UI and data handling, should remove UI data where possible
+ *
+ */
 public class JObjective extends JLabel{
 	private static final long serialVersionUID = 1L;
-	public static final int DISCRETE = 1;		
-	public static final int CONTINUOUS = 2;
 	
 	public static final int CREATED = 1;	
 	public static final int FROM_FILE = 2;
@@ -22,7 +24,7 @@ public class JObjective extends JLabel{
 	
 	private String name;
 	int num_obj;
-	String weight;
+	private String weight;
 	//Value Function 
 	//Discrete
 	int num_points = 6;	
@@ -32,39 +34,62 @@ public class JObjective extends JLabel{
 	double minC = 0;		
 	double maxC = 100;
 	
-	AttributeDomain domain;	
-	int domain_type;
-	int origin;		
-	String unit;	
-	boolean init;			//for new objectives, shows whether first value function is created
+	// UI data
+	private AttributeDomain domain;	
+	private AttributeDomainType domain_type;
+	private String unit;
+	/**
+	 * If JObjective is associated with some data (ie. not just generated for display)
+	 * then data should be instantiated
+	 */
+	private AttributeData data = null;
+
+	int origin;        
+    boolean init;			//for new objectives, shows whether first value function is created
 	ValueChart chart=null;	//needed for utility graphs
     AttributeCell acell;
     
 	DecimalFormat decimalFormat;
 	
-	public JObjective(String str){
-		setFont(new Font("Arial", Font.PLAIN, 11));
-		//set objective details
-		name = str;
-		setContinuous();	// defaults to a positive linear continuous domain
 	
-		unit = "";
-		weight = "*";
-		origin = CREATED;	//defaults to newly created objective
-		init = false;
-		
-		//set component details
-		setText(name);		
+
+    public JObjective(String str){
+		name = str;
+		constructDefault();
+	}
+    
+    /**
+     * Construct based on information from data
+     * @param d associated data handle
+     */
+    public JObjective(AttributeData d){
+        data = d;
+        constructDefault();
+    }
+    
+    private void constructDefault() {
+        setFont(new Font("Arial", Font.PLAIN, 11));
+
+        //set objective details
+        setContinuous();    // defaults to a positive linear continuous domain
+        
+        unit = "";
+        weight = "*";
+        origin = CREATED;   //defaults to newly created objective
+        init = false;
+        
+        //set component details
+        setText(getName());      
         setBorder(BorderFactory.createEtchedBorder(1));
         setHorizontalAlignment(JLabel.CENTER);
         color = Color.WHITE;
         setOpaque(false);
         setColor(color);
-        setToolTipText(name);
-        setDecimalFormat("0.0");
+        setToolTipText(getName());
+        setDecimalFormat("0.000");
         
-        menuItem = new JMenuItem(name);
-	}
+        menuItem = new JMenuItem(getName());
+    }
 	
 	public JMenuItem getMenuItem(){
 		return menuItem;
@@ -75,61 +100,93 @@ public class JObjective extends JLabel{
 		setBackground(color);
 	}
 	
-	
+	/**
+	 * returns name from associated data where available
+	 * returns UI name otherwise
+	 */
 	public String getName(){
-		return name;
+	    if (data != null)
+            return data.getName();
+	    else
+	        return name;
 	}
 	
+	/**
+	 * sets UI name label only
+	 */
 	public void setName(String str){
 		name = str;
-		setText(name);
+		setText(getName());
 	}
 	
-	public int domainType(){
-		return domain_type;
+	public AttributeDomainType getDomainType(){
+	    if (data != null && !data.isAbstract())
+	        return data.getPrimitive().getDomain().getType();
+	    else
+	        return domain_type;
 	}
 	
 	public String getUnit(){
-		return unit;
+	    if (data != null && !data.isAbstract())
+	        return data.getPrimitive().getUnitsName();
+	    else 
+	        return unit;
 	}
 	
+	/**
+	 * returns name of JObjective, calls getName()
+	 */
 	public String toString(){
-	    String infoString = name;
-	    return infoString;
+	    return getName();
 	}	
 	
 	public static void setValueFunction(boolean isContinuous){
 		// if it is continuous, set default
 	}
-
-	public int getType(){
-		return domain_type;
-	}
 	
 	public String getWeight(){
-		return weight;
+	    if (data != null && !data.isAbstract() && decimalFormat != null)
+            return decimalFormat.format(data.getWeight());
+	    else 
+	        return weight;
 	}
 	
+	public double getWeightNumeric() {
+       if (data != null)
+           return data.getWeight();
+       else
+           return Double.parseDouble(weight);
+	}
+	
+	/**
+	 * sets weight string label only, does not update underlying
+	 * AttributeData weight, if it is not null
+	 * IMPORTANT: make sure to modify underlying AttributeData if required
+	 * @param wt
+	 */
 	public void setWeight(String wt){
 		weight = wt;
 	}
 	
 	public AttributeDomain getDomain(){
-		return domain;
+	    if (data != null && !data.isAbstract())
+	        return data.getPrimitive().getDomain();
+	    else 
+	        return domain;
 	}
 	
-	void updateDetails(int dt, String nm, String un){
+	void updateDetails(AttributeDomainType dt, String nm, String un){
 		domain_type = dt;		
 		name = nm;
 		unit = un;
-		setText(name);
-		if (domain_type == CONTINUOUS)
+		setText(getName());
+		if (domain_type == AttributeDomainType.CONTINUOUS)
 			setContinuous();
 		else
 			setDiscrete();		
 	}
 	 
-	void setType(int type){
+	void setDomainType(AttributeDomainType type){
 		domain_type = type;
 	}
 	
@@ -172,7 +229,7 @@ public class JObjective extends JLabel{
 		//seting domain as would in setCDomain
     	domain = null;		
     	Vector knots = new Vector();
-		domain_type = CONTINUOUS;		
+		domain_type = AttributeDomainType.CONTINUOUS;		
 
 		knots.add(Double.valueOf(minC));
 		knots.add(Double.valueOf(peak));
@@ -185,7 +242,7 @@ public class JObjective extends JLabel{
     	domain = null;		
 		Vector values = v;
 		Vector knots = new Vector();
-		domain_type = CONTINUOUS;		
+		domain_type = AttributeDomainType.CONTINUOUS;		
 		for (int i=0; i<num_points; i++){
 			Double knt = new Double(minC+((maxC-minC)/(num_points-1)*(i)));
 			knots.add(knt);
@@ -197,7 +254,7 @@ public class JObjective extends JLabel{
 		Vector values = new Vector();	//reset value vector	
 		Vector elements = new Vector();	
     	domain = null;		
-		domain_type = DISCRETE;
+		domain_type = AttributeDomainType.DISCRETE;
 		domain = AttributeDomain.getInfo(elements, values, domain_type);			
 	}
 	
@@ -206,7 +263,7 @@ public class JObjective extends JLabel{
 		Vector values = new Vector();	//reset value vector	
 		Vector elements = new Vector();	
     	domain = null;		
-		domain_type = DISCRETE;
+		domain_type = AttributeDomainType.DISCRETE;
 		elements = v;
 		for (int i=0; i<elements.size(); i++){			
 			values.add(Double.valueOf(0.5));
@@ -219,14 +276,14 @@ public class JObjective extends JLabel{
     	DefineValueFunction dvf = d;
     	JPanel pnl = new JPanel();
     	pnl.setLayout(new FlowLayout());
-        if (domain_type == DISCRETE) {
-        	DiscreteAttributeDomain dd = (DiscreteAttributeDomain)domain;
-        	DiscreteUtilityGraph dug = new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), name, dvf, acell);
+        if (getDomainType() == AttributeDomainType.DISCRETE) {
+        	DiscreteAttributeDomain dd = (DiscreteAttributeDomain)getDomain();
+        	DiscreteUtilityGraph dug = new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), getName(), dvf, acell);
             pnl.add(dug);        	
         }
         else {
-        	ContinuousAttributeDomain cd = (ContinuousAttributeDomain)domain;
-            ContinuousUtilityGraph cug = new ContinuousUtilityGraph(chart, cd, cd.getKnots(), cd.getWeights(), unit, name, dvf, acell);
+        	ContinuousAttributeDomain cd = (ContinuousAttributeDomain)getDomain();
+            ContinuousUtilityGraph cug = new ContinuousUtilityGraph(chart, cd, cd.getKnots(), cd.getWeights(), getUnit(), getName(), dvf, acell);
             pnl.add(cug);            
         }
         return pnl;	
@@ -238,6 +295,15 @@ public class JObjective extends JLabel{
     
     public void setDecimalFormat(String df){
     	decimalFormat = new DecimalFormat(df);
+    }
+    
+    
+    public AttributeData getData() {
+        return data;
+    }
+
+    public void setData(AttributeData data) {
+        this.data = data;
     }
 }
 

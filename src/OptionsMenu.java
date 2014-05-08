@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
@@ -433,9 +432,9 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 	}
 	
 	void changeHeaders(TablePane pane){
-		Iterator it;    	
+		Iterator<BaseTableContainer> it;    	
 		for (it = pane.getRows(); it.hasNext();){
-			BaseTableContainer btc = (BaseTableContainer)(it.next());
+			BaseTableContainer btc = it.next();
 			btc.updateHeader();
 			if (btc.table instanceof TablePane) 
 				changeHeaders((TablePane)btc.table); 

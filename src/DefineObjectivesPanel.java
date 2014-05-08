@@ -140,7 +140,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		if (type!=FROM_DATAFILE){
 			listed_objs = new Vector<JObjective>();
 			JObjective name_obj = new JObjective("name");
-			name_obj.setType(JObjective.DISCRETE);
+			name_obj.setDomainType(AttributeDomainType.DISCRETE);
 			listed_objs.add(name_obj);
 		}		
 	}		
@@ -366,7 +366,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		for (Iterator<JObjective> it = prim_obj.iterator(); it.hasNext();){
 			JObjective obj = it.next();
 			if (!obj.getWeight().equals("*"))
-				weights += Double.valueOf(obj.getWeight()).doubleValue();			
+				weights += obj.getWeightNumeric();			
 		}
 		pnlCon.getAltPanel().checkAlternativeCount();
 		if (weights <= 0.98 || weights >= 1.02){
@@ -389,19 +389,19 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 			str = str + obj.toString() + " " + obj.getWeight() + " { ";			
 			//double vals[] = new double[obj.num_points];
 			//Vector vals = obj.domain.getWeights();
-			double vals[] = obj.domain.getWeights();
-			for (int i=0; i<obj.domain.getWeights().length; i++){
-				if (obj.getType() == 1){									
-					String elts[] = obj.domain.getElements();
+			double vals[] = obj.getDomain().getWeights();
+			for (int i=0; i<vals.length; i++){
+				if (obj.getDomainType() == AttributeDomainType.DISCRETE){									
+					String elts[] = obj.getDomain().getElements();
 					str = str + "\"" + elts[i] + "\" "; 
 				}
 				else{
-					double kts[] = obj.domain.getKnots();
+					double kts[] = obj.getDomain().getKnots();
 					str = str + kts[i] + " ";
 			
 				}
 				str = str + vals[i];
-				if (i != (obj.domain.getWeights().length-1))
+				if (i != (vals.length-1))
 					str =str + ",";
 				str = str + " ";
 					
@@ -415,7 +415,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 				//str = str + "color=" + colors.getColorName(colorcount);			
 			//colorcount++;
 			
-			if ((obj.getType()==2)&&(obj.getUnit()!="")){
+			if ((obj.getDomainType()==AttributeDomainType.CONTINUOUS)&&(obj.getUnit()!="")){
 				str = str + " units=" + obj.getUnit();				
 			}
 			str = str + " end\n";

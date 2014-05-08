@@ -166,10 +166,10 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			//set combobox if discrete
 			TableColumn col = table.getColumnModel().getColumn(i+1);
 			JObjective obj = (JObjective)objs.get(i);
-			if (obj.getType() == JObjective.DISCRETE){
+			if (obj.getDomainType() == AttributeDomainType.DISCRETE){
 				JComboBox cboCell;
-				if (obj.domain.getElements() != null)
-					cboCell = new JComboBox(obj.domain.getElements());
+				if (obj.getDomain().getElements() != null)
+					cboCell = new JComboBox(obj.getDomain().getElements());
 				else
 					cboCell = new JComboBox();
 				col.setCellEditor(new DefaultCellEditor(cboCell));
@@ -257,7 +257,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        data.addElement(new_name);	 
 	        for (int i=0; i<objs.size(); i++){
 	        		JObjective obj = (JObjective)objs.get(i);
-	        		if (obj.getType()==JObjective.DISCRETE){
+	        		if (obj.getDomainType()==AttributeDomainType.DISCRETE){
 	        			data.addElement("");
 	        		}
 	        		else
@@ -274,7 +274,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        for (int i=0; i<all_objs.size(); i++){
         		JObjective obj = (JObjective)all_objs.get(i);
         		if (!obj.getName().equals("name")){
-	        		if (obj.getType()==JObjective.DISCRETE){
+	        		if (obj.getDomainType()==AttributeDomainType.DISCRETE){
 	        			datamap.put(obj.getName(), "");
 	        		}
 	        		else
@@ -298,7 +298,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     	for(int i=0; i< all_objs.size(); i++){
     		JObjective obj = (JObjective)all_objs.get(i);
     		//create a vector with unique discrete values
-    		if (obj.domain_type==(JObjective.DISCRETE)){
+    		if (obj.getDomainType()==(AttributeDomainType.DISCRETE)){
     			//-->if (from_const){
 	    			v = new Vector();
 		    		for (int j=0; j<alts.size(); j++){
@@ -353,7 +353,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     				for (int k=0; k<objs.size(); k++){
     					JObjective obj = (JObjective)objs.get(k);
     					if ((obj.getName()).equals(columns.get(j).toString()))
-    						if (obj.getType() == JObjective.DISCRETE)
+    						if (obj.getDomainType() == AttributeDomainType.DISCRETE)
     							str = str + "\"" + hm.get(columns.get(j).toString()) + "\"" + "\n";
     						else 
     							str = str + hm.get(columns.get(j).toString()) + "\n";
@@ -471,8 +471,8 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		
 		        		//2. discrete items
 		        		//a) check if in list
-		        		if (obj!=null && obj.domain_type==JObjective.DISCRETE){
-		        			String elts[] = obj.domain.getElements();
+		        		if (obj!=null && obj.getDomainType()==AttributeDomainType.DISCRETE){
+		        			String elts[] = obj.getDomain().getElements();
 		        			try{
 			        			for (int i=0; i<elts.length; i++){
 			        				if (entered.equals(elts[i])){ 
@@ -489,7 +489,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                                JOptionPane.YES_NO_CANCEL_OPTION);
 		                        //c)add the new discrete value 
 		                        if (n == JOptionPane.YES_OPTION) {
-		                        	DiscreteAttributeDomain dom = (DiscreteAttributeDomain)obj.domain;
+		                        	DiscreteAttributeDomain dom = (DiscreteAttributeDomain)obj.getDomain();
 		                        	dom.addElement(entered, 0.5); 		                        	
 		                        	updateTable(); //d. update for new combobox item
 		                        }

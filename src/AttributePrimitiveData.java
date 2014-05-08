@@ -84,7 +84,7 @@ public class AttributePrimitiveData implements AttributeData {
         AttributeDomain d = getDomain();
         double vals[] = d.getWeights();
         for (int i = 0; i < vals.length; i++) {
-            if (d.getType() == AttributeDomain.DISCRETE) {
+            if (d.getType() == AttributeDomainType.DISCRETE) {
                 String elts[] = d.getElements();
                 str = str + "\"" + elts[i] + "\" ";
             } else {
@@ -103,7 +103,7 @@ public class AttributePrimitiveData implements AttributeData {
 
         str = str + "color=" + getName();
 
-        if ((d.getType() == AttributeDomain.CONTINUOUS)
+        if ((d.getType() == AttributeDomainType.CONTINUOUS)
                 && (getUnitsName() != "")) {
             str = str + " units=" + getUnitsName();
         }

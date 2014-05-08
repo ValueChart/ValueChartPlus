@@ -91,7 +91,7 @@ public class ObjectiveDetails extends JPanel implements ActionListener{
     }
     public void updateFields(JObjective obj){
     	objective = obj;
-        if (objective.getType()==2){
+        if (objective.getDomainType()==AttributeDomainType.CONTINUOUS){
         	optCont.setSelected(true);
         	txtUnit.setEnabled(true);
         	lblUnit.setForeground(Color.BLACK);
@@ -107,11 +107,11 @@ public class ObjectiveDetails extends JPanel implements ActionListener{
     
     public void actionPerformed(ActionEvent e) {
     	if ("btnOK".equals(e.getActionCommand())) {
-    		int type;
+    	    AttributeDomainType type;
     		if (optCont.isSelected())
-    			type = 2;
+    			type = AttributeDomainType.CONTINUOUS;
     		else
-    			type = 1;    		
+    			type = AttributeDomainType.DISCRETE;    		
     		String name = objective.getName();
     		objective.updateDetails(type, txtName.getText(), txtUnit.getText());
     		con.getAltPanel().updateObjDetails(objective, name);    		
