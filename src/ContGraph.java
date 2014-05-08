@@ -207,7 +207,9 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
     }
   
     class MoveablePoint extends Point2D.Float {
-    	int r = getHeight() > MIN_HEIGHT ? 3 : 1;
+        private static final long serialVersionUID = 1L;
+        
+        int r = getHeight() > MIN_HEIGHT ? 3 : 1;
         Shape shape;
         public MoveablePoint(int x, int y) {
             super(x, y);

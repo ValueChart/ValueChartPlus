@@ -264,7 +264,15 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 			}			
 
 			//set up table model and component
-			tabModelWiz = new DefaultTableModel();
+			tabModelWiz = new DefaultTableModel() {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }
+			};
 			tabModelWiz.setDataVector(wizRows, wizCols);		
 			tableWiz = new JTable(tabModelWiz);        
 	        tableWiz.setPreferredScrollableViewportSize(new Dimension(350, Math.min(wizRows.size() * 16, 150)));

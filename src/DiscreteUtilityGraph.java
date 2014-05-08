@@ -351,6 +351,8 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     
     
     class MoveablePoint extends Point2D.Float {
+        private static final long serialVersionUID = 1L;
+        
         int r = 4;
         Shape shape;
         public MoveablePoint(int x, int y) {
