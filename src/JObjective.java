@@ -38,7 +38,10 @@ public class JObjective extends JLabel{
 	private AttributeDomain domain;	
 	private AttributeDomainType domain_type;
 	private String unit;
-	/**
+	private double tempWeight; // hold temporary changes
+	private boolean tempModified = false;
+
+    /**
 	 * If JObjective is associated with some data (ie. not just generated for display)
 	 * then data should be instantiated
 	 */
@@ -145,15 +148,24 @@ public class JObjective extends JLabel{
 	}
 	
 	public String getWeight(){
-	    if (data != null && !data.isAbstract() && decimalFormat != null)
-            return decimalFormat.format(data.getWeight());
+	    if (data != null && !data.isAbstract() && decimalFormat != null) {
+	        if (tempModified)
+	            return decimalFormat.format(tempWeight);
+	        else
+	            return decimalFormat.format(data.getWeight());
+	    }
 	    else 
 	        return weight;
 	}
 	
 	public double getWeightNumeric() {
        if (data != null)
-           return data.getWeight();
+       {
+           if (tempModified)
+               return tempWeight;
+           else
+               return data.getWeight();
+       }
        else
            return Double.parseDouble(weight);
 	}
@@ -304,6 +316,23 @@ public class JObjective extends JLabel{
 
     public void setData(AttributeData data) {
         this.data = data;
+    }
+    
+    public double getTempWeight() {
+        return tempWeight;
+    }
+
+    public void setTempWeight(double tempWeight) {
+        this.tempWeight = tempWeight;
+        tempModified = true;
+    }
+    
+    public boolean getTempModified() {
+        return tempModified;
+    }
+    
+    public void resetTempModified() {
+        tempModified = false;
     }
 }
 

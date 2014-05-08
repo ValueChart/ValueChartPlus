@@ -154,7 +154,7 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 			 	entry.add(String.valueOf(obj.decimalFormat.format(equalWeight)));
 			 	obj.setWeight(String.valueOf(obj.decimalFormat.format(equalWeight)));
 			 	if (obj.getData() != null && !obj.getData().isAbstract()){
-			 	    obj.getData().getPrimitive().setWeight(equalWeight);
+			 	    obj.setTempWeight(equalWeight);
                 }
 			 }
 			 else
@@ -162,7 +162,7 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 			 		entry.add(String.valueOf("0.00"));
 			 		obj.setWeight("0.00");
 			 		if (obj.getData() != null && !obj.getData().isAbstract()){
-			 		    obj.getData().getPrimitive().setWeight(0);
+			 		    obj.setTempWeight(0);
 	                }
 			 	}
 			 	else
@@ -200,7 +200,7 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 			JObjective obj = (JObjective)obj_map.get(v.get(0));
 			obj.setWeight(String.valueOf(df.format(w)));
 			if (obj.getData() != null && !obj.getData().isAbstract()){
-			    obj.getData().getPrimitive().setWeight(w);
+			    obj.setTempWeight(w);
 			}
 			
 			con.btnOK.setEnabled(true);
@@ -426,7 +426,7 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 				JObjective obj = (JObjective)obj_map.get(v.get(0));
 				obj.setWeight(df.format(weights.get(i)));
 				if (obj.getData() != null && !obj.getData().isAbstract()){
-                    obj.getData().getPrimitive().setWeight(weights.get(i));
+                    obj.setTempWeight(weights.get(i));
                 }
 			}
 			con.btnOK.setEnabled(true);
@@ -441,4 +441,15 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 		}
 	}
 	
+	   
+    ///////////////////////// update data
+    public void updateDataValues() {
+        for (JObjective obj : objs){   
+            if (obj.getData() != null && !obj.getData().isAbstract() && obj.getTempModified())
+            {
+                obj.getData().getPrimitive().setWeight(obj.getTempWeight());
+                obj.resetTempModified();
+            }
+        }
+    }
 }

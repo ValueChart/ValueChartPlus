@@ -158,6 +158,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                 chart.newConst();
             }
         else if ("btnOK".equals(e.getActionCommand())) {
+            pnlWeighting.updateDataValues();
             frame.setVisible(false);
             createDataFile("test.vc");
             if (pnlAlternatives.alts.size() > 10)
