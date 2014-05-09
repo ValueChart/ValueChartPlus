@@ -424,7 +424,7 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 	                    JOptionPane.YES_NO_OPTION);	        			     	    		        
 	    	}
 	    	if (ans == JOptionPane.YES_OPTION){
-		        chart.con.createDataFile(filename);
+		        chart.con.createDataFile(filename, true);
 		        }
 	    	else 
 	    		saveFile();

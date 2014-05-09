@@ -89,11 +89,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		
 		for (int i=0; i<objs.size(); i++){
 		    JObjective obj = objs.get(i);
-		    JObjective lblObj;
-		    if (obj.getData() != null)
-		        lblObj = new JObjective(obj.getData());
-		    else
-		        lblObj = new JObjective(obj.toString());
+		    JObjective lblObj = new JObjective(obj.toString());
 			lblObj.setPreferredSize(new Dimension(75, getHeight()/objs.size()));			
 			lblObj.setMaximumSize(new Dimension(75, getHeight()/objs.size()));
 			lblObj.setAlignmentY(TOP_ALIGNMENT); 

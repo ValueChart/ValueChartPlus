@@ -38,14 +38,6 @@ public class JObjective extends JLabel{
 	private AttributeDomain domain;	
 	private AttributeDomainType domain_type;
 	private String unit;
-	private double tempWeight; // hold temporary changes
-	private boolean tempModified = false;
-
-    /**
-	 * If JObjective is associated with some data (ie. not just generated for display)
-	 * then data should be instantiated
-	 */
-	private AttributeData data = null;
 
 	int origin;        
     boolean init;			//for new objectives, shows whether first value function is created
@@ -60,15 +52,6 @@ public class JObjective extends JLabel{
 		name = str;
 		constructDefault();
 	}
-    
-    /**
-     * Construct based on information from data
-     * @param d associated data handle
-     */
-    public JObjective(AttributeData d){
-        data = d;
-        constructDefault();
-    }
     
     private void constructDefault() {
         setFont(new Font("Arial", Font.PLAIN, 11));
@@ -108,10 +91,7 @@ public class JObjective extends JLabel{
 	 * returns UI name otherwise
 	 */
 	public String getName(){
-	    if (data != null)
-            return data.getName();
-	    else
-	        return name;
+	    return name;
 	}
 	
 	/**
@@ -123,17 +103,11 @@ public class JObjective extends JLabel{
 	}
 	
 	public AttributeDomainType getDomainType(){
-	    if (data != null && !data.isAbstract())
-	        return data.getPrimitive().getDomain().getType();
-	    else
-	        return domain_type;
+	    return domain_type;
 	}
 	
 	public String getUnit(){
-	    if (data != null && !data.isAbstract())
-	        return data.getPrimitive().getUnitsName();
-	    else 
-	        return unit;
+	    return unit;
 	}
 	
 	/**
@@ -148,26 +122,11 @@ public class JObjective extends JLabel{
 	}
 	
 	public String getWeight(){
-	    if (data != null && !data.isAbstract() && decimalFormat != null) {
-	        if (tempModified)
-	            return decimalFormat.format(tempWeight);
-	        else
-	            return decimalFormat.format(data.getWeight());
-	    }
-	    else 
-	        return weight;
+	    return weight;
 	}
 	
 	public double getWeightNumeric() {
-       if (data != null)
-       {
-           if (tempModified)
-               return tempWeight;
-           else
-               return data.getWeight();
-       }
-       else
-           return Double.parseDouble(weight);
+       return Double.parseDouble(weight);
 	}
 	
 	/**
@@ -181,10 +140,7 @@ public class JObjective extends JLabel{
 	}
 	
 	public AttributeDomain getDomain(){
-	    if (data != null && !data.isAbstract())
-	        return data.getPrimitive().getDomain();
-	    else 
-	        return domain;
+	    return domain;
 	}
 	
 	void updateDetails(AttributeDomainType dt, String nm, String un){
@@ -307,32 +263,6 @@ public class JObjective extends JLabel{
     
     public void setDecimalFormat(String df){
     	decimalFormat = new DecimalFormat(df);
-    }
-    
-    
-    public AttributeData getData() {
-        return data;
-    }
-
-    public void setData(AttributeData data) {
-        this.data = data;
-    }
-    
-    public double getTempWeight() {
-        return tempWeight;
-    }
-
-    public void setTempWeight(double tempWeight) {
-        this.tempWeight = tempWeight;
-        tempModified = true;
-    }
-    
-    public boolean getTempModified() {
-        return tempModified;
-    }
-    
-    public void resetTempModified() {
-        tempModified = false;
     }
 }
 

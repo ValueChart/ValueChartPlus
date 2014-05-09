@@ -153,17 +153,11 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 			 if (allequal){
 			 	entry.add(String.valueOf(obj.decimalFormat.format(equalWeight)));
 			 	obj.setWeight(String.valueOf(obj.decimalFormat.format(equalWeight)));
-			 	if (obj.getData() != null && !obj.getData().isAbstract()){
-			 	    obj.setTempWeight(equalWeight);
-                }
 			 }
 			 else
 			 	if(obj.getWeight().equals("*")){
 			 		entry.add(String.valueOf("0.00"));
 			 		obj.setWeight("0.00");
-			 		if (obj.getData() != null && !obj.getData().isAbstract()){
-			 		    obj.setTempWeight(0);
-	                }
 			 	}
 			 	else
 			 		entry.add(df.format(obj.getWeightNumeric()));
@@ -199,9 +193,6 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 			//update objective weight
 			JObjective obj = (JObjective)obj_map.get(v.get(0));
 			obj.setWeight(String.valueOf(df.format(w)));
-			if (obj.getData() != null && !obj.getData().isAbstract()){
-			    obj.setTempWeight(w);
-			}
 			
 			con.btnOK.setEnabled(true);
 			con.repaint();
@@ -425,9 +416,6 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 				//update objective weight
 				JObjective obj = (JObjective)obj_map.get(v.get(0));
 				obj.setWeight(df.format(weights.get(i)));
-				if (obj.getData() != null && !obj.getData().isAbstract()){
-                    obj.setTempWeight(weights.get(i));
-                }
 			}
 			con.btnOK.setEnabled(true);
 		}
@@ -441,15 +429,4 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 		}
 	}
 	
-	   
-    ///////////////////////// update data
-    public void updateDataValues() {
-        for (JObjective obj : objs){   
-            if (obj.getData() != null && !obj.getData().isAbstract() && obj.getTempModified())
-            {
-                obj.getData().getPrimitive().setWeight(obj.getTempWeight());
-                obj.resetTempModified();
-            }
-        }
-    }
 }

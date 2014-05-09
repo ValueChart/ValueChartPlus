@@ -247,6 +247,8 @@ public class ValueChart extends JPanel {
                     obj.setDomain(ac.getDomain());
                     obj.setUnit(ac.getUnits());
                     double pc = btc.getOverallRatio();
+                    AttributeData data = btc.getData();
+                    if (data != null && !data.isAbstract()) pc = data.getWeight();
                     obj.setWeight(String.valueOf(pc));
                     //connect ac and obj
                     ac.obj = obj;
@@ -278,9 +280,6 @@ public class ValueChart extends JPanel {
             if (str.equals("root")) {
                 con.getObjPanel().lblRoot.setName(btc.getName());
             } else {
-                if (btc.getData() != null)
-                    obj = new JObjective(btc.getData());
-                else
                     obj = new JObjective(btc.getName());
                 con.getObjPanel().addFromVC(str, obj);
                 objs.add(obj);

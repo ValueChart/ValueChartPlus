@@ -158,9 +158,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                 chart.newConst();
             }
         else if ("btnOK".equals(e.getActionCommand())) {
-            pnlWeighting.updateDataValues();
             frame.setVisible(false);
-            createDataFile("test.vc");
+            createDataFile("test.vc", false);
             if (pnlAlternatives.alts.size() > 10)
                 display_type = SIDE_DISPLAY;
             showChart(true);
@@ -217,7 +216,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         init = i;
     }
 
-    public void createDataFile(String fname) {
+    public void createDataFile(String fname, boolean save) {
         data = ""; // initialize new data string
         colors = new ColorList();
         int countblank = 0;
@@ -247,10 +246,13 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         }
 
         data = data + "\n\nattributes\n";
-        // data = data + pnlObjectives.getObjectiveOutput(colors);
-        if (chart != null) {
-            for (AttributeData a : chart.attrData) {
-                data = data + a.getObjectiveOutput(colors, 0);
+        if (!save) {
+            data = data + pnlObjectives.getObjectiveOutput(colors);
+        } else {
+            if (chart != null) {
+                for (AttributeData a : chart.attrData) {
+                    data = data + a.getObjectiveOutput(colors, 0);
+                }
             }
         }
         data = data + "end\n";
