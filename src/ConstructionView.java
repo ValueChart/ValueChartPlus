@@ -163,6 +163,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             if (pnlAlternatives.alts.size() > 10)
                 display_type = SIDE_DISPLAY;
             showChart(true);
+            chart.logConstruction();
         }
     }
 
@@ -170,7 +171,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         if (fromCon)
             if (chart != null)
                 chart.closeChart();
-        chart = new ValueChart(this, filename, ValueChart.DEFAULT_DISPLAY,
+        LogUserAction log = null;
+        if (chart != null) log = chart.getLog();
+        chart = new ValueChart(this, filename, log, ValueChart.DEFAULT_DISPLAY,
                 ValueChart.DEFAULT_COL_WIDTH, true, true); // TODO
         chart.newConst();
     }
@@ -250,9 +253,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             data = data + pnlObjectives.getObjectiveOutput(colors);
         } else {
             if (chart != null) {
-                for (AttributeData a : chart.attrData) {
-                    data = data + a.getObjectiveOutput(colors, 0);
-                }
+                data = data + chart.outputAttributes(colors);
             }
         }
         data = data + "end\n";

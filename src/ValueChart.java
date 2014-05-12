@@ -62,7 +62,8 @@ public class ValueChart extends JPanel {
     LastInteraction last_int;
     LastInteraction next_int;
     Vector<AttributeData> attrData;
-    
+    LogUserAction log;
+
     //***Added so that there is one frame that allows display of pdf reports from value chart. This window is not used for each of the attribute/entry reports.
     //Those are contained within the AttributeCell class. Rather, this is for anywhere else on the interface (it started with a need to have one report window to display the report for the criteria details)
     SwingController controller; //Used for each window that controls a pdf document
@@ -73,25 +74,25 @@ public class ValueChart extends JPanel {
     OutlineItem item = null; //The items in the bookmark
 
 //CONSTRUCTOR
-    public ValueChart(ConstructionView c, String file, int type, int colwd, boolean b, boolean g) {
+    public ValueChart(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g) {
         super();
-        constructFromFile(c, file, type, colwd, b, g);
+        constructFromFile(c, file, l, type, colwd, b, g);
     }
 
-    public ValueChart(ConstructionView c, String file,
+    public ValueChart(ConstructionView c, String file, LogUserAction l,
             Vector<AttributeData> data, Vector entry, int type, int colwd,
             boolean b, boolean g) {
         super();
         if (data == null || entry == null)
-            constructFromFile(c, file, type, colwd, b, g);
+            constructFromFile(c, file, l, type, colwd, b, g);
         else {
             filename = file;
-            constructFromAttribute(c, data, entry, type, colwd, b, g);
+            constructFromAttribute(c, data, entry, l, type, colwd, b, g);
         }
     }
     
     
-    private void constructFromFile(ConstructionView c, String file, int type, int colwd, boolean b, boolean g) {
+    private void constructFromFile(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g) {
         show_graph = g;
         con = c;
         isNew = b;
@@ -126,7 +127,14 @@ public class ValueChart extends JPanel {
         }
 
         showVC();
+        if (l != null) {
+            log = l;
+        } else {
+            log = new LogUserAction(getChartTitle());
+            log.setVerbosity(LogUserAction.LOG_ALL);
+        }
         if (isNew) {
+            menuOptions.setSelectedItems();
             chartFrame.setJMenuBar(menuOptions);
         }
         setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
@@ -136,7 +144,7 @@ public class ValueChart extends JPanel {
     }
     
     
-    private void constructFromAttribute(ConstructionView c, Vector<AttributeData> data, Vector entry, int type, int colwd, boolean b, boolean g) {
+    private void constructFromAttribute(ConstructionView c, Vector<AttributeData> data, Vector entry, LogUserAction l, int type, int colwd, boolean b, boolean g) {
         show_graph = g;
         con = c;
         isNew = b;
@@ -168,7 +176,14 @@ public class ValueChart extends JPanel {
         setVisible(true);
 
         showVC();
+        if (l != null) {
+            log = l;
+        } else {
+            log = new LogUserAction(getChartTitle());
+            log.setVerbosity(LogUserAction.LOG_ALL);
+        }
         if (isNew) {
+            menuOptions.setSelectedItems();
             chartFrame.setJMenuBar(menuOptions);
         }
         setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
@@ -346,9 +361,6 @@ public class ValueChart extends JPanel {
         }
         mainPane.getRowAt(0).setAbstractRatios();
         setConnectingFields();
-        if (isNew) {
-            menuOptions.setSelectedItems();
-        }
     }
     
     private void readFromAttribute() {
@@ -372,9 +384,6 @@ public class ValueChart extends JPanel {
         }
         mainPane.getRowAt(0).setAbstractRatios();
         setConnectingFields();
-        if (isNew) {
-            menuOptions.setSelectedItems();
-        }
     }
 
     public void newConst() {
@@ -719,6 +728,7 @@ public class ValueChart extends JPanel {
 //BOOLS
     public void showEditView(int idx) {
         setConnectingFields();
+        log.setOldAttrData(log.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
         con.constPane.setSelectedIndex(idx);
         con.frame.setVisible(true);
     }
@@ -881,7 +891,7 @@ public class ValueChart extends JPanel {
     }
 
     public void resetDisplay(int type, int colwd, boolean close, boolean graph) {
-        ValueChart ch = new ValueChart(con, filename, attrData, entryList, type, colwd, true, graph);
+        ValueChart ch = new ValueChart(con, filename, log, attrData, entryList, type, colwd, true, graph);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -899,7 +909,7 @@ public class ValueChart extends JPanel {
     }
 
     public void compareDisplay(int type, int colwd) {
-        ValueChart ch = new ValueChart(con, filename, type, colwd, false, show_graph); // TODO
+        ValueChart ch = new ValueChart(con, filename, log, type, colwd, false, show_graph); // TODO
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -1117,7 +1127,7 @@ public class ValueChart extends JPanel {
             AttributePrimitiveData prim = a.getPrimitive();
             AttributeDomain domain = prim.getDomain();
 
-            AttributeCell cell = new AttributeCell(this, domain);
+            AttributeCell cell = new AttributeCell(this, prim);
             cell.setColWidth(colWidth);
             cell.setColor(prim.getColor());
             cell.setUnits(prim.getUnitsName());
@@ -1289,5 +1299,70 @@ public class ValueChart extends JPanel {
             }
         }
 
+    }
+    
+
+    
+    public boolean logAttribute(int outputType, String msg) {
+        if (outputType == LogUserAction.OUTPUT_WEIGHT) {
+            return log.logAttributeWeight(attrData, msg);
+        }
+        else if (outputType == LogUserAction.OUTPUT_STATE) {
+            return log.logAttributeState(attrData, msg);
+        }
+
+        return false;
+    }
+    
+    public boolean logState() {
+        int temp = log.getVerbosity();
+        log.setVerbosity(LogUserAction.LOG_ALL);
+        boolean res = log.logAttributeState(attrData, "");
+        log.setVerbosity(temp);
+        return res;
+    }
+    
+    public boolean logConstruction() {
+        return log.logConstruction(attrData);
+    }
+    
+    public boolean logUtility(AttributeData data) {
+        return log.logUtility(data);
+    }
+    
+    public boolean logPump(String pumpAttr, boolean isInc) {
+        return log.logPump(attrData, pumpAttr, isInc);
+    }
+    
+    public boolean logDrag(AttributeData attr1, AttributeData attr2) {
+        return log.logDrag(attr1, attr2);
+    }
+    
+    public String outputAttributes(ColorList colors) {
+        String data = "";
+        for (AttributeData a : attrData) {
+            data = data + a.getObjectiveOutput(colors, 0);
+        }
+        return data;
+    }
+    
+    public boolean logString(String str, String msg) {
+        return log.log(str, msg);
+    }
+    
+    public void setLogOldAttributeData(String str) {
+        log.setOldAttrData(str);
+    }
+    
+    public void setLogVerbosity(int v) {
+        log.setVerbosity(v);
+    }
+
+    public LogUserAction getLog() {
+        return log;
+    }
+
+    public void setLog(LogUserAction log) {
+        this.log = log;
     }
 }

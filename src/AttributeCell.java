@@ -27,7 +27,7 @@ public class AttributeCell extends JComponent {
     private ValueChart chart;
     private String units;
     private double threshold;
-    AttributeDomain domain;
+    private AttributePrimitiveData data;
     JPopupMenu domainPopup;
     JPopupMenu entryPopup;
     JMenuItem entryPopupMenuItem;
@@ -40,13 +40,13 @@ public class AttributeCell extends JComponent {
     JFrame[] window; //the windows created for the attribute, these are used to show the report. They are class variables because we need to toggle visibility from different methods
     JPanel[] viewerComponentPanel; //the panel for which the fram sits on;
 
-    public AttributeCell(ValueChart chart, AttributeDomain domain) {
+    public AttributeCell(ValueChart chart, AttributePrimitiveData data) {
         MouseHandler mouseHandler = new MouseHandler();
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         //addComponentListener(new ResizeHandler());
         this.chart = chart;
-        this.domain = domain;
+        this.data = data;
     }
 
     //temp
@@ -54,8 +54,8 @@ public class AttributeCell extends JComponent {
         return attributeName;
     }
 
-    public void setDomain(AttributeDomain ad) {
-        domain = ad;
+    public void setData(AttributePrimitiveData d) {
+        data = d;
     }
 
     public double getOverallRatio() { // return overallRatio;
@@ -127,14 +127,14 @@ public class AttributeCell extends JComponent {
 
     public JPopupMenu getDomainPopup() {
         if (domainPopup == null) {
-            makeHelpPopups(domain);
+            makeHelpPopups(getDomain());
         }
         return domainPopup;
     }
 
     public JPopupMenu getEntryPopup() {
         if (entryPopup == null) {
-            makeHelpPopups(domain);
+            makeHelpPopups(getDomain());
         }
         return entryPopup;
     }
@@ -242,7 +242,11 @@ public class AttributeCell extends JComponent {
     }
 
     AttributeDomain getDomain() {
-        return domain;
+        return data.getDomain();
+    }
+
+    public AttributePrimitiveData getData() {
+        return data;
     }
 
     public int getColWidth() {

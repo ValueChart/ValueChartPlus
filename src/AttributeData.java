@@ -16,4 +16,7 @@ public interface AttributeData {
 
     public String getObjectiveOutput(ColorList color, int level);
 
+    public String getOutputLogXML(boolean isRoot);
+    
+    public String getOutputWeightXML(boolean isRoot);
 }

@@ -92,9 +92,9 @@ public class BaseTableContainer extends Box implements ActionListener {
                 AttributeCell ac = (AttributeCell) table;
                 JPanel graph = null;
                 if (ac.getDomain().getType() == AttributeDomainType.DISCRETE) {
-                    graph = ac.makeDiscGraph(ac.domain);
+                    graph = ac.makeDiscGraph(ac.getDomain());
                 } else {
-                    graph = ac.makeContGraph(ac.domain);
+                    graph = ac.makeContGraph(ac.getDomain());
                 }
                 add(graph);
 
@@ -816,6 +816,15 @@ public class BaseTableContainer extends Box implements ActionListener {
                     bNei = tNei.getRowAt(0);
                 }
             }
+            
+            String str = "";
+            if (bSel.getData() != null) {
+                str = LogUserAction.getSingleDataOutput(bSel.getData(), LogUserAction.OUTPUT_WEIGHT);
+            }
+            if (bNei.getData() != null) {
+                str += LogUserAction.getSingleDataOutput(bNei.getData(), LogUserAction.OUTPUT_WEIGHT);
+            }
+            chart.setLogOldAttributeData(str);
         }
 
         void setEastRollup(BaseTableContainer b) {
@@ -841,6 +850,15 @@ public class BaseTableContainer extends Box implements ActionListener {
                     bNei = tNei.getRowLast();
                 }
             }
+            
+            String str = "";
+            if (bSel.getData() != null) {
+                str = LogUserAction.getSingleDataOutput(bSel.getData(), LogUserAction.OUTPUT_WEIGHT);
+            }
+            if (bNei.getData() != null) {
+                str += LogUserAction.getSingleDataOutput(bNei.getData(), LogUserAction.OUTPUT_WEIGHT);
+            }
+            chart.setLogOldAttributeData(str);
         }
 
         void upSize(BaseTableContainer b) {
@@ -861,6 +879,7 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
 
         public void pump(BaseTableContainer base, boolean up) {
+            chart.setLogOldAttributeData(LogUserAction.getDataOutput(chart.attrData, LogUserAction.OUTPUT_WEIGHT));
             Vector prims = chart.getPrims();
             double othercount = -1;
             for (Iterator it = prims.iterator(); it.hasNext();) {
@@ -896,6 +915,7 @@ public class BaseTableContainer extends Box implements ActionListener {
             }
             chart.updateMainPane();
             realignAll(chart.mainPane);
+            chart.logPump(base.data.getName(), up);
         }
         //-double-click for sorting by objective: call to reorder	
 
@@ -941,7 +961,7 @@ public class BaseTableContainer extends Box implements ActionListener {
             			chart.reorderEntries(BaseTableContainer.this);
             		}
             		else if (e.getComponent().toString().startsWith("DiscGraph") || e.getComponent().toString().startsWith("ContGraph")) {
-                        ((AttributeCell) table).getUtility(((AttributeCell) table).domain);
+                        ((AttributeCell) table).getUtility(((AttributeCell) table).getDomain());
                     } 
 //            		else {
 //                        chart.reorderEntries(BaseTableContainer.this);
@@ -955,6 +975,8 @@ public class BaseTableContainer extends Box implements ActionListener {
             int dy = undoY - relY;
             if (dragMode == EAST_ROLLUP_STRETCH_DRAG) {
                 chart.last_int.setUndoSlide(BaseTableContainer.this, dy, relY, true);
+                
+                chart.logDrag(bSel.getData(), bNei.getData());
             }
             /*			if (dragMode == WEST_ROLLUP_STRETCH_DRAG)
              chart.last_int.setUndoSlide(BaseTableContainer.this, -dy, relY, false);	*/
@@ -991,7 +1013,7 @@ public class BaseTableContainer extends Box implements ActionListener {
         
     public void actionPerformed(ActionEvent ae) {
         if (("Value Function SA...").equals(ae.getActionCommand())) {
-            ((AttributeCell) table).makeUtility(((AttributeCell) table).domain);
+            ((AttributeCell) table).makeUtility(((AttributeCell) table).getDomain());
         } else if (("Set Color...").equals(ae.getActionCommand())) {
             new ColorSelection(table, chart, header);
         } else if (("Edit").equals(ae.getActionCommand())) {

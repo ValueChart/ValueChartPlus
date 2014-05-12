@@ -112,4 +112,44 @@ public class AttributePrimitiveData implements AttributeData {
         return str;
     }
 
+    @Override
+    public String getOutputLogXML(boolean isRoot) {
+        AttributeDomain d = getDomain();
+        AttributeDomainType t = d.getType();
+        
+        String str = "";
+        str += "<Primary name=\"" + getName() 
+                + "\" weight=\"" + getWeight() 
+                + "\" color=\"" + getName() 
+                + "\" units=\"" + (t == AttributeDomainType.DISCRETE ? "" : getUnitsName()) + "\">\n";
+        str += "<Domain type=\"" + (t == AttributeDomainType.DISCRETE ? "discrete" : "continuous") + "\">\n";
+
+        double vals[] = d.getWeights();
+        for (int i = 0; i < vals.length; i++) {
+            str += "<DomainValue ";
+            if (t == AttributeDomainType.DISCRETE) {
+                String elts[] = d.getElements();
+                str += "key=\"" + elts[i] + "\" ";
+            } else {
+                double kts[] = d.getKnots();
+                str += "key=\"" + kts[i] + "\" ";
+            }
+            str += "value=\"" + vals[i] + "\"/>\n"; 
+        }
+        str += "</Domain>\n";
+        
+        str += "</Primary>\n";
+        return str;
+    }
+
+    @Override
+    public String getOutputWeightXML(boolean isRoot) {
+        String str = "";
+        str += "<Primary name=\"" + getName() 
+                + "\" weight=\"" + getWeight() 
+                + "\" color=\"" + getName() 
+                + "\" units=\"" + (getDomain().getType() == AttributeDomainType.DISCRETE ? "" : getUnitsName()) + "\"/>\n";
+        return str;
+    }
+    
 }

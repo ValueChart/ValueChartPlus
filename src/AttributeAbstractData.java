@@ -94,4 +94,36 @@ public class AttributeAbstractData implements AttributeData {
         return str;
     }
 
+    @Override
+    public String getOutputLogXML(boolean isRoot) {
+        String str = "";
+        if (isRoot) 
+            str += "<Attribute name=\"" + getName() + "\" weight=\"" + getWeight() + "\">\n";
+        else
+            str += "<Attribute name=\"" + getName() + "\" weight=\"*\">\n";
+
+        for (int i = 0; i < children.size(); i++) {
+            str = str + children.get(i).getOutputLogXML(false);
+        }
+        
+        str += "</Attribute>\n";
+        return str;
+    }
+
+    @Override
+    public String getOutputWeightXML(boolean isRoot) {
+        String str = "";
+        if (isRoot) 
+            str += "<Attribute name=\"" + getName() + "\" weight=\"" + getWeight() + "\">\n";
+        else
+            str += "<Attribute name=\"" + getName() + "\" weight=\"*\">\n";
+
+        for (int i = 0; i < children.size(); i++) {
+            str = str + children.get(i).getOutputWeightXML(false);
+        }
+        
+        str += "</Attribute>\n";
+        return str;
+    }
+
 }
