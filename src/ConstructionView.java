@@ -200,7 +200,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 
             @Override
             public void windowClosing(WindowEvent e) {
-                chart.newConst();
+                if (chart != null)
+                    chart.newConst();
             }
         };
         frame.addWindowListener(exitListener);
