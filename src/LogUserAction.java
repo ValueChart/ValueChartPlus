@@ -147,7 +147,9 @@ public class LogUserAction {
             fw.write("<Log ");
             fw.write("timestamp=\"" + df.format(Calendar.getInstance().getTime()) + "\">\n");
             
-            fw.write("<Action type=\"utility\"/>\n");
+            fw.write("<Action type=\"utility\">\n");
+            fw.write("<Utility attribute=\"" + newAttr.getName() + "\"/>\n");
+            fw.write("</Action>\n");
             
             if (verbosity >= LOG_ALL) {
                 fw.write("<State type=\"originalPartial\">\n");
@@ -261,7 +263,10 @@ public class LogUserAction {
             fw.write("<Log ");
             fw.write("timestamp=\"" + df.format(Calendar.getInstance().getTime()) + "\">\n");
             
-            fw.write("<Action type=\"drag\"/>\n");
+            fw.write("<Action type=\"drag\">\n");
+            fw.write("<Drag attribute1=\"" + newAttr1.getName() 
+                    + "\" attribute2=\"" + newAttr2.getName() + "\"/>\n");
+            fw.write("</Action>\n");
             
             if (verbosity >= LOG_ALL) {
                 fw.write("<State type=\"originalPartial\">\n");
