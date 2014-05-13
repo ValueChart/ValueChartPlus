@@ -20,6 +20,7 @@ public class DisplayPanel extends JComponent {
     boolean ruler = false;
     private TablePane rootPane;
     private int colWidth = ValueChart.DEFAULT_COL_WIDTH;
+    private int prefHeight = -1;
     private Vector entryList;
     
     JPopupMenu domainMeta = new JPopupMenu();
@@ -49,11 +50,19 @@ public class DisplayPanel extends JComponent {
 
         dim.width = colWidth * entryList.size();
         setPreferredSize(dim);
-        setMaximumSize(new Dimension(colWidth * entryList.size() + colWidth * 2, 10000));
+        setMaximumSize(new Dimension(colWidth * entryList.size(), 10000));
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(colWidth * entryList.size() + colWidth * 2, getHeight());
+        return new Dimension(colWidth * entryList.size(), (prefHeight < 0 ? getHeight() : prefHeight));
+    }
+    
+    public void setPrefHeight(int height) {
+        prefHeight = height;
+    }
+    
+    public int getPrefHeight() {
+        return prefHeight;
     }
 
     public void setScore(boolean s) {
@@ -70,7 +79,7 @@ public class DisplayPanel extends JComponent {
         int totalHeight = getHeight();
         g.setColor(Color.white);
         int align_right = 0;//totalWidth - numEntries*colWidth;//
-        g.fillRect(align_right + colWidth, 0, numEntries * colWidth, totalHeight);//
+        g.fillRect(align_right, 0, numEntries * colWidth, totalHeight);//
         if (rootPane == null) {
             return;
         }
@@ -87,7 +96,7 @@ public class DisplayPanel extends JComponent {
             weights = cell.getWeights();
             //absolute weight
             double or = cell.getOverallRatio();
-            int h, x = align_right + colWidth;
+            int h, x = align_right;
             //for each entry, paint the said attribute's value
             for (int i = 0; i < numEntries; i++) {
                 accumulatedRatios[i] += or * weights[i];
@@ -109,7 +118,7 @@ public class DisplayPanel extends JComponent {
                 }
             }
         }
-        int y = colWidth + (colWidth / 3);
+        int str_x = (colWidth / 3);
 
         //SANJANA: finding the max score
         double max = 0;
@@ -132,16 +141,16 @@ public class DisplayPanel extends JComponent {
             		g.setColor(Color.RED);
             		g.setFont(new Font("DEFAULT",Font.BOLD,12));
             	}            		
-                g.drawString(String.valueOf(Math.round(accumulatedRatios[j] * 100)), y, totalHeight - ypos[j] - 5);
-                y += colWidth;
+                g.drawString(String.valueOf(Math.round(accumulatedRatios[j] * 100)), str_x, totalHeight - ypos[j] - 5);
+                str_x += colWidth;
             }
         }
 
         g.setColor(Color.lightGray);
-        y = align_right + colWidth;	//temp, was only colWidth
+        str_x = align_right + colWidth;	//temp, was only colWidth
         for (int i = 1; i < numEntries + 1; i++) {
-            g.drawLine(y, 0, y, totalHeight - 1);
-            y += colWidth;
+            g.drawLine(str_x, 0, str_x, totalHeight - 1);
+            str_x += colWidth;
         }
 
         //ruler
