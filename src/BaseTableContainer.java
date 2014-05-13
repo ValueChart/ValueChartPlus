@@ -300,7 +300,7 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
     }
 
-    private void updateHeadersRecursively() {
+    public void updateHeadersRecursively() {
         updateHeader();
         if (table instanceof TablePane) {
             Iterator<BaseTableContainer> it;
@@ -354,13 +354,43 @@ public class BaseTableContainer extends Box implements ActionListener {
 //        String pct = String.format("%.2f", Double.valueOf(pct_d).toString());
 //        System.out.println(name+" "+heightRatio+" "+heightScale);
         
+        String range = "";
+        if (data != null && !data.isAbstract()) {
+            String best = "";
+            String worst = "";
+            AttributeDomain d = data.getPrimitive().getDomain();
+            double[] wts = d.getWeights();
+            for (int i = 0; i < wts.length; i++) {
+                if (wts[i] == 0 && worst.isEmpty()) {
+                    if (d.getType() == AttributeDomainType.DISCRETE) {
+                        String elts[] = d.getElements();
+                        worst = elts[i];
+                    } else {
+                        double kts[] = d.getKnots();
+                        worst = String.valueOf(kts[i]);
+                    }
+                }
+                if (wts[i] == 1 && best.isEmpty()) {
+                    if (d.getType() == AttributeDomainType.DISCRETE) {
+                        String elts[] = d.getElements();
+                        best = elts[i];
+                    } else {
+                        double kts[] = d.getKnots();
+                        best = String.valueOf(kts[i]);
+                    }
+                }
+            }
+            range = "<br><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[" + (best.isEmpty() ? "" : "BEST: " + best) 
+                    + (worst.isEmpty() ? "" : " WORST: " + worst) + "]</small>";
+        }
+        
         if (getHeight() < 30) {
             header.setText("   " + name.replace('_', ' ') + " (" + pct + "%)");
         } else {
-            header.setText("<html><left>" + "&nbsp;&nbsp;&nbsp;" + name.replace('_', ' ') + " (" + pct + "%)</left></html>");
+            header.setText("<html><left>" + "&nbsp;&nbsp;&nbsp;" + name.replace('_', ' ') + " (" + pct + "%)" + range + "</left></html>");
         }
         //header.setText(s);
-        header.setToolTipText("<html><blockquote><left><font size=\"6\">" + name.replace('_', ' ') + " (" + pct + "%)</left></blockquote></html>");
+        header.setToolTipText("<html><blockquote><left><font size=\"6\">" + name.replace('_', ' ') + " (" + pct + "%)" + range + "</left></blockquote></html>");
         header.setFont(new Font("Verdana", Font.PLAIN, 12));
     }
 

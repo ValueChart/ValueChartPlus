@@ -229,6 +229,7 @@ public class ValueChart extends JPanel {
     }
 
     public void updateAll() {
+        updateHeaders();
         displayPanel.repaint();
         mainPane.repaint();
     }
@@ -1375,5 +1376,14 @@ public class ValueChart extends JPanel {
 
     public void setLog(LogUserAction log) {
         this.log = log;
+    }
+    
+    public void updateHeaders() {
+        if (mainPane == null) return;
+        Iterator<BaseTableContainer> it;
+        for (it = mainPane.getRows(); it.hasNext();) {
+            BaseTableContainer btc = it.next();
+            btc.updateHeadersRecursively();
+        }
     }
 }
