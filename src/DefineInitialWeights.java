@@ -178,7 +178,9 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
         if ("SMARTER...".equals(e.getActionCommand())) {
         	count = 1;	//reset counter;
         	WeightingBySMARTER wbs = new WeightingBySMARTER();
-        	wbs.startWeighting();
+        	String problem = "";
+        	if (con != null && con.chart != null) problem = con.chart.getChartTitle();
+        	wbs.startWeighting(problem);
         	rowstemp.clear();
         }
         if ("Set equal weights".equals(e.getActionCommand())) {
@@ -213,11 +215,11 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 
 		JDialog frame;
 		
-		String q1 = "Imagine the worst possible alternative (i.e. scoring 0 on all objectives), and for some reason you were required to choose it. ";
-		String q2 = "If you can choose just one objective to improve from its WORST value to its BEST, which would you choose to improve? ";
-		String q3 = "Next, imagine that you are stuck with the worst possible alternative and allowed to improve any objective EXCEPT ";
-		String q4 = " from its worst value to its best.  Which would it be?";
-		String q5 = " is the last objective that you would choose to improve.  Click OK to complete the SMARTER weighting technique.";
+		String q1a = "Imagine the worst possible ";
+		String q1b = " (i.e. scoring worst on all criteria) ";
+		String q1c = "and you were given the opportunity to improve one criteria from its WORST value to its BEST. Which would you choose? ";
+		String q2 = "Next, imagine again the worst possible alternative and you are allowed to improve one of the following criteria from its WORST value to its BEST. Which would you choose?";
+		String q3 = " is the last criteria that you would choose to improve.  Click OK to complete the SMARTER weighting technique.";
 		JButton btnSelect; 
 		JButton btnCancel;
 		
@@ -233,8 +235,8 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 		WeightingBySMARTER(){			
 		}
 		
-		void startWeighting(){
-		    txtQ = new JTextArea(q1 + q2);	
+		void startWeighting(String problem){
+		    txtQ = new JTextArea(q1a + (problem == null || problem.isEmpty() ? "alternative" : problem) + q1b + q1c);	
 	        txtQ.setLineWrap(true);
 	        txtQ.setWrapStyleWord(true);	
 	        txtQ.setRows(5);
@@ -329,17 +331,13 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 	            	for (int j=i; j<sel.length; j++)
 	            		sel[j]--;
 	            	tableWiz.addNotify();
-	            	if ((objs.size() - tableWiz.getRowCount())>1 && tableWiz.getRowCount() != 1){
-	            		q3 = q3 + " and ";
-	            	}
 	            	if (tableWiz.getRowCount()==1){
 	            		str = tableWiz.getValueAt(0, 0).toString();
-	            		txtQ.setText(str.substring(0, 1).toUpperCase() + str.substring(1, str.length()) + q5);
+	            		txtQ.setText(str.substring(0, 1).toUpperCase() + str.substring(1, str.length()) + q3);
 	            		btnSelect.setText("OK");
 	            	}			    
 	            	else{ 
-	            		q3 = q3 + str.substring(0, 1).toUpperCase() + str.substring(1, str.length());		            
-	            		txtQ.setText(q3 + " " + q4);
+	            		txtQ.setText(q2);
 	            	}
 	            	repaint();	            
 	            	if (tableWiz.getRowCount() == 0) { //none left, disable firing.

@@ -46,6 +46,7 @@ class OptionsMenu extends JMenuBar implements ActionListener{
     CheckBoxMenuEntry logMsgMenuItem;
     CheckBoxMenuEntry logChangeMenuItem;
     CheckBoxMenuEntry logAllMenuItem;
+    CheckBoxMenuEntry utilDispMenuItem;
     MenuEntry logStateMenuItem;
     MenuEntry menuItem;  
     MenuEntry menuUndo;
@@ -117,7 +118,12 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         scoreMenuItem.setSelected(true);
         submenu.add(scoreMenuItem);         
         measureMenuItem = new CheckBoxMenuEntry("Score Measure");  
-        submenu.add(measureMenuItem);    
+        submenu.add(measureMenuItem);   
+        
+        utilDispMenuItem = new CheckBoxMenuEntry("Utility Weights");
+        utilDispMenuItem.setSelected(chart.displayUtilityWeights);
+        submenu.add(utilDispMenuItem);
+        
         menu.add(submenu);
         
         submenu = new MenuTitle("Chart Display");
@@ -313,6 +319,10 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 				chart.getDisplayPanel().setRuler(false);
 			chart.updateDisplay();
 		}			
+		else if ("Utility Weights".equals(ae.getActionCommand())){
+		    chart.displayUtilityWeights = !chart.displayUtilityWeights;
+		    chart.updateAll();
+		}
 		else if ("Small".equals(ae.getActionCommand())){
 			chart.resetDisplay(chart.displayType, 30, true, chart.show_graph);
 		}	

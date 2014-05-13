@@ -63,6 +63,7 @@ public class ValueChart extends JPanel {
     LastInteraction next_int;
     Vector<AttributeData> attrData;
     LogUserAction log;
+    boolean displayUtilityWeights = false;
 
     //***Added so that there is one frame that allows display of pdf reports from value chart. This window is not used for each of the attribute/entry reports.
     //Those are contained within the AttributeCell class. Rather, this is for anywhere else on the interface (it started with a need to have one report window to display the report for the criteria details)
@@ -74,30 +75,43 @@ public class ValueChart extends JPanel {
     OutlineItem item = null; //The items in the bookmark
 
 //CONSTRUCTOR
-    public ValueChart(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g) {
+    
+    public ValueChart(ValueChart vc) {
         super();
-        constructFromFile(c, file, l, type, colwd, b, g);
-    }
-
-    public ValueChart(ConstructionView c, String file, LogUserAction l,
-            Vector<AttributeData> data, Vector entry, int type, int colwd,
-            boolean b, boolean g) {
-        super();
-        if (data == null || entry == null)
-            constructFromFile(c, file, l, type, colwd, b, g);
-        else {
-            filename = file;
-            constructFromAttribute(c, data, entry, l, type, colwd, b, g);
-        }
     }
     
-    
-    private void constructFromFile(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g) {
+    public ValueChart(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g, boolean dispUtil) {
+        super();
         show_graph = g;
         con = c;
         isNew = b;
         filename = file;
         setDisplayType(type);
+        displayUtilityWeights = dispUtil;
+        
+        constructFromFile(l, colwd);
+    }
+
+    public ValueChart(ConstructionView c, String file, LogUserAction l,
+            Vector<AttributeData> data, Vector entry, int type, int colwd,
+            boolean b, boolean g, boolean dispUtil) {
+        super();
+        show_graph = g;
+        con = c;
+        isNew = b;
+        setDisplayType(type);
+        displayUtilityWeights = dispUtil;
+
+        if (data == null || entry == null)
+            constructFromFile(l, colwd);
+        else {
+            filename = file;
+            constructFromAttribute(data, entry, l, colwd);
+        }
+    }
+    
+    
+    private void constructFromFile(LogUserAction l, int colwd) {
 
         menuOptions = new OptionsMenu(this);
         menuOptions.createMenu();
@@ -144,11 +158,8 @@ public class ValueChart extends JPanel {
     }
     
     
-    private void constructFromAttribute(ConstructionView c, Vector<AttributeData> data, Vector entry, LogUserAction l, int type, int colwd, boolean b, boolean g) {
-        show_graph = g;
-        con = c;
-        isNew = b;
-        setDisplayType(type);
+    private void constructFromAttribute(Vector<AttributeData> data, Vector entry, LogUserAction l, int colwd) {
+
 
         menuOptions = new OptionsMenu(this);
         menuOptions.createMenu();
@@ -891,7 +902,7 @@ public class ValueChart extends JPanel {
     }
 
     public void resetDisplay(int type, int colwd, boolean close, boolean graph) {
-        ValueChart ch = new ValueChart(con, filename, log, attrData, entryList, type, colwd, true, graph);
+        ValueChart ch = new ValueChart(con, filename, log, attrData, entryList, type, colwd, true, graph, displayUtilityWeights);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -909,7 +920,7 @@ public class ValueChart extends JPanel {
     }
 
     public void compareDisplay(int type, int colwd) {
-        ValueChart ch = new ValueChart(con, filename, log, type, colwd, false, show_graph); // TODO
+        ValueChart ch = new ValueChart(con, filename, log, type, colwd, false, show_graph, displayUtilityWeights); // TODO
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;

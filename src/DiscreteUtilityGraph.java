@@ -31,6 +31,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     AttributeCell acell;
     JPanel pnl;    
     boolean modified = false;
+    boolean fromChart = false; // graph opened by clicking on chart interface
     
     public static Font LABELFONT = new Font("Verdana", Font.PLAIN, 10);
     public static Font LABELFONT_BOLD = new Font("Verdana", Font.BOLD, 10);
@@ -50,7 +51,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     	return sp;
     }
     
-    public DiscreteUtilityGraph(ValueChart ch, DiscreteAttributeDomain dd, String[] it, double[] we, String att, DefineValueFunction d, AttributeCell ac) {
+    public DiscreteUtilityGraph(ValueChart ch, boolean fromCh, DiscreteAttributeDomain dd, String[] it, double[] we, String att, DefineValueFunction d, AttributeCell ac) {
         
         //Setting variable names
         ddomain = dd;
@@ -62,6 +63,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         redo = new DiscreteAttributeDomain();
         dvf = d;
         acell = ac;
+        fromChart = fromCh;
         
        for(int i = 0; i < items.length; i++){
             undo.addElement(items[i], ddomain.weight(items[i]));
@@ -76,7 +78,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         
         addMouseListener(this);
         addMouseMotionListener(this);
-        if (chart!=null) {
+        if (chart!=null && fromChart) {
             if (acell != null && acell.getData() != null) {
                 AttributeData attrData = acell.getData();
                 if (attrData != null)
@@ -188,7 +190,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
                 xaxis = (int)base[i].x;
                 moving = p[i];
                 clicki = i;
-                if (chart != null)
+                if (chart != null && fromChart)
                 	chart.last_int.setUndoUtil(this, items[i], 0, weights[i], ddomain);    
                 
             for(int e = 0; e < items.length; e++){
@@ -249,7 +251,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
 	    //Update Value Chart
 	    if (chart!=null)        
 	        chart.updateAll();
-        else
+        if (!fromChart)
         	dvf.checkUtility(dvf.obj_sel, dvf.lbl_sel);        
         
     }
@@ -279,9 +281,11 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         String temp;
         g.setColor(Color.DARK_GRAY);
         for(int i = 0; i < items.length; i++){
-            Float test = new Float((205 - p[i].y) / 200); //converted domain values
-            temp = test.toString();
-            g.drawString(( temp.length() >3?temp.substring(0,4):temp.substring(0,3) ), (p[i].x + 5),p[i].y);
+            if (chart != null && chart.displayUtilityWeights) {
+                Float test = new Float((205 - p[i].y) / 2); //converted domain values
+                temp = test.toString();
+                g.drawString(temp, (p[i].x + 5),p[i].y);
+            }
             s[i] = p[i].getShape();
         }
         
@@ -299,8 +303,6 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         
         //Draw the static labels
         g.setFont(new Font(null, Font.BOLD, 12));
-        String utility_label = new String("Utility");
-        g.drawString(utility_label, 10, 110);
 //        String utility_upper_bound = new String("1");
         String utility_upper_bound = new String("Best");
 //        g.drawString(utility_upper_bound, 35, 15);
@@ -348,7 +350,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if (modified && chart!=null && acell != null && acell.getData() != null) {
+                if (modified && chart!=null && fromChart && acell != null && acell.getData() != null) {
                     chart.logUtility(acell.getData());
                 }
             }

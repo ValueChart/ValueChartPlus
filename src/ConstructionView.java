@@ -172,9 +172,13 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             if (chart != null)
                 chart.closeChart();
         LogUserAction log = null;
-        if (chart != null) log = chart.getLog();
+        boolean dispUtil = false;
+        if (chart != null) {
+            log = chart.getLog();
+            dispUtil = chart.displayUtilityWeights;
+        }
         chart = new ValueChart(this, filename, log, ValueChart.DEFAULT_DISPLAY,
-                ValueChart.DEFAULT_COL_WIDTH, true, true); // TODO
+                ValueChart.DEFAULT_COL_WIDTH, true, true, dispUtil); // TODO
         chart.newConst();
     }
 

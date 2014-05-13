@@ -20,9 +20,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
     JLabel lbl_sel;
 	
     AttributeDomain domain;
-    ValueChart chart;
     String attributeName;
-    ContinuousUtilityGraph graph;
     
     JObjective obj;
   
