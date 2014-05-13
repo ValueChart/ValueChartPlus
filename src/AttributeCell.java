@@ -1,7 +1,6 @@
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.font.GlyphVector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import javax.swing.*;
@@ -409,29 +408,10 @@ public class AttributeCell extends JComponent {
             Font f = new Font("Verdana", Font.BOLD, 10);
             g.setFont(f);
 
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-            
             try {
                 if (entry.getShowFlag()) {
-                	int textx = x+2;
-                	int texty = height-5;
-                    g2.translate(textx, texty);
-                    // draw outline
-                    g.setColor(Color.WHITE);
-                    GlyphVector gv = f.createGlyphVector(g2.getFontRenderContext(), value.stringValue());
-                    Shape shape = gv.getOutline();
-                    g2.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL));
-                    g2.draw(shape);    
-                    g2.fill(shape);
-                    // draw text
                     g.setColor(Color.BLACK);
-                    g.drawString(value.stringValue(), 0, 0);
-                    
-                    g2.translate(-textx, -texty);
+                	g.drawString(value.stringValue(), x+2, height-5);                    
                 }
             } catch (java.lang.NullPointerException ne) {
             }
