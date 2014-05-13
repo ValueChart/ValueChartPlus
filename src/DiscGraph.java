@@ -238,6 +238,8 @@ public class DiscGraph extends JPanel implements MouseListener, MouseMotionListe
     }
        
     class MoveablePoint extends Point2D.Float {
+        private static final long serialVersionUID = 1L;
+        
         int r = 3;
         Shape shape;
         public MoveablePoint(int x, int y) {

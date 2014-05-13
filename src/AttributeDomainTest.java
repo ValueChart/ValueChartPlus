@@ -46,7 +46,7 @@ class AttributeDomainTest
 				     error.getMessage());
 		 System.exit(1); 
 	       }
-	      if (domain.getType() != AttributeDomain.DISCRETE)
+	      if (domain.getType() != AttributeDomainType.DISCRETE)
 	       { System.out.println ("Error, input " + s + ":");
 		 System.out.println ("Expected discrete domain");
 		 System.exit(1);
@@ -85,7 +85,7 @@ class AttributeDomainTest
 				     error.getMessage());
 		 System.exit(1); 
 	       }
-	      if (domain.getType() != AttributeDomain.CONTINUOUS)
+	      if (domain.getType() != AttributeDomainType.CONTINUOUS)
 	       { System.out.println ("Error, input " + s + ":");
 		 System.out.println ("Expected continuous domain");
 		 System.exit(1);

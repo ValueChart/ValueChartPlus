@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
@@ -43,6 +42,11 @@ class OptionsMenu extends JMenuBar implements ActionListener{
     CheckBoxMenuEntry medMenuItem;
     CheckBoxMenuEntry lgMenuItem;
     CheckBoxMenuEntry xlgMenuItem;
+    CheckBoxMenuEntry logNoneMenuItem;
+    CheckBoxMenuEntry logMsgMenuItem;
+    CheckBoxMenuEntry logChangeMenuItem;
+    CheckBoxMenuEntry logAllMenuItem;
+    MenuEntry logStateMenuItem;
     MenuEntry menuItem;  
     MenuEntry menuUndo;
     MenuEntry menuRedo;
@@ -146,6 +150,21 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         menu.add(menuItem);
 
         add(menu);
+        
+        menu = new MenuTitle("Logging"); 
+        logNoneMenuItem = new CheckBoxMenuEntry("Log Off");
+        menu.add(logNoneMenuItem);
+        logMsgMenuItem = new CheckBoxMenuEntry("Log Actions");
+        menu.add(logMsgMenuItem);
+        logChangeMenuItem = new CheckBoxMenuEntry("Log Changes");
+        menu.add(logChangeMenuItem);
+        logAllMenuItem = new CheckBoxMenuEntry("Log All");
+        menu.add(logAllMenuItem);
+        menu.addSeparator();
+        logStateMenuItem = new MenuEntry("Log current state");
+        menu.add(logStateMenuItem);
+        add(menu);
+        
         setOpaque(true);
 
     }    
@@ -164,15 +183,32 @@ class OptionsMenu extends JMenuBar implements ActionListener{
     			defMenuItem.setSelected(true); break;} 
     	}
     	switch (chart.colWidth){
-			case SMALL:{
-				smMenuItem.setSelected(true); break;}  
-			case MEDIUM:{
-				medMenuItem.setSelected(true); break;}   
-			case LARGE:{
-				lgMenuItem.setSelected(true); break;}  
-                        case EXTRALARGE:{
-                                xlgMenuItem.setSelected(true); break;} 
+            case SMALL: {
+                smMenuItem.setSelected(true); break;}
+            case MEDIUM: {
+                medMenuItem.setSelected(true); break;}
+            case LARGE: {
+                lgMenuItem.setSelected(true); break;}
+            case EXTRALARGE: {
+                xlgMenuItem.setSelected(true); break;}
     	}
+    	switch (chart.log.getVerbosity()) {
+        	case LogUserAction.LOG_NONE: {
+        	    logNoneMenuItem.setSelected(true); break;}
+        	case LogUserAction.LOG_MSG: {
+                logMsgMenuItem.setSelected(true); break;}
+        	case LogUserAction.LOG_CHANGE: {
+                logChangeMenuItem.setSelected(true); break;}
+        	case LogUserAction.LOG_ALL: {
+                logAllMenuItem.setSelected(true); break;}
+    	}
+    }
+    
+    public void deselectLogItems() {
+        logNoneMenuItem.setSelected(false);
+        logMsgMenuItem.setSelected(false);
+        logChangeMenuItem.setSelected(false);
+        logAllMenuItem.setSelected(false);
     }
     
 	public void actionPerformed(ActionEvent ae) {
@@ -295,7 +331,29 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 			chart.compareDisplay(chart.displayType, chart.colWidth);
 		}
 
-
+		else if (logNoneMenuItem.getText().equals(ae.getActionCommand())){
+		    deselectLogItems();
+		    logNoneMenuItem.setSelected(true);
+		    chart.setLogVerbosity(LogUserAction.LOG_NONE);
+		}
+		else if (logMsgMenuItem.getText().equals(ae.getActionCommand())){
+            deselectLogItems();
+            logMsgMenuItem.setSelected(true);
+            chart.setLogVerbosity(LogUserAction.LOG_MSG);
+        }
+		else if (logChangeMenuItem.getText().equals(ae.getActionCommand())){
+            deselectLogItems();
+            logChangeMenuItem.setSelected(true);
+            chart.setLogVerbosity(LogUserAction.LOG_CHANGE);
+        }
+		else if (logAllMenuItem.getText().equals(ae.getActionCommand())){
+            deselectLogItems();
+            logAllMenuItem.setSelected(true);
+            chart.setLogVerbosity(LogUserAction.LOG_ALL);
+        }
+		else if (logStateMenuItem.getText().equals(ae.getActionCommand())){
+            chart.logState();
+        }
 		
 	}
 	
@@ -425,7 +483,7 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 	                    JOptionPane.YES_NO_OPTION);	        			     	    		        
 	    	}
 	    	if (ans == JOptionPane.YES_OPTION){
-		        chart.con.createDataFile(filename);
+		        chart.con.createDataFile(filename, true);
 		        }
 	    	else 
 	    		saveFile();
@@ -433,9 +491,9 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 	}
 	
 	void changeHeaders(TablePane pane){
-		Iterator it;    	
+		Iterator<BaseTableContainer> it;    	
 		for (it = pane.getRows(); it.hasNext();){
-			BaseTableContainer btc = (BaseTableContainer)(it.next());
+			BaseTableContainer btc = it.next();
 			btc.updateHeader();
 			if (btc.table instanceof TablePane) 
 				changeHeaders((TablePane)btc.table); 

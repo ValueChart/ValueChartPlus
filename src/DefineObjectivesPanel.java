@@ -39,8 +39,8 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	int type;
 	int counter;
 	int colorcount = 0;	
-	Vector listed_objs;
-	Vector prim_obj;	
+	Vector<JObjective> listed_objs;
+	Vector<JObjective> prim_obj;	
 	String output = "";	
 	boolean del_mode = false;
 	boolean dnd_mode = true;
@@ -138,9 +138,9 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	    //hidden objective: the key for alternative list
 	    //this must is added to the listed_objectives vector for later alternative use
 		if (type!=FROM_DATAFILE){
-			listed_objs = new Vector();
+			listed_objs = new Vector<JObjective>();
 			JObjective name_obj = new JObjective("name");
-			name_obj.setType(JObjective.DISCRETE);
+			name_obj.setDomainType(AttributeDomainType.DISCRETE);
 			listed_objs.add(name_obj);
 		}		
 	}		
@@ -170,7 +170,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		add(pnlList);	
 	}
 
-	void setFileObjectives(Vector obj){		
+	void setFileObjectives(Vector<JObjective> obj){		
 		listed_objs = obj;	
 		repaintList();
 	}
@@ -213,7 +213,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		for (Enumeration en = root_node.breadthFirstEnumeration(); en.hasMoreElements();)
 			if (en.nextElement().toString().equals(str))
 				return true;
-		for (Iterator it = listed_objs.iterator(); it.hasNext();)
+		for (Iterator<JObjective> it = listed_objs.iterator(); it.hasNext();)
 			if (it.next().toString().equals(str))
 				return true;
 		return false;
@@ -314,7 +314,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	boolean ok;//- 
 	public void setPrimitiveObjectives(){
 	ok = true;//-
-		prim_obj = new Vector();
+		prim_obj = new Vector<JObjective>();
 		DefaultMutableTreeNode node = root_node.getFirstLeaf();
 		while (node != null){
 			JObjective obj = (JObjective)node.getUserObject();
@@ -329,7 +329,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		//pnlCon.btnOK.setEnabled(false);
 	}
 	
-	public Vector getPrimitiveObjectives(){
+	public Vector<JObjective> getPrimitiveObjectives(){
 		setPrimitiveObjectives();		
 		return prim_obj;
 	}
@@ -363,10 +363,10 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		else
 			pnlCon.constPane.setEnabledAt(1, true);
 		double weights=0.0;
-		for (Iterator it = prim_obj.iterator(); it.hasNext();){
-			JObjective obj = (JObjective)it.next();
+		for (Iterator<JObjective> it = prim_obj.iterator(); it.hasNext();){
+			JObjective obj = it.next();
 			if (!obj.getWeight().equals("*"))
-				weights += Double.valueOf(obj.getWeight()).doubleValue();			
+				weights += obj.getWeightNumeric();			
 		}
 		pnlCon.getAltPanel().checkAlternativeCount();
 		if (weights <= 0.98 || weights >= 1.02){
@@ -376,7 +376,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	
 //OUTPUT
 	
-	void writeOutput(DefaultMutableTreeNode node, Vector color){
+	void writeOutput(DefaultMutableTreeNode node, ColorList color){
 		String str = "";
 		for (int i=0; i<=node.getLevel(); i++)
 			str = str + "\t";
@@ -389,19 +389,19 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 			str = str + obj.toString() + " " + obj.getWeight() + " { ";			
 			//double vals[] = new double[obj.num_points];
 			//Vector vals = obj.domain.getWeights();
-			double vals[] = obj.domain.getWeights();
-			for (int i=0; i<obj.domain.getWeights().length; i++){
-				if (obj.getType() == 1){									
-					String elts[] = obj.domain.getElements();
+			double vals[] = obj.getDomain().getWeights();
+			for (int i=0; i<vals.length; i++){
+				if (obj.getDomainType() == AttributeDomainType.DISCRETE){									
+					String elts[] = obj.getDomain().getElements();
 					str = str + "\"" + elts[i] + "\" "; 
 				}
 				else{
-					double kts[] = obj.domain.getKnots();
+					double kts[] = obj.getDomain().getKnots();
 					str = str + kts[i] + " ";
 			
 				}
 				str = str + vals[i];
-				if (i != (obj.domain.getWeights().length-1))
+				if (i != (vals.length-1))
 					str =str + ",";
 				str = str + " ";
 					
@@ -415,7 +415,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 				//str = str + "color=" + colors.getColorName(colorcount);			
 			//colorcount++;
 			
-			if ((obj.getType()==2)&&(obj.getUnit()!="")){
+			if ((obj.getDomainType()==AttributeDomainType.CONTINUOUS)&&(obj.getUnit()!="")){
 				str = str + " units=" + obj.getUnit();				
 			}
 			str = str + " end\n";
@@ -432,7 +432,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		}
 	}
 	
-	public String getObjectiveOutput(Vector color){
+	public String getObjectiveOutput(ColorList color){
 		output = "";
 		writeOutput(root_node, color); 
 		colorcount=0;

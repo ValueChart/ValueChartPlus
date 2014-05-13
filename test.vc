@@ -1,101 +1,66 @@
-color Cost 0.0 0.0 0.2
-color IRR 0.0 0.0 0.34901962
-color Sustainability 0.0 0.0 0.5019608
-color Community 0.0 0.0 0.6509804
-color Robustness 0.0 0.0 0.7490196
+color area 0.0 0.0 0.5019608
+color skytrain-distance 0.0 0.0 0.8
+color rate 0.0 0.8 0.0
+color internet-access 0.8 0.0 0.0
 
 
 attributes
-	attributes LionsGate 1.0
-		Cost 0.457 { 1.0 0.0, 2.0 0.25, 3.0 0.5049999952316284, 4.0 1.0, 5.0 1.0 }
-			color=Cost units=null end
-		IRR 0.040 { "Best" 1.0, "Better" 0.75, "Good" 0.5, "Medium" 0.25, "Worst" 0.0 }
-			color=IRR end
-		Sustainability 0.257 { "Best" 1.0, "Better" 0.75, "Good" 0.5, "Medium" 0.25, "Worst" 0.0 }
-			color=Sustainability end
-		Community 0.2 { 1.0 0.0, 2.0 0.25, 3.0 0.5, 4.0 0.75, 5.0 1.0 }
-			color=Community units=null end
-		Robustness 0.2 { 0.0 0.0, 0.5 0.1, 1.0 0.2, 1.5 0.3, 2.0 0.4, 2.5 0.5, 3.0 0.6, 3.5 0.7, 4.0 0.8, 4.5 0.9, 5.0 1.0 }
-			color=Robustness units=null end
+	attributes Hotel 1.0
+		attributes location *
+			area 0.250 { "uptown" 0.5, "downtown" 1.0, "eastend" 0.0 }
+				color=area end
+			skytrain-distance 0.250 { 1.0 1.0, 5.0 0.5, 9.0 0.0 }
+				color=skytrain-distance units=blocks end
+		 end
+		attributes room *
+			attributes size 0.04
+				rate 0.250 { 100.0 1.0, 125.0 0.5, 150.0 0.0 }
+					color=rate units=CAD end
+			 end
+			internet-access 0.250 { "none" 0.0, "highspeed" 1.0, "dialup" 0.24500000476837158 }
+				color=internet-access end
+		 end
 	 end
 end
 
-entry "I'TIDAL"
-	Cost 5.0
-	IRR "Medium"
-	Sustainability "Better"
-	Community 5.0
-	Robustness 4.5
+entry "hotel1"
+	area "uptown"
+	skytrain-distance 7.0
+	rate 125.0
+	internet-access "highspeed"
 end
 
-entry "LBO"
-	Cost 5.0
-	IRR "Good"
-	Sustainability "Medium"
-	Community 3.0
-	Robustness 4.0
+entry "hotel2"
+	area "uptown"
+	skytrain-distance 2.0
+	rate 100.0
+	internet-access "highspeed"
 end
 
-entry "NETWORK"
-	Cost 1.0
-	IRR "Best"
-	Sustainability "Best"
-	Community 4.0
-	Robustness 1.5
+entry "hotel3"
+	area "downtown"
+	skytrain-distance 2.0
+	rate 150.0
+	internet-access "dialup"
 end
 
-entry "ANT_COLONY"
-	Cost 3.0
-	IRR "Best"
-	Sustainability "Better"
-	Community 2.0
-	Robustness 2.5
+entry "hotel4"
+	area "eastend"
+	skytrain-distance 9.0
+	rate 130.0
+	internet-access "dialup"
 end
 
-entry "FLEA_M"
-	Cost 4.0
-	IRR "Worst"
-	Sustainability "Worst"
-	Community 5.0
-	Robustness 3.0
+entry "hotel5"
+	area "eastend"
+	skytrain-distance 1.0
+	rate 100.0
+	internet-access "none"
 end
 
-entry "PMM"
-	Cost 5.0
-	IRR "Better"
-	Sustainability "Medium"
-	Community 2.0
-	Robustness 4.0
-end
-
-entry "U_GARDEN"
-	Cost 5.0
-	IRR "Good"
-	Sustainability "Better"
-	Community 4.0
-	Robustness 5.0
-end
-
-entry "U_ECO"
-	Cost 4.0
-	IRR "Better"
-	Sustainability "Good"
-	Community 5.0
-	Robustness 3.5
-end
-
-entry "DD_A"
-	Cost 4.0
-	IRR "Medium"
-	Sustainability "Medium"
-	Community 1.0
-	Robustness 3.0
-end
-
-entry "DD_B"
-	Cost 4.0
-	IRR "Medium"
-	Sustainability "Medium"
-	Community 1.0
-	Robustness 2.5
+entry "hotel6"
+	area "downtown"
+	skytrain-distance 1.0
+	rate 110.0
+	internet-access "none"
 end

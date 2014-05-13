@@ -61,7 +61,9 @@ public class ValueChart extends JPanel {
     boolean isNew = true;
     LastInteraction last_int;
     LastInteraction next_int;
-    
+    Vector<AttributeData> attrData;
+    LogUserAction log;
+
     //***Added so that there is one frame that allows display of pdf reports from value chart. This window is not used for each of the attribute/entry reports.
     //Those are contained within the AttributeCell class. Rather, this is for anywhere else on the interface (it started with a need to have one report window to display the report for the criteria details)
     SwingController controller; //Used for each window that controls a pdf document
@@ -72,8 +74,25 @@ public class ValueChart extends JPanel {
     OutlineItem item = null; //The items in the bookmark
 
 //CONSTRUCTOR
-    public ValueChart(ConstructionView c, String file, int type, int colwd, boolean b, boolean g) {
+    public ValueChart(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g) {
         super();
+        constructFromFile(c, file, l, type, colwd, b, g);
+    }
+
+    public ValueChart(ConstructionView c, String file, LogUserAction l,
+            Vector<AttributeData> data, Vector entry, int type, int colwd,
+            boolean b, boolean g) {
+        super();
+        if (data == null || entry == null)
+            constructFromFile(c, file, l, type, colwd, b, g);
+        else {
+            filename = file;
+            constructFromAttribute(c, data, entry, l, type, colwd, b, g);
+        }
+    }
+    
+    
+    private void constructFromFile(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g) {
         show_graph = g;
         con = c;
         isNew = b;
@@ -108,7 +127,63 @@ public class ValueChart extends JPanel {
         }
 
         showVC();
+        if (l != null) {
+            log = l;
+        } else {
+            log = new LogUserAction(getChartTitle());
+            log.setVerbosity(LogUserAction.LOG_ALL);
+        }
         if (isNew) {
+            menuOptions.setSelectedItems();
+            chartFrame.setJMenuBar(menuOptions);
+        }
+        setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        if (displayType == SEPARATE_DISPLAY) {
+            dialog.setLocation(chartFrame.getX(), chartFrame.getHeight());
+        }
+    }
+    
+    
+    private void constructFromAttribute(ConstructionView c, Vector<AttributeData> data, Vector entry, LogUserAction l, int type, int colwd, boolean b, boolean g) {
+        show_graph = g;
+        con = c;
+        isNew = b;
+        setDisplayType(type);
+
+        menuOptions = new OptionsMenu(this);
+        menuOptions.createMenu();
+        if (!isNew) {
+            menuOptions.setVisible(false);
+        }
+        last_int = new LastInteraction(menuOptions.menuUndo);
+        next_int = new LastInteraction(menuOptions.menuRedo);
+        setColWidth(colwd);
+
+        showAbsoluteRatios = true;
+        attrData = data;
+        entryList = entry;
+        resizeHandler = new ResizeHandler();
+        addComponentListener(resizeHandler);
+
+        // TODO
+        readFromAttribute();
+
+        // setDisplayHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
+        setDisplayHeight(displayHeight);
+        setSize(getPreferredWidth(),
+                displayType == SIDE_DISPLAY ? displayHeight * 2 - 50
+                        : displayHeight);
+        setVisible(true);
+
+        showVC();
+        if (l != null) {
+            log = l;
+        } else {
+            log = new LogUserAction(getChartTitle());
+            log.setVerbosity(LogUserAction.LOG_ALL);
+        }
+        if (isNew) {
+            menuOptions.setSelectedItems();
             chartFrame.setJMenuBar(menuOptions);
         }
         setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
@@ -165,9 +240,9 @@ public class ValueChart extends JPanel {
 
 //CONNECT CONST/INSP
     void setPrims(TablePane pane) {
-        Iterator it;
+        Iterator<BaseTableContainer> it;
         for (it = pane.getRows(); it.hasNext();) {
-            BaseTableContainer btc = (BaseTableContainer) (it.next());
+            BaseTableContainer btc = it.next();
             if (btc.table instanceof AttributeCell) {
                 prims.add(btc);
                 btc.adjustHeaderWidth();//added for rotate
@@ -187,11 +262,13 @@ public class ValueChart extends JPanel {
                     obj.setDomain(ac.getDomain());
                     obj.setUnit(ac.getUnits());
                     double pc = btc.getOverallRatio();
+                    AttributeData data = btc.getData();
+                    if (data != null && !data.isAbstract()) pc = data.getWeight();
                     obj.setWeight(String.valueOf(pc));
                     //connect ac and obj
                     ac.obj = obj;
                     obj.acell = ac;
-                    if (obj.domain_type == JObjective.CONTINUOUS) {
+                    if (obj.getDomainType() == AttributeDomainType.CONTINUOUS) {
                         if (obj.getUnit().equals("CAD")) {
                             obj.setDecimalFormat("0.00");
                         }
@@ -210,15 +287,15 @@ public class ValueChart extends JPanel {
     }
 
     void setObjs(TablePane pane, String str) {
-        Iterator it;
+        Iterator<BaseTableContainer> it;
         JObjective obj = null;
         for (it = pane.getRows(); it.hasNext();) {
-            BaseTableContainer btc = (BaseTableContainer) (it.next());
+            BaseTableContainer btc = it.next();
             btc.updateHeader();
             if (str.equals("root")) {
                 con.getObjPanel().lblRoot.setName(btc.getName());
             } else {
-                obj = new JObjective(btc.getName());
+                    obj = new JObjective(btc.getName());
                 con.getObjPanel().addFromVC(str, obj);
                 objs.add(obj);
                 if (btc.table instanceof AttributeCell) {
@@ -248,7 +325,7 @@ public class ValueChart extends JPanel {
                 } else {
                     AttributeValue val = (AttributeValue) datamap.get(obj.getName());
                     datamap.put(obj.getName(), val.stringValue());
-                    obj.setType(val.domain.getType());
+                    obj.setDomainType(val.domain.getType());
                 }
             }
             alts.add(datamap);
@@ -282,11 +359,31 @@ public class ValueChart extends JPanel {
             BaseTableContainer btc = (BaseTableContainer) it.next();
             btc.setRollUp();
         }
-        ((BaseTableContainer) mainPane.rowList.get(0)).setAbstractRatios();
+        mainPane.getRowAt(0).setAbstractRatios();
         setConnectingFields();
-        if (isNew) {
-            menuOptions.setSelectedItems();
+    }
+    
+    private void readFromAttribute() {
+        if (attrData == null)
+            return;
+
+        rebuildMainPane();
+
+        // bulding the construction view straight from vc
+        if (!con.init) {
+            setConst();
+            con.setInit(true);
         }
+        con.setChart(this);
+        // set prim obj list for rolling up the absolute tree
+        prims = new Vector();
+        setPrims(mainPane);
+        for (Iterator it = prims.iterator(); it.hasNext();) {
+            BaseTableContainer btc = (BaseTableContainer) it.next();
+            btc.setRollUp();
+        }
+        mainPane.getRowAt(0).setAbstractRatios();
+        setConnectingFields();
     }
 
     public void newConst() {
@@ -328,7 +425,9 @@ public class ValueChart extends JPanel {
             }
             if (keyword.equals("attributes")) {
                 mainPane = new TablePane();
-                readAttributes(scanReader, mainPane, colorList);
+                attrData = new Vector<AttributeData>();
+                readAttributes(scanReader, attrData, colorList);
+                renderMainPaneAttributes();
                 mainPane.adjustAttributesForDepth(mainPane.getDepth());
                 attributesRead = true;
             } else if (keyword.equals("color")) {
@@ -493,51 +592,51 @@ public class ValueChart extends JPanel {
         return hr;
     }
 
-    private void readAttributes(ScanfReader scanReader, TablePane pane, HashMap colorList)
+    private void readAttributes(ScanfReader scanReader,
+            Vector<AttributeData> attrList, HashMap colorList)
             throws IOException {
         String name = null;
         while (!(name = scanReader.scanString()).equals("end")) {
-            BaseTableContainer container;
+            AttributeData a;
             double hr;
-            if (name.equals("attributes")) { //if keyword=attibutes, then read abstract name and ratio
-                TablePane subpane = new TablePane();
+            if (name.equals("attributes")) { // if keyword=attibutes, then read
+                                             // abstract name and ratio
+                a = new AttributeAbstractData();
                 name = scanReader.scanString();
-                if (chartTitle == null) {
-                    //this is the first attribute level, so set the title of the window to the main title of the ValueChart
-                    chartTitle = name.replace('_', ' ');
-                }
+                a.setName(name);
                 hr = readHeightRatio(scanReader);
-                readAttributes(scanReader, subpane, colorList);
-                container = new BaseTableContainer(subpane, name, this, colWidth);
+                readAttributes(scanReader, a.getAbstract().children, colorList);
 
-            } else { //if no keyword is primitive
+            } else { // if no keyword is primitive
+                a = new AttributePrimitiveData();
+                a.setName(name);
                 hr = readHeightRatio(scanReader);
+                a.getPrimitive().setWeight(hr);
                 AttributeDomain domain = AttributeDomain.read(scanReader);
-                AttributeCell cell = new AttributeCell(this, domain);
-                cell.setColWidth(colWidth);
+                a.getPrimitive().setDomain(domain);
                 String option = null;
 
-                //This is where the program reads through the valuecharts file (.vc) and collects the properties for each of the attributes
+                // This is where the program reads through the valuecharts file
+                // (.vc) and collects the properties for each of the attributes
                 while (!(option = scanReader.scanString()).equals("end")) {
                     if (option.startsWith("color=")) {
                         String colorName = option.substring(6);
                         Color color = (Color) colorList.get(colorName);
                         if (color == null) {
-                            throw new IOException("Unknown color '" + colorName + "'");
+                            throw new IOException("Unknown color '" + colorName
+                                    + "'");
                         }
-                        cell.setColor(color);
+                        a.getPrimitive().setColor(color);
                     } else if (option.startsWith("units=")) {
                         String unitsName = option.substring(6);
-                        cell.setUnits(unitsName);
+                        a.getPrimitive().setUnitsName(unitsName);
                     } else {
                         throw new IOException("Unknown option '" + option + "'");
                     }
                 }
-                container = new BaseTableContainer(cell, name, this, colWidth);
             }
-            pane.addRow(container);
-            container.setHeightRatio(hr);
-            /**/ container.setRollUpRatio(hr);
+
+            attrList.addElement(a);
         }
     }
 
@@ -613,7 +712,7 @@ public class ValueChart extends JPanel {
                 }
                 AttributeDomain domain = attributeCell.getDomain();
                 AttributeValue value;
-                if (domain.getType() == AttributeDomain.DISCRETE) {
+                if (domain.getType() == AttributeDomainType.DISCRETE) {
                     String name = scanReader.scanString("%S");
                     value = new AttributeValue(name, domain);
                 } else { // type == AttributeDomain.CONTINUOUS
@@ -629,6 +728,7 @@ public class ValueChart extends JPanel {
 //BOOLS
     public void showEditView(int idx) {
         setConnectingFields();
+        log.setOldAttrData(log.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
         con.constPane.setSelectedIndex(idx);
         con.frame.setVisible(true);
     }
@@ -791,7 +891,7 @@ public class ValueChart extends JPanel {
     }
 
     public void resetDisplay(int type, int colwd, boolean close, boolean graph) {
-        ValueChart ch = new ValueChart(con, filename, type, colwd, true, graph);
+        ValueChart ch = new ValueChart(con, filename, log, attrData, entryList, type, colwd, true, graph);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -809,7 +909,7 @@ public class ValueChart extends JPanel {
     }
 
     public void compareDisplay(int type, int colwd) {
-        ValueChart ch = new ValueChart(con, filename, type, colwd, false, show_graph);
+        ValueChart ch = new ValueChart(con, filename, log, type, colwd, false, show_graph); // TODO
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -954,7 +1054,7 @@ public class ValueChart extends JPanel {
             last.elt = elt;
             last.domain = domain;
             if (domain != null) {
-                if (domain.getType() == AttributeDomain.DISCRETE) {
+                if (domain.getType() == AttributeDomainType.DISCRETE) {
                     DiscreteAttributeDomain d = ((DiscreteAttributeDomain) domain);
                     last.weight = (d.getEntry(elt)).weight;
                 } else {
@@ -1004,5 +1104,265 @@ public class ValueChart extends JPanel {
             }
             reset();
         }
+    }
+    
+    
+    void renderAttribute(TablePane pane, AttributeData a) {
+        BaseTableContainer container;
+        double hr = a.getWeight();
+        String name = a.getName();
+
+        if (a.isAbstract()) {
+            TablePane subpane = new TablePane();
+            if (chartTitle == null) {
+                // this is the first attribute level, so set the title of the
+                // window to the main title of the ValueChart
+                chartTitle = name.replace('_', ' ');
+            }
+            for (AttributeData c : a.getAbstract().getChildren()) {
+                renderAttribute(subpane, c);
+            }
+            container = new BaseTableContainer(subpane, name, this, colWidth);
+        } else {
+            AttributePrimitiveData prim = a.getPrimitive();
+            AttributeDomain domain = prim.getDomain();
+
+            AttributeCell cell = new AttributeCell(this, prim);
+            cell.setColWidth(colWidth);
+            cell.setColor(prim.getColor());
+            cell.setUnits(prim.getUnitsName());
+
+            container = new BaseTableContainer(cell, name, this, colWidth);
+        }
+
+        pane.addRow(container);
+        container.setHeightRatio(hr);
+        container.setRollUpRatio(hr);
+        container.setData(a);
+    }
+
+    void renderMainPaneAttributes() {
+        for (AttributeData a : attrData) {
+            renderAttribute(mainPane, a);
+        }
+    }
+
+    void updateMainPane() {
+        for (BaseTableContainer b : mainPane.getRowList()) {
+            b.updateSize();
+        }
+    }
+
+    // TODO: to be adjusted, not currently accurate
+    double getMainPaneHeight() {
+        return mainPane.getHeight();
+    }
+
+    void rebuildMainPane() {
+        mainPane = new TablePane();
+        renderMainPaneAttributes();
+        mainPane.adjustAttributesForDepth(mainPane.getDepth());
+
+        mainPane.fillInEntries(entryList);
+
+        mainPaneWithNames = new JPanel();
+        mainPaneWithNames.setLayout(new BoxLayout(mainPaneWithNames,
+                BoxLayout.Y_AXIS));
+
+        mainEntryNames = new EntryNamePanel(entryList, colWidth,
+                mainPane.getDepth(), true, this);
+        // mainPaneWithNames.add(Box.createVerticalStrut(40));//-
+        JPanel pnlBottom = new JPanel();
+        pnlBottom.setLayout(new BoxLayout(pnlBottom, BoxLayout.X_AXIS));
+        pnlBottom.add(Box.createHorizontalGlue());
+        pnlBottom.add(mainEntryNames);
+
+        mainPaneWithNames.add(mainPane);
+        mainPaneWithNames.add(pnlBottom);
+
+        removeAll();
+
+        /*
+         * if (displayType == SIDE_DISPLAY){ setLayout (new BoxLayout (this,
+         * BoxLayout.X_AXIS)); add(mainPaneWithNames); } else{ setLayout (new
+         * BoxLayout (this, BoxLayout.Y_AXIS)); add(mainPaneWithNames); if
+         * (displayType != SEPARATE_DISPLAY){ add
+         * (Box.createVerticalStrut(colWidth)); add (Box.createGlue()); } }
+         */
+
+        displayPanel = new DisplayPanel(colWidth);
+        displayPanel.setRootPane(mainPane);
+        displayPanel.setEntries(entryList);
+
+        JPanel pnlDisp = new JPanel();
+        pnlDisp.setLayout(new BoxLayout(pnlDisp, BoxLayout.X_AXIS));
+        pnlDom = new DomainValues(this);
+        if (displayType == SIDE_DISPLAY) {
+            pnlDisp.add(Box.createHorizontalGlue());
+        } else {
+            pnlDisp.add(Box.createHorizontalStrut(colWidth));
+            pnlOpt = new SensitivityAnalysisOptions(this);
+            pnlDisp.add(pnlOpt);
+            int blah = mainPane.getDepth();
+            // Note: subtracted 1 from mainPane depth, this might cause a
+            // problem if there is only one level.
+            pnlOpt.setPreferredSize(new Dimension((mainPane.getDepth() - 1)
+                    * headerWidth - colWidth + (show_graph ? graphWidth : 0),
+                    displayHeight));
+            pnlOpt.setMaximumSize(new Dimension((mainPane.getDepth() - 1)
+                    * headerWidth - colWidth, displayHeight));
+        }
+        pnlDisp.add(Box.createHorizontalGlue());
+        pnlDisp.add(displayPanel);
+
+        displayWithNames = new JPanel();
+        displayWithNames.setLayout(new BoxLayout(displayWithNames,
+                BoxLayout.Y_AXIS));
+        displayEntryNames = new EntryNamePanel(entryList, colWidth, 0, false,
+                this);
+        JPanel pnlNames = new JPanel();
+        pnlNames.setLayout(new BoxLayout(pnlNames, BoxLayout.X_AXIS));
+        pnlNames.add(Box.createHorizontalGlue());
+        // pnlNames.add(displayEntryNames);
+        pnlNames.add(Box.createRigidArea(new Dimension(colWidth, 0)));
+        displayWithNames.add(pnlDisp);
+        displayWithNames.add(pnlNames);
+
+        // int mainWidth = (entryList.size()+mainPane.getDepth())*colWidth;
+        int mainWidth = entryList.size() * colWidth;
+        // /**/ int dispWidth = entryList.size()*colWidth + colWidth;
+        int dispWidth = entryList.size() * colWidth + colWidth;
+
+        if (displayType == SIDE_DISPLAY) {
+            displayPanel.setMaximumSize(new Dimension(dispWidth, 10000));
+            displayPanel.setMinimumSize(new Dimension(dispWidth, 0));
+            // mainPaneWithNames.setAlignmentY(0.0f);
+        }
+
+        graphWidth = (show_graph ? graphWidth : 0);
+
+        mainPaneWithNames
+                .setMaximumSize(new Dimension(mainWidth
+                        + ((mainPane.getDepth() - 1) * headerWidth)
+                        + graphWidth, 10000));
+        mainPaneWithNames.setMinimumSize(new Dimension(mainWidth
+                + ((mainPane.getDepth() - 1) * headerWidth) + graphWidth, 0));
+        mainPaneWithNames.setPreferredSize(new Dimension(mainWidth
+                + ((mainPane.getDepth() - 1) * headerWidth) + graphWidth,
+                displayType == SIDE_DISPLAY ? displayHeight * 2 - 50
+                        : displayHeight));
+
+        int w = ((displayType == SIDE_DISPLAY) ? mainWidth + 40 : dispWidth)
+                + colWidth;// no real reason why it's 40
+
+        if (displayType == SIDE_DISPLAY) {
+            displayWithNames.setMaximumSize(new Dimension(w, 10000));
+            displayWithNames.setMinimumSize(new Dimension(w, 0));
+            displayWithNames.setPreferredSize(new Dimension(w,
+                    displayHeight * 2 - 50));
+        } else {
+            displayWithNames.setMaximumSize(new Dimension(w
+                    + (mainPane.getDepth() - 1) * headerWidth + graphWidth,
+                    10000));// - and rev x, y
+            displayWithNames.setMinimumSize(new Dimension(w
+                    + (mainPane.getDepth() - 1) * headerWidth + graphWidth, 0));// -
+                                                                                // and
+                                                                                // rev
+                                                                                // x,
+                                                                                // y
+            displayWithNames.setPreferredSize(new Dimension(w
+                    + (mainPane.getDepth() - 1) * headerWidth + graphWidth,
+                    displayHeight));// - and rev x, y
+        }
+        mainPane.updateSizesAndHeights();
+
+        if (displayType == SEPARATE_DISPLAY) {
+            dialog = new DisplayDialog(chartFrame, "Total Scores",
+                    displayWithNames);
+        }
+        if (displayType == DEFAULT_DISPLAY) {
+            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            add(displayWithNames);
+            add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        if (displayType == SIDE_DISPLAY) {
+            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            add(mainPaneWithNames);
+            add(Box.createHorizontalStrut(40));// -
+            add(Box.createGlue());
+            add(displayWithNames);
+        } else {
+            add(mainPaneWithNames);
+            if (displayType != SEPARATE_DISPLAY) {
+                // add (Box.createVerticalStrut(40));
+                // add (Box.createGlue());
+            }
+        }
+
+    }
+    
+
+    
+    public boolean logAttribute(int outputType, String msg) {
+        if (outputType == LogUserAction.OUTPUT_WEIGHT) {
+            return log.logAttributeWeight(attrData, msg);
+        }
+        else if (outputType == LogUserAction.OUTPUT_STATE) {
+            return log.logAttributeState(attrData, msg);
+        }
+
+        return false;
+    }
+    
+    public boolean logState() {
+        int temp = log.getVerbosity();
+        log.setVerbosity(LogUserAction.LOG_ALL);
+        boolean res = log.logAttributeState(attrData, "");
+        log.setVerbosity(temp);
+        return res;
+    }
+    
+    public boolean logConstruction() {
+        return log.logConstruction(attrData);
+    }
+    
+    public boolean logUtility(AttributeData data) {
+        return log.logUtility(data);
+    }
+    
+    public boolean logPump(String pumpAttr, boolean isInc) {
+        return log.logPump(attrData, pumpAttr, isInc);
+    }
+    
+    public boolean logDrag(AttributeData attr1, AttributeData attr2) {
+        return log.logDrag(attr1, attr2);
+    }
+    
+    public String outputAttributes(ColorList colors) {
+        String data = "";
+        for (AttributeData a : attrData) {
+            data = data + a.getObjectiveOutput(colors, 0);
+        }
+        return data;
+    }
+    
+    public boolean logString(String str, String msg) {
+        return log.log(str, msg);
+    }
+    
+    public void setLogOldAttributeData(String str) {
+        log.setOldAttrData(str);
+    }
+    
+    public void setLogVerbosity(int v) {
+        log.setVerbosity(v);
+    }
+
+    public LogUserAction getLog() {
+        return log;
+    }
+
+    public void setLog(LogUserAction log) {
+        this.log = log;
     }
 }

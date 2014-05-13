@@ -33,6 +33,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     AttributeCell acell;
     
     JPanel pnl;
+    boolean modified = false;
     
     public ContinuousUtilityGraph(ValueChart ch, ContinuousAttributeDomain dd, double[] it, double[] we, String un, String att, DefineValueFunction d, AttributeCell ac) {
        	
@@ -52,8 +53,14 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         plotPoints();
         addMouseListener(this);
         addMouseMotionListener(this);
-        if (chart!=null)
-        	showGraph();
+        if (chart!=null) {
+            if (acell != null && acell.getData() != null) {
+                AttributeData attrData = acell.getData();
+                if (attrData != null)
+                    chart.setLogOldAttributeData(LogUserAction.getSingleDataOutput(attrData, LogUserAction.OUTPUT_STATE));
+            }
+            showGraph();
+        }
         else
         	setGraph();      
         
@@ -85,6 +92,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     }
 
     public void mouseClicked(MouseEvent me) { 
+        modified = true;
         if((me.getX()< 40) && (me.getX() > 0) && (me.getY() > 240)){
             for(int i = 0; i < undo.length; i++){
             cdomain.removeKnot(items[i]);
@@ -192,6 +200,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     
     void movePoint(int x, int y) {
         if (moving == null) return;
+        modified = true;
         moving.setLocation(x, y);
         
         //Updating all the lines
@@ -293,7 +302,13 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         JDialog frame = new JDialog(chart.getFrame(), attributeName + " utility graph");
         frame.setModal(true);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if (modified && chart!=null && acell != null && acell.getData() != null) {
+                    chart.logUtility(acell.getData());
+                }
+            }
+        });
         //ContinuousUtilityGraph moving = new ContinuousUtilityGraph();
         //moving
         this.setPreferredSize(new Dimension(275,260));
@@ -307,6 +322,8 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     }
         
     class MoveablePoint extends Point2D.Float {
+        private static final long serialVersionUID = 1L;
+        
         int r = 4;
         Shape shape;
         public MoveablePoint(int x, int y) {

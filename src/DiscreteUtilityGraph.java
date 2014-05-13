@@ -30,6 +30,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     boolean undone;
     AttributeCell acell;
     JPanel pnl;    
+    boolean modified = false;
     
     public static Font LABELFONT = new Font("Verdana", Font.PLAIN, 10);
     public static Font LABELFONT_BOLD = new Font("Verdana", Font.BOLD, 10);
@@ -75,8 +76,14 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         
         addMouseListener(this);
         addMouseMotionListener(this);
-        if (chart!=null)
+        if (chart!=null) {
+            if (acell != null && acell.getData() != null) {
+                AttributeData attrData = acell.getData();
+                if (attrData != null)
+                    chart.setLogOldAttributeData(LogUserAction.getSingleDataOutput(attrData, LogUserAction.OUTPUT_STATE));
+            }
         	showGraph();
+        }
         else
         	setGraph();        
     }
@@ -111,6 +118,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     }
     
     public void mouseClicked(MouseEvent me) {
+        modified = true;
         if((me.getX()< 40) && (me.getX() > 0) && (me.getY() > 240)){
             undone = true;
             int Incre = 240 / items.length; // This is the variable that calculate how far each point should be.
@@ -223,6 +231,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     
     void movePoint(int x, int y) {
         if (moving == null) return;
+        modified = true;
         moving.setLocation(x, y);
         
         //Updating all the lines
@@ -337,7 +346,13 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         JFrame frame = new JFrame(attributeName + " utility graph");
         
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if (modified && chart!=null && acell != null && acell.getData() != null) {
+                    chart.logUtility(acell.getData());
+                }
+            }
+        });
         //ContinuousUtilityGraph moving = new ContinuousUtilityGraph();
         //moving
         this.setPreferredSize(new Dimension(275,260));
@@ -351,6 +366,8 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     
     
     class MoveablePoint extends Point2D.Float {
+        private static final long serialVersionUID = 1L;
+        
         int r = 4;
         Shape shape;
         public MoveablePoint(int x, int y) {

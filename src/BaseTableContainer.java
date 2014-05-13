@@ -1,12 +1,8 @@
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.border.*;
-
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -58,6 +54,15 @@ public class BaseTableContainer extends Box implements ActionListener {
     int preferredHeaderWidth = 0;
     String weight;
     JPopupMenu popAttribute;
+    private AttributeData data = null;
+
+    public AttributeData getData() {
+        return data;
+    }
+
+    public void setData(AttributeData data) {
+        this.data = data;
+    }
 
     public BaseTableContainer(JComponent table, ValueChart chart) {
         this(table, null, chart, -1);
@@ -86,10 +91,10 @@ public class BaseTableContainer extends Box implements ActionListener {
             if (table instanceof AttributeCell) {
                 AttributeCell ac = (AttributeCell) table;
                 JPanel graph = null;
-                if (ac.getDomain().getType() == AttributeDomain.DISCRETE) {
-                    graph = ac.makeDiscGraph(ac.domain);
+                if (ac.getDomain().getType() == AttributeDomainType.DISCRETE) {
+                    graph = ac.makeDiscGraph(ac.getDomain());
                 } else {
-                    graph = ac.makeContGraph(ac.domain);
+                    graph = ac.makeContGraph(ac.getDomain());
                 }
                 add(graph);
 
@@ -224,8 +229,8 @@ public class BaseTableContainer extends Box implements ActionListener {
         double wt = 0.0;
         TablePane pt = (TablePane) getParent();
         if (pt.getDepth() != chart.mainPane.getDepth() - 1) {
-            for (Iterator it = pt.getRows(); it.hasNext();) {
-                BaseTableContainer comp = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = pt.getRows(); it.hasNext();) {
+                BaseTableContainer comp = it.next();
                 wt += comp.rollUpRatio;
             }
             BaseTableContainer abs = (BaseTableContainer) pt.getParent();
@@ -242,8 +247,8 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
         if (table instanceof TablePane) {
             TablePane tab = (TablePane) table;
-            for (Iterator it = tab.getRows(); it.hasNext();) {
-                ((BaseTableContainer) it.next()).setAbstractRatios();
+            for (Iterator<BaseTableContainer> it = tab.getRows(); it.hasNext();) {
+                it.next().setAbstractRatios();
             }
         }
     }
@@ -258,8 +263,8 @@ public class BaseTableContainer extends Box implements ActionListener {
 
     private void propogateHeightScale() {
         if (table instanceof TablePane) {
-            for (Iterator it = ((TablePane) table).getRows(); it.hasNext();) {
-                BaseTableContainer comp = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = ((TablePane) table).getRows(); it.hasNext();) {
+                BaseTableContainer comp = it.next();
                 comp.setHeightScale(heightScale * heightRatio);
             }
         }
@@ -298,9 +303,9 @@ public class BaseTableContainer extends Box implements ActionListener {
     private void updateHeadersRecursively() {
         updateHeader();
         if (table instanceof TablePane) {
-            Iterator it;
-            for (it = ((TablePane) table).rowList.iterator(); it.hasNext();) {
-                ((BaseTableContainer) it.next()).updateHeadersRecursively();
+            Iterator<BaseTableContainer> it;
+            for (it = ((TablePane) table).getRows(); it.hasNext();) {
+                it.next().updateHeadersRecursively();
             }
         }
     }
@@ -310,9 +315,9 @@ public class BaseTableContainer extends Box implements ActionListener {
             return 0;
         } else if (table instanceof TablePane) {
             double w = 0;
-            Iterator it;
-            for (it = ((TablePane) table).rowList.iterator(); it.hasNext();) {
-                w += ((BaseTableContainer) it.next()).entryWeight(entry);
+            Iterator<BaseTableContainer> it;
+            for (it = ((TablePane) table).getRows(); it.hasNext();) {
+                w += it.next().entryWeight(entry);
             }
             return w;
         } else {
@@ -339,11 +344,12 @@ public class BaseTableContainer extends Box implements ActionListener {
         //header.setText (s);
         //header.setToolTipText (s);
 
-        Integer pct = (int)(s * 100);
+        s = data.getWeight();
+        //long pct = Math.round(s * 100);
         Double pct_d = s * 100.0;
         
-//        DecimalFormat twoDForm = new DecimalFormat("#.##");
-//        Double pct = Double.valueOf(twoDForm.format(pct_d));
+        DecimalFormat twoDForm = new DecimalFormat("#.##");
+        Double pct = Double.valueOf(twoDForm.format(pct_d));
         
 //        String pct = String.format("%.2f", Double.valueOf(pct_d).toString());
 //        System.out.println(name+" "+heightRatio+" "+heightScale);
@@ -477,16 +483,21 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             Component comp = bTopNei.getParent();
             BaseTableContainer base = bNei;
+            
+            double del = (double)delY/chart.getMainPaneHeight();
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
-                for (Iterator it = tp.getRows(); it.hasNext();) {
-                    BaseTableContainer b = (BaseTableContainer) it.next();
+                for (Iterator<BaseTableContainer> it = tp.getRows(); it.hasNext();) {
+                    BaseTableContainer b = it.next();
                     if (b.isAncestorOf(base) || (b == base)) {
                         b.setExactSize(b.getWidth(), b.getHeight() + delY);
                         realignPanels(tp, b);
                         b.setRollUpRatio(b.heightRatio * b.heightScale);
                         comp = b.table;
+                        if (b == base) {
+                            b.data.getPrimitive().setWeight(base.data.getWeight() + del);
+                        }
                     }
                     realignPanels(tp, b);
                 }
@@ -497,13 +508,16 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
-                for (Iterator it = tp.getRows(); it.hasNext();) {
-                    BaseTableContainer b = (BaseTableContainer) it.next();
+                for (Iterator<BaseTableContainer> it = tp.getRows(); it.hasNext();) {
+                    BaseTableContainer b = it.next();
                     if (b.isAncestorOf(base) || (b == base)) {
                         b.setExactSize(b.getWidth(), b.getHeight() - delY);
                         realignPanels(tp, b);
                         b.setRollUpRatio(b.heightRatio * b.heightScale);
                         comp = b.table;
+                        if (b == base) {
+                            b.data.getPrimitive().setWeight(base.data.getWeight() - del);
+                        }
                     }
                     realignPanels(tp, b);
                 }
@@ -523,16 +537,21 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             Component comp = bTopSel.getParent();
             BaseTableContainer base = bSel;
+            
+            double del = (double)delY/chart.getMainPaneHeight();
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
-                for (Iterator it = tp.getRows(); it.hasNext();) {
-                    BaseTableContainer b = (BaseTableContainer) it.next();
+                for (Iterator<BaseTableContainer> it = tp.getRows(); it.hasNext();) {
+                    BaseTableContainer b = it.next();
                     if (b.isAncestorOf(base) || (b == base)) {
                         b.setExactSize(b.getWidth(), b.getHeight() + delY);
                         realignPanels(tp, b);
                         b.setRollUpRatio(b.heightRatio * b.heightScale);
                         comp = b.table;
+                        if (b == base) {
+                            b.data.getPrimitive().setWeight(base.data.getWeight() + del);
+                        }
                     }
                     realignPanels(tp, b);
                 }
@@ -544,13 +563,16 @@ public class BaseTableContainer extends Box implements ActionListener {
 
             while (comp instanceof TablePane) {
                 TablePane tp = (TablePane) comp;
-                for (Iterator it = tp.getRows(); it.hasNext();) {
-                    BaseTableContainer b = (BaseTableContainer) it.next();
+                for (Iterator<BaseTableContainer> it = tp.getRows(); it.hasNext();) {
+                    BaseTableContainer b = it.next();
                     if (b.isAncestorOf(base) || (b == base)) {
                         b.setExactSize(b.getWidth(), b.getHeight() - delY);
                         realignPanels(tp, b);
                         b.setRollUpRatio(b.heightRatio * b.heightScale);
                         comp = b.table;
+                        if (b == base) {
+                            b.data.getPrimitive().setWeight(base.data.getWeight() - del);
+                        }
                     }
                     realignPanels(tp, b);
                 }
@@ -559,8 +581,8 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
 
         void realignAll(TablePane tab) {
-            for (Iterator it = tab.getRows(); it.hasNext();) {
-                BaseTableContainer b = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = tab.getRows(); it.hasNext();) {
+                BaseTableContainer b = it.next();
                 realignPanels(tab, b);
                 if (b.table instanceof TablePane) {
                     realignAll((TablePane) b.table);
@@ -569,7 +591,7 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
 
         public void realignPanels(TablePane t, BaseTableContainer b) {
-            BaseTableContainer p = (BaseTableContainer) t.prevRow(b);
+            BaseTableContainer p = t.prevRow(b);
             if (p == null) {
                 b.setLocation(b.getLocation().x, 0);
             } else {
@@ -596,9 +618,15 @@ public class BaseTableContainer extends Box implements ActionListener {
             prev.setSize(adjDim.width, adjDim.height + dy);
             base.computeHeightRatio();
             prev.computeHeightRatio();
+            if (chart != null) {
+                double del = dy/chart.mainPane.getHeight();
+                base.data.getPrimitive().setWeight(base.data.getWeight() - del);
+                prev.data.getPrimitive().setWeight(prev.data.getWeight() + del);
+            }
             base.revalidate();
             prev.revalidate();
             if (chart != null) {
+                chart.updateMainPane();
                 chart.updateDisplay();
             }
         }
@@ -615,11 +643,17 @@ public class BaseTableContainer extends Box implements ActionListener {
             Point adjPos = next.getLocation();
             next.setLocation(adjPos.x, adjPos.y + dy);
             next.setSize(adjDim.width, adjDim.height - dy);
+            if (chart != null) {
+                double del = dy/chart.mainPane.getHeight();
+                base.data.getPrimitive().setWeight(base.data.getWeight() + del);
+                next.data.getPrimitive().setWeight(next.data.getWeight() - del);
+            }
             base.computeHeightRatio();
             base.revalidate();
             next.computeHeightRatio();
             next.revalidate();
             if (chart != null) {
+                chart.updateMainPane();
                 chart.updateDisplay();
             }
         }
@@ -779,9 +813,18 @@ public class BaseTableContainer extends Box implements ActionListener {
                 tNei = tTopNei;
                 while (!(bNei.table instanceof AttributeCell)) {
                     tNei = (TablePane) bNei.table;
-                    bNei = (BaseTableContainer) tNei.rowList.get(0);
+                    bNei = tNei.getRowAt(0);
                 }
             }
+            
+            String str = "";
+            if (bSel.getData() != null) {
+                str = LogUserAction.getSingleDataOutput(bSel.getData(), LogUserAction.OUTPUT_WEIGHT);
+            }
+            if (bNei.getData() != null) {
+                str += LogUserAction.getSingleDataOutput(bNei.getData(), LogUserAction.OUTPUT_WEIGHT);
+            }
+            chart.setLogOldAttributeData(str);
         }
 
         void setEastRollup(BaseTableContainer b) {
@@ -804,9 +847,18 @@ public class BaseTableContainer extends Box implements ActionListener {
                 tNei = tTopNei;
                 while (!(bNei.table instanceof AttributeCell)) {
                     tNei = (TablePane) bNei.table;
-                    bNei = (BaseTableContainer) tNei.rowList.get(tNei.rowList.size() - 1);
+                    bNei = tNei.getRowLast();
                 }
             }
+            
+            String str = "";
+            if (bSel.getData() != null) {
+                str = LogUserAction.getSingleDataOutput(bSel.getData(), LogUserAction.OUTPUT_WEIGHT);
+            }
+            if (bNei.getData() != null) {
+                str += LogUserAction.getSingleDataOutput(bNei.getData(), LogUserAction.OUTPUT_WEIGHT);
+            }
+            chart.setLogOldAttributeData(str);
         }
 
         void upSize(BaseTableContainer b) {
@@ -816,8 +868,8 @@ public class BaseTableContainer extends Box implements ActionListener {
                 BaseTableContainer bp = (BaseTableContainer) p.getParent();
                 if (bp.getParent() != chart.mainPane) {
                     int ht = 0;
-                    for (Iterator it = p.getRows(); it.hasNext();) {
-                        ht += ((BaseTableContainer) it.next()).getHeight();
+                    for (Iterator<BaseTableContainer> it = p.getRows(); it.hasNext();) {
+                        ht += it.next().getHeight();
                     }
 
                     bp.setExactSize(bp.getWidth(), ht);
@@ -827,10 +879,12 @@ public class BaseTableContainer extends Box implements ActionListener {
         }
 
         public void pump(BaseTableContainer base, boolean up) {
+            chart.setLogOldAttributeData(LogUserAction.getDataOutput(chart.attrData, LogUserAction.OUTPUT_WEIGHT));
             Vector prims = chart.getPrims();
             double othercount = -1;
             for (Iterator it = prims.iterator(); it.hasNext();) {
-                if (((BaseTableContainer) it.next()).rollUpRatio > 0) {
+                BaseTableContainer b = (BaseTableContainer) it.next(); 
+                if (b.data.getWeight() > 0) {
                     othercount = othercount + 1;
                 }
             }
@@ -842,27 +896,26 @@ public class BaseTableContainer extends Box implements ActionListener {
                 BaseTableContainer b = (BaseTableContainer) it.next();
                 //int bsize = b.getHeight(); //height of primitive at start			
                 if (b == base) {
-                    b.setRollUpRatio(b.rollUpRatio + pump);
+                    b.setRollUpRatio(b.data.getWeight() + pump);
+                    b.data.getPrimitive().setWeight(b.data.getWeight() + pump);
                 } else {
                     if (b.rollUpRatio < (pump / othercount)) {
-                        double d = b.getRollUpRatio();
+                        double d = b.data.getWeight();
                         if (b.rollUpRatio != 0) {
                             base.setRollUpRatio(base.rollUpRatio + (pump / othercount - d));
+                            base.data.getPrimitive().setWeight(base.data.getWeight() + (pump / othercount - d));
                         }
                         b.setRollUpRatio(0);
+                        b.data.getPrimitive().setWeight(0);
                     } else {
                         b.setRollUpRatio(b.rollUpRatio - pump / othercount);
+                        b.data.getPrimitive().setWeight(b.data.getWeight() - pump / othercount);
                     }
                 }
             }
-            for (Iterator it = chart.getPrims().iterator(); it.hasNext();) {
-                BaseTableContainer b = (BaseTableContainer) it.next();
-                b.setExactSize(b.getWidth(), (int) Math.round(b.rollUpRatio * chart.mainPane.getHeight()));
-            }
-            for (Iterator it = chart.getPrims().iterator(); it.hasNext();) {
-                upSize((BaseTableContainer) it.next());
-            }
+            chart.updateMainPane();
             realignAll(chart.mainPane);
+            chart.logPump(base.data.getName(), up);
         }
         //-double-click for sorting by objective: call to reorder	
 
@@ -890,8 +943,8 @@ public class BaseTableContainer extends Box implements ActionListener {
                             }
                             setSize(getWidth() + pump, getHeight());
 
-                            for (Iterator it = par.getRows(); it.hasNext();) {
-                                BaseTableContainer b = (BaseTableContainer) it.next();
+                            for (Iterator<BaseTableContainer> it = par.getRows(); it.hasNext();) {
+                                BaseTableContainer b = it.next();
                                 if (b != BaseTableContainer.this) {
                                     b.setSize(b.getWidth(), b.getHeight() - pump / sibcount);
                                 }
@@ -908,7 +961,7 @@ public class BaseTableContainer extends Box implements ActionListener {
             			chart.reorderEntries(BaseTableContainer.this);
             		}
             		else if (e.getComponent().toString().startsWith("DiscGraph") || e.getComponent().toString().startsWith("ContGraph")) {
-                        ((AttributeCell) table).getUtility(((AttributeCell) table).domain);
+                        ((AttributeCell) table).getUtility(((AttributeCell) table).getDomain());
                     } 
 //            		else {
 //                        chart.reorderEntries(BaseTableContainer.this);
@@ -922,6 +975,8 @@ public class BaseTableContainer extends Box implements ActionListener {
             int dy = undoY - relY;
             if (dragMode == EAST_ROLLUP_STRETCH_DRAG) {
                 chart.last_int.setUndoSlide(BaseTableContainer.this, dy, relY, true);
+                
+                chart.logDrag(bSel.getData(), bNei.getData());
             }
             /*			if (dragMode == WEST_ROLLUP_STRETCH_DRAG)
              chart.last_int.setUndoSlide(BaseTableContainer.this, -dy, relY, false);	*/
@@ -958,7 +1013,7 @@ public class BaseTableContainer extends Box implements ActionListener {
         
     public void actionPerformed(ActionEvent ae) {
         if (("Value Function SA...").equals(ae.getActionCommand())) {
-            ((AttributeCell) table).makeUtility(((AttributeCell) table).domain);
+            ((AttributeCell) table).makeUtility(((AttributeCell) table).getDomain());
         } else if (("Set Color...").equals(ae.getActionCommand())) {
             new ColorSelection(table, chart, header);
         } else if (("Edit").equals(ae.getActionCommand())) {
@@ -966,6 +1021,19 @@ public class BaseTableContainer extends Box implements ActionListener {
         } else if (("Criteria Details in Report").equals(ae.getActionCommand())) {
             //go to the valuechart report
             chart.zoomToReport(this.getName());
+        }
+    }
+    
+    public void updateSize() {
+        if (data == null)
+            return;
+        setExactSize(getWidth(), (int) Math.round(data.getWeight() * chart.mainPane.getHeight()));
+        // abstract
+        if (!(table instanceof AttributeCell)) {
+            for (Iterator<BaseTableContainer> it = ((TablePane) table).getRows(); it.hasNext();) {
+                BaseTableContainer comp = it.next();
+                comp.updateSize();
+            }
         }
     }
 }

@@ -7,14 +7,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.swing.JPanel;
 import org.icepdf.core.pobjects.OutlineItem;
-import org.icepdf.core.pobjects.Outlines;
 import org.icepdf.ri.common.ComponentKeyBinding;
-import org.icepdf.ri.common.OutlineItemTreeNode;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingViewBuilder;
 import org.icepdf.ri.common.views.DocumentViewControllerImpl;
@@ -31,7 +26,7 @@ public class AttributeCell extends JComponent {
     private ValueChart chart;
     private String units;
     private double threshold;
-    AttributeDomain domain;
+    private AttributePrimitiveData data;
     JPopupMenu domainPopup;
     JPopupMenu entryPopup;
     JMenuItem entryPopupMenuItem;
@@ -44,13 +39,13 @@ public class AttributeCell extends JComponent {
     JFrame[] window; //the windows created for the attribute, these are used to show the report. They are class variables because we need to toggle visibility from different methods
     JPanel[] viewerComponentPanel; //the panel for which the fram sits on;
 
-    public AttributeCell(ValueChart chart, AttributeDomain domain) {
+    public AttributeCell(ValueChart chart, AttributePrimitiveData data) {
         MouseHandler mouseHandler = new MouseHandler();
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         //addComponentListener(new ResizeHandler());
         this.chart = chart;
-        this.domain = domain;
+        this.data = data;
     }
 
     //temp
@@ -58,8 +53,8 @@ public class AttributeCell extends JComponent {
         return attributeName;
     }
 
-    public void setDomain(AttributeDomain ad) {
-        domain = ad;
+    public void setData(AttributePrimitiveData d) {
+        data = d;
     }
 
     public double getOverallRatio() { // return overallRatio;
@@ -131,14 +126,14 @@ public class AttributeCell extends JComponent {
 
     public JPopupMenu getDomainPopup() {
         if (domainPopup == null) {
-            makeHelpPopups(domain);
+            makeHelpPopups(getDomain());
         }
         return domainPopup;
     }
 
     public JPopupMenu getEntryPopup() {
         if (entryPopup == null) {
-            makeHelpPopups(domain);
+            makeHelpPopups(getDomain());
         }
         return entryPopup;
     }
@@ -148,7 +143,7 @@ public class AttributeCell extends JComponent {
         String best = "";
         String worst = "";
         DecimalFormat df = obj.decimalFormat;
-        if (domain.getType() == AttributeDomain.DISCRETE) {
+        if (domain.getType() == AttributeDomainType.DISCRETE) {
             DiscreteAttributeDomain dd = (DiscreteAttributeDomain) domain;
             String elt[] = dd.getElements();
             double wt[] = dd.getWeights();
@@ -209,7 +204,7 @@ public class AttributeCell extends JComponent {
 
     //This is added to display utility graph
     public void getUtility(AttributeDomain domain) {
-        if (domain.getType() == AttributeDomain.DISCRETE) {
+        if (domain.getType() == AttributeDomainType.DISCRETE) {
             DiscreteAttributeDomain dd =
                     (DiscreteAttributeDomain) domain;
             new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
@@ -222,7 +217,7 @@ public class AttributeCell extends JComponent {
 
     //This will make function call to get utility graph
     public void makeUtility(AttributeDomain domain) {
-        if (domain.getType() == AttributeDomain.DISCRETE) {
+        if (domain.getType() == AttributeDomainType.DISCRETE) {
             DiscreteAttributeDomain dd =
                     (DiscreteAttributeDomain) domain;
             new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
@@ -246,7 +241,11 @@ public class AttributeCell extends JComponent {
     }
 
     AttributeDomain getDomain() {
-        return domain;
+        return data.getDomain();
+    }
+
+    public AttributePrimitiveData getData() {
+        return data;
     }
 
     public int getColWidth() {
@@ -406,12 +405,13 @@ public class AttributeCell extends JComponent {
             g.setColor(Color.WHITE);
             g.fillRect(x, 0, colWidth, (int) ((1 - value.weight()) * height));
 
-            g.setFont(new Font("Verdana", Font.BOLD, 10));
+            Font f = new Font("Verdana", Font.BOLD, 10);
+            g.setFont(f);
 
             try {
                 if (entry.getShowFlag()) {
                     g.setColor(Color.BLACK);
-                    g.drawString(value.stringValue(), x + 2, wthresh - 5);
+                	g.drawString(value.stringValue(), x+2, height-5);                    
                 }
             } catch (java.lang.NullPointerException ne) {
             }

@@ -13,14 +13,12 @@ import acme.misc.ScanfReader;
 //NOTE: THIS IS JUST AN ABSTRACT CLASS
 public abstract class AttributeDomain
 {
-	public static final int DISCRETE = 1;
-	public static final int CONTINUOUS = 2;
 
 	public AttributeDomain()
 	 { 
 	 }
 
-	public abstract int getType();
+	public abstract AttributeDomainType getType();
 
         //getElemnts give you the value in a discrete domain
 	public String[] getElements()
@@ -72,9 +70,9 @@ public abstract class AttributeDomain
 
 	*/
 	
-	public static AttributeDomain getInfo(Vector xval, Vector yval, int type){
+	public static AttributeDomain getInfo(Vector xval, Vector yval, AttributeDomainType type){
 		AttributeDomain domain = null;
-		if (type == DISCRETE){	      	
+		if (type == AttributeDomainType.DISCRETE){	      	
 			domain = new DiscreteAttributeDomain();
             for (int i=0; i<yval.size(); i++ ){	      	
             	Double dbl = (Double) yval.get(i);
@@ -119,7 +117,7 @@ public abstract class AttributeDomain
 		 if (domain == null)
 		  { domain = new DiscreteAttributeDomain();
 		  }
-		 else if (domain.getType() == CONTINUOUS)
+		 else if (domain.getType() == AttributeDomainType.CONTINUOUS)
 		  { throw new IOException ("Line "+scanReader.getLineNumber()+
 ": continuous domains cannot have symbolic entries");
 		  }
@@ -128,7 +126,7 @@ public abstract class AttributeDomain
 	       { if (domain == null)
 		  { domain = new ContinuousAttributeDomain();
 		  }
-		 else if (domain.getType() == DISCRETE)
+		 else if (domain.getType() == AttributeDomainType.DISCRETE)
 		  { throw new IOException ("Line "+scanReader.getLineNumber()+
 ": discrete domains cannot have numeric entries");
 		  }
@@ -154,7 +152,7 @@ public abstract class AttributeDomain
 	       { throw new IOException ("Line " + scanReader.getLineNumber() + 
 ": weight " + val + " should be within [0,1]");
 	       } 
-	      if (domain.getType() == DISCRETE)
+	      if (domain.getType() == AttributeDomainType.DISCRETE)
 	       { ((DiscreteAttributeDomain)domain).addElement(ordstr, val);
 	       }
 	      else
