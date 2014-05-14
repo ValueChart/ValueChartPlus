@@ -31,6 +31,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     private DefineAlternativesPanel pnlAlternatives;
     private DefineValueFunction pnlValueFunction;
     private DefineInitialWeights pnlWeighting;
+    private WeightingBySMARTER pnlSMARTER;
     JObjective lblRoot;
     JPopupMenu popObjective;
 
@@ -69,12 +70,15 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         pnlValueFunction = new DefineValueFunction(this);
         constPane.addTab("Values", pnlValueFunction);
         pnlWeighting = new DefineInitialWeights(this);
+        pnlSMARTER = new WeightingBySMARTER(this, true);
+        constPane.addTab("SMARTER", pnlSMARTER);
         constPane.addTab("Weighting", pnlWeighting);
 
         // disable other tabs at first
         constPane.setEnabledAt(1, false);
         constPane.setEnabledAt(2, false);
         constPane.setEnabledAt(3, false);
+        constPane.setEnabledAt(4, false);
 
         // Set up the command buttons
         btnOK = new JButton("    OK    ");
@@ -117,6 +121,10 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         return pnlAlternatives;
     }
 
+    public DefineInitialWeights getWeightPanel() {
+        return pnlWeighting;
+    }
+
     public void stateChanged(ChangeEvent ce) {
         JTabbedPane pane = (JTabbedPane) ce.getSource();
         int sel = pane.getSelectedIndex();
@@ -136,6 +144,20 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             break;
         }
         case 3: {
+            if (pnlValueFunction.checkAllUtility()) {
+                pnlWeighting.setObjectiveList();
+                String problem  = "";
+                if (chart != null) problem = chart.getChartTitle();
+                pnlSMARTER.startWeighting(problem);
+            }
+            else {
+                vf_flag = false;
+                pane.setSelectedIndex(2);
+                vf_flag = true;
+            }
+            break;
+        }
+        case 4: {
             if (pnlValueFunction.checkAllUtility())
                 pnlWeighting.setObjectiveList();
             else {

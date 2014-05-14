@@ -96,7 +96,7 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         menu.add(menuItem);
         menuItem = new MenuEntry("Value Function");  
         menu.add(menuItem);
-        menuItem = new MenuEntry("Initial Weighting");  
+        menuItem = new MenuEntry("Weighting");  
         menu.add(menuItem);  
         add(menu);
         
@@ -266,8 +266,8 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		else if ("Value Function".equals(ae.getActionCommand())){
 			chart.showEditView(2);
 		}
-		else if ("Initial Weighting".equals(ae.getActionCommand())){
-			chart.showEditView(3);
+		else if ("Weighting".equals(ae.getActionCommand())){
+			chart.showEditView(4);
 		}		
 		else if ("Vertical".equals(ae.getActionCommand())){
 			chart.resetDisplay(1, chart.getColWidth(), true, chart.show_graph);		
