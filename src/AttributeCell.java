@@ -371,6 +371,26 @@ public class AttributeCell extends JComponent {
             return -1;
         }
     }
+    
+    // http://www.splitbrain.org/blog/2008-09/18-calculating_color_contrast_with_php
+    public static boolean useBlackForeground(Color background) {
+        int black = 0;
+        int r = background.getRed();
+        int g = background.getGreen();
+        int b = background.getBlue();
+        
+        // brightness
+        int bright = (299 * r + 587 * g + 114 * b) / 1000;
+        black += (bright >= 125 ? 1 : 0);
+        
+        // luminosity
+        double lumo = 0.2126 * Math.pow(r/255, 2.2) +
+                0.7152 * Math.pow(g/255, 2.2) +
+                0.0722 * Math.pow(b/255, 2.2);
+        black += (lumo >= 5 ? 1 : 0);
+        
+        return (black >= 1);
+    }
 
     public void paint(Graphics g) {
         int width = getWidth();
@@ -394,7 +414,7 @@ public class AttributeCell extends JComponent {
             g.setColor(color);
             int wthresh = Math.max(hpos, thresholdPos);
             if (wthresh < height) {
-                g.setColor(Color.darkGray);
+                g.setColor(Color.lightGray);
                 g.fillRect(x, wthresh, colWidth, h);
             }
             if (wthresh > hpos) {
@@ -410,14 +430,33 @@ public class AttributeCell extends JComponent {
 
             try {
                 if (entry.getShowFlag()) {
-                    g.setColor(Color.BLACK);
+                    // completely grey background
+                    if (wthresh < height - 10) {
+                        g.setColor(Color.darkGray);
+                    } else {
+                        boolean black = useBlackForeground(data.getColor());
+                        // completely coloured background
+                        if (hpos < height - 10){
+                            g.setColor((black ? Color.BLACK : Color.WHITE));
+                            // partially white, partially grey background
+                        } else if ( (wthresh < height - 7) ) {
+                            g.setColor(Color.darkGray);
+                            // partially white, partially dark coloured background
+                        } else if ( ((hpos < height - 7) && !black) ) {
+                            g.setColor(Color.darkGray);
+                            // mostly white background
+                        } else {
+                            g.setColor(Color.BLACK);
+                        }
+                    }
                 	g.drawString(value.stringValue(), x+2, height-5);                    
                 }
             } catch (java.lang.NullPointerException ne) {
             }
 
 
-            g.setColor(Color.lightGray);
+            // vertical grid line
+            g.setColor(ValueChart.gridColor);
             x += colWidth;
             g.drawLine(x - 1, 0, x - 1, height - 1);
 

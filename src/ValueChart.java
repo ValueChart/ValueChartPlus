@@ -27,6 +27,8 @@ public class ValueChart extends JPanel {
     static public final int DEFAULT_DISPLAY = 1,
             SIDE_DISPLAY = 2,
             SEPARATE_DISPLAY = 3;
+    static public final Color gridColor = new Color(150, 150, 150); // between lightgray and gray
+    
     int headerWidth = 250;
     int graphWidth = 100;
     int displayType = DEFAULT_DISPLAY;
@@ -77,9 +79,9 @@ public class ValueChart extends JPanel {
 
 //CONSTRUCTOR
     
-    public ValueChart(ValueChart vc) {
+    /*public ValueChart(ValueChart vc) {
         super();
-    }
+    }*/
     
     public ValueChart(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g, boolean dispUtil) {
         super();

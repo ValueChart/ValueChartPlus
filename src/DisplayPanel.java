@@ -146,7 +146,8 @@ public class DisplayPanel extends JComponent {
             }
         }
 
-        g.setColor(Color.lightGray);
+        // vertical grid line
+        g.setColor(ValueChart.gridColor);
         str_x = align_right + colWidth;	//temp, was only colWidth
         for (int i = 1; i < numEntries + 1; i++) {
             g.drawLine(str_x, 0, str_x, totalHeight - 1);
