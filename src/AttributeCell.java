@@ -523,14 +523,14 @@ public class AttributeCell extends JComponent {
             dragY = newY;
             int height = getHeight();
 
-            if (dragMode == MOVING && height > 1) {
+            if (dragMode == MOVING && height >= 1) {
                 thresholdPos += delY;
                 if (thresholdPos <= 0) {
                     thresholdPos = 0;
-                } else if (thresholdPos > height - 1) {
-                    thresholdPos = height - 1;
+                } else if (thresholdPos > height) {
+                    thresholdPos = height;
                 }
-                threshold = (height - thresholdPos) / (double) (height - 1);//-
+                threshold = (height - thresholdPos) / (double) (height);//-
                 boolean redisplay = false;
                 for (Iterator it = entryList.iterator(); it.hasNext();) {
                     ChartEntry entry = (ChartEntry) it.next();
@@ -547,11 +547,11 @@ public class AttributeCell extends JComponent {
                             }
                         }
                     } else {
-                        if (threshold >= h && !entry.isMasked() && threshold > 1.0 / ((double) height - 1.0)) {//added 2013 because bug fix above wasn't working for domain values = 0. Because height-1 might be zero, added condition 
+                        if (threshold >= h && !entry.isMasked() && threshold >= 1.0 / ((double) height)) {//added 2013 because bug fix above wasn't working for domain values = 0. Because height-1 might be zero, added condition 
                             if (entry.addMaskingAttribute(AttributeCell.this)) {
                                 redisplay = true;
                             }
-                        } else if (threshold < h && entry.isMasked() || threshold <= 1.0 / ((double) height - 1.0)) {//added 2013 because bug fix above wasn't working for domain values = 0. Because height-1 might be zero, added condition  
+                        } else if (threshold < h && entry.isMasked() || threshold < 1.0 / ((double) height)) {//added 2013 because bug fix above wasn't working for domain values = 0. Because height-1 might be zero, added condition  
                             if (entry.removeMaskingAttribute(AttributeCell.this)) {
                                 redisplay = true;
                             }
