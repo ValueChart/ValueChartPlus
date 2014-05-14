@@ -10,16 +10,16 @@ attributes
 		attributes location *
 			area 0.46 { "nightlife" 0.5, "beach" 1.0, "airport" 0.0 }
 				color=area end
-			skytrain-distance 0.09 { 1.0 1.0, 5.0 0.5, 9.0 0.0 }
+			skytrain-distance 0.09 { 1.0 1.0, 3.0 0.75, 5.0 0.5, 7.0 0.25, 9.0 0.0 }
 				color=skytrain-distance units=blocks end
 		end
 		attributes room *
-			size 0.04 { 200.0 0.0, 275.0 0.5, 350.0 1.0 }
+			size 0.04 { 200.0 0.0, 237.5 0.25, 275.0 0.5, 312.5 0.75, 350.0 1.0 }
 				color=size units=sq-ft end
 			internet-access 0.21 { "none" 0.0, "highspeed" 1.0, "lowspeed" 0.24500000476837158 }
 				color=internet-access end
 		end
-		rate 0.2 { 100.0 1.0, 150.0 0.5, 200.0 0.0 }
+		rate 0.2 { 100.0 1.0, 125.0 0.75, 150.0 0.5, 175.0 0.25, 200.0 0.0 }
 			color=rate units=CAD end
 	end
 end
