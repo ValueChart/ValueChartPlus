@@ -41,7 +41,6 @@ public class JObjective extends JLabel{
 
 	int origin;        
     boolean init;			//for new objectives, shows whether first value function is created
-	ValueChart chart=null;	//needed for utility graphs
     AttributeCell acell;
     
 	DecimalFormat decimalFormat;
@@ -244,14 +243,16 @@ public class JObjective extends JLabel{
     	DefineValueFunction dvf = d;
     	JPanel pnl = new JPanel();
     	pnl.setLayout(new FlowLayout());
+        ValueChart chart = null;
+        if (dvf != null && dvf.con != null) chart = dvf.con.chart;
         if (getDomainType() == AttributeDomainType.DISCRETE) {
         	DiscreteAttributeDomain dd = (DiscreteAttributeDomain)getDomain();
-        	DiscreteUtilityGraph dug = new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), getName(), dvf, acell);
+        	DiscreteUtilityGraph dug = new DiscreteUtilityGraph(chart, false, dd, dd.getElements(), dd.getWeights(), getName(), dvf, acell);
             pnl.add(dug);        	
         }
         else {
         	ContinuousAttributeDomain cd = (ContinuousAttributeDomain)getDomain();
-            ContinuousUtilityGraph cug = new ContinuousUtilityGraph(chart, cd, cd.getKnots(), cd.getWeights(), getUnit(), getName(), dvf, acell);
+            ContinuousUtilityGraph cug = new ContinuousUtilityGraph(chart, false, cd, cd.getKnots(), cd.getWeights(), getUnit(), getName(), dvf, acell);
             pnl.add(cug);            
         }
         return pnl;	

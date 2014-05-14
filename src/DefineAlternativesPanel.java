@@ -233,11 +233,13 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     	if ((num_alts<2) || ((num_alts>=2)&&(!con.constPane.isEnabledAt(1))) || !con.getObjPanel().ok){//- last part
     		con.constPane.setEnabledAt(2, false);
     		con.constPane.setEnabledAt(3, false); 
-    		con.btnOK.setEnabled(false);
+            con.constPane.setEnabledAt(4, false); 
+            con.btnOK.setEnabled(false);
     	}
     	else{
     		con.constPane.setEnabledAt(2, true);
     		con.constPane.setEnabledAt(3, true);
+            con.constPane.setEnabledAt(4, true); 
     		con.btnOK.setEnabled(true);
     	}
     }

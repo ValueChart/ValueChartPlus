@@ -207,11 +207,11 @@ public class AttributeCell extends JComponent {
         if (domain.getType() == AttributeDomainType.DISCRETE) {
             DiscreteAttributeDomain dd =
                     (DiscreteAttributeDomain) domain;
-            new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
+            new DiscreteUtilityGraph(chart, true, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
 
         } else {
             ContinuousAttributeDomain cd = (ContinuousAttributeDomain) domain;
-            new ContinuousUtilityGraph(chart, cd, cd.getKnots(), cd.getWeights(), getUnits(), attributeName, null, this);
+            new ContinuousUtilityGraph(chart, true, cd, cd.getKnots(), cd.getWeights(), getUnits(), attributeName, null, this);
         }
     }
 
@@ -220,11 +220,11 @@ public class AttributeCell extends JComponent {
         if (domain.getType() == AttributeDomainType.DISCRETE) {
             DiscreteAttributeDomain dd =
                     (DiscreteAttributeDomain) domain;
-            new DiscreteUtilityGraph(chart, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
+            new DiscreteUtilityGraph(chart, true, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
 
         } else {
             ContinuousAttributeDomain cd = (ContinuousAttributeDomain) domain;
-            new ContinuousUtilityGraph(chart, cd, cd.getKnots(), cd.getWeights(), getUnits(), attributeName, null, this);
+            new ContinuousUtilityGraph(chart, true, cd, cd.getKnots(), cd.getWeights(), getUnits(), attributeName, null, this);
         }
     }
 

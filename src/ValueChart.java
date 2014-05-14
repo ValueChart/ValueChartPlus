@@ -22,7 +22,7 @@ public class ValueChart extends JPanel {
     static public final int DEFAULT_COL_WIDTH = 50; //SANJANA: Changed default col width to "Large"
     //*%* Changed display height to make it relative to the screen size
     //static public final int DEFAULT_DISPLAY_HEIGHT = 365;
-    static public final int DEFAULT_DISPLAY_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * .44);
+    static public final int DEFAULT_DISPLAY_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * .48);
     //*%*
     static public final int DEFAULT_DISPLAY = 1,
             SIDE_DISPLAY = 2,
@@ -44,6 +44,7 @@ public class ValueChart extends JPanel {
     DisplayDialog dialog;
     Reader initReader = null;
     ResizeHandler resizeHandler;
+    JPanel pnlDisp;
     Vector entryList;
     String filename;
     Vector objs;
@@ -63,6 +64,7 @@ public class ValueChart extends JPanel {
     LastInteraction next_int;
     Vector<AttributeData> attrData;
     LogUserAction log;
+    boolean displayUtilityWeights = false;
 
     //***Added so that there is one frame that allows display of pdf reports from value chart. This window is not used for each of the attribute/entry reports.
     //Those are contained within the AttributeCell class. Rather, this is for anywhere else on the interface (it started with a need to have one report window to display the report for the criteria details)
@@ -74,30 +76,43 @@ public class ValueChart extends JPanel {
     OutlineItem item = null; //The items in the bookmark
 
 //CONSTRUCTOR
-    public ValueChart(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g) {
+    
+    public ValueChart(ValueChart vc) {
         super();
-        constructFromFile(c, file, l, type, colwd, b, g);
-    }
-
-    public ValueChart(ConstructionView c, String file, LogUserAction l,
-            Vector<AttributeData> data, Vector entry, int type, int colwd,
-            boolean b, boolean g) {
-        super();
-        if (data == null || entry == null)
-            constructFromFile(c, file, l, type, colwd, b, g);
-        else {
-            filename = file;
-            constructFromAttribute(c, data, entry, l, type, colwd, b, g);
-        }
     }
     
-    
-    private void constructFromFile(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g) {
+    public ValueChart(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g, boolean dispUtil) {
+        super();
         show_graph = g;
         con = c;
         isNew = b;
         filename = file;
         setDisplayType(type);
+        displayUtilityWeights = dispUtil;
+        
+        constructFromFile(l, colwd);
+    }
+
+    public ValueChart(ConstructionView c, String file, LogUserAction l,
+            Vector<AttributeData> data, Vector entry, int type, int colwd,
+            boolean b, boolean g, boolean dispUtil) {
+        super();
+        show_graph = g;
+        con = c;
+        isNew = b;
+        setDisplayType(type);
+        displayUtilityWeights = dispUtil;
+
+        if (data == null || entry == null)
+            constructFromFile(l, colwd);
+        else {
+            filename = file;
+            constructFromAttribute(data, entry, l, colwd);
+        }
+    }
+    
+    
+    private void constructFromFile(LogUserAction l, int colwd) {
 
         menuOptions = new OptionsMenu(this);
         menuOptions.createMenu();
@@ -144,11 +159,8 @@ public class ValueChart extends JPanel {
     }
     
     
-    private void constructFromAttribute(ConstructionView c, Vector<AttributeData> data, Vector entry, LogUserAction l, int type, int colwd, boolean b, boolean g) {
-        show_graph = g;
-        con = c;
-        isNew = b;
-        setDisplayType(type);
+    private void constructFromAttribute(Vector<AttributeData> data, Vector entry, LogUserAction l, int colwd) {
+
 
         menuOptions = new OptionsMenu(this);
         menuOptions.createMenu();
@@ -218,6 +230,7 @@ public class ValueChart extends JPanel {
     }
 
     public void updateAll() {
+        updateHeaders();
         displayPanel.repaint();
         mainPane.repaint();
     }
@@ -367,6 +380,10 @@ public class ValueChart extends JPanel {
         if (attrData == null)
             return;
 
+        mainPane = new TablePane();
+        renderMainPaneAttributes();
+        mainPane.adjustAttributesForDepth(mainPane.getDepth());
+        
         rebuildMainPane();
 
         // bulding the construction view straight from vc
@@ -458,123 +475,7 @@ public class ValueChart extends JPanel {
             }
         }
 
-        mainPane.fillInEntries(entryList);
-
-        mainPaneWithNames = new JPanel();
-        mainPaneWithNames.setLayout(new BoxLayout(mainPaneWithNames, BoxLayout.Y_AXIS));
-
-        mainEntryNames = new EntryNamePanel(entryList, colWidth, mainPane.getDepth(), true, this);
-        //mainPaneWithNames.add(Box.createVerticalStrut(40));//-
-        JPanel pnlBottom = new JPanel();
-        pnlBottom.setLayout(new BoxLayout(pnlBottom, BoxLayout.X_AXIS));
-        pnlBottom.add(Box.createHorizontalGlue());
-        pnlBottom.add(mainEntryNames);
-
-        mainPaneWithNames.add(mainPane);
-        mainPaneWithNames.add(pnlBottom);
-
-        removeAll();
-
-        /*   	if (displayType == SIDE_DISPLAY){ 
-         setLayout (new BoxLayout (this, BoxLayout.X_AXIS));
-         add(mainPaneWithNames);
-         }
-         else{ 
-         setLayout (new BoxLayout (this, BoxLayout.Y_AXIS));
-         add(mainPaneWithNames);
-         if (displayType != SEPARATE_DISPLAY){ 
-         add (Box.createVerticalStrut(colWidth));
-         add (Box.createGlue());
-         }
-         }*/
-
-        displayPanel = new DisplayPanel(colWidth);
-        displayPanel.setRootPane(mainPane);
-        displayPanel.setEntries(entryList);
-
-
-        JPanel pnlDisp = new JPanel();
-        pnlDisp.setLayout(new BoxLayout(pnlDisp, BoxLayout.X_AXIS));
-        pnlDom = new DomainValues(this);
-        if (displayType == SIDE_DISPLAY) {
-            pnlDisp.add(Box.createHorizontalGlue());
-        } else {
-            pnlDisp.add(Box.createHorizontalStrut(colWidth));
-            pnlOpt = new SensitivityAnalysisOptions(this);
-            pnlDisp.add(pnlOpt);
-            int blah = mainPane.getDepth();
-            //Note: subtracted 1 from mainPane depth, this might cause a problem if there is only one level.
-            pnlOpt.setPreferredSize(new Dimension((mainPane.getDepth() - 1) * headerWidth - colWidth + (show_graph ? graphWidth : 0), displayHeight));
-            pnlOpt.setMaximumSize(new Dimension((mainPane.getDepth() - 1) * headerWidth - colWidth, displayHeight));
-        }
-        pnlDisp.add(Box.createHorizontalGlue());
-        pnlDisp.add(displayPanel);
-
-        displayWithNames = new JPanel();
-        displayWithNames.setLayout(new BoxLayout(displayWithNames, BoxLayout.Y_AXIS));
-        displayEntryNames = new EntryNamePanel(entryList, colWidth, 0, false, this);
-        JPanel pnlNames = new JPanel();
-        pnlNames.setLayout(new BoxLayout(pnlNames, BoxLayout.X_AXIS));
-        pnlNames.add(Box.createHorizontalGlue());
-        //pnlNames.add(displayEntryNames);
-        pnlNames.add(Box.createRigidArea(new Dimension(colWidth, 0)));
-        displayWithNames.add(pnlDisp);
-        displayWithNames.add(pnlNames);
-
-        //int mainWidth = (entryList.size()+mainPane.getDepth())*colWidth;
-        int mainWidth = entryList.size() * colWidth;
-///**/	int dispWidth = entryList.size()*colWidth + colWidth;
-        int dispWidth = entryList.size() * colWidth + colWidth;
-
-        if (displayType == SIDE_DISPLAY) {
-            displayPanel.setMaximumSize(new Dimension(dispWidth, 10000));
-            displayPanel.setMinimumSize(new Dimension(dispWidth, 0));
-            //mainPaneWithNames.setAlignmentY(0.0f);
-        }
-
-        graphWidth = (show_graph ? graphWidth : 0);
-
-        mainPaneWithNames.setMaximumSize(new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, 10000));
-        mainPaneWithNames.setMinimumSize(new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, 0));
-        mainPaneWithNames.setPreferredSize(
-                new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, displayType == SIDE_DISPLAY ? displayHeight * 2 - 50 : displayHeight));
-
-        int w = ((displayType == SIDE_DISPLAY) ? mainWidth + 40 : dispWidth) + colWidth;//no real reason why it's 40
-
-        if (displayType == SIDE_DISPLAY) {
-            displayWithNames.setMaximumSize(new Dimension(w, 10000));
-            displayWithNames.setMinimumSize(new Dimension(w, 0));
-            displayWithNames.setPreferredSize(new Dimension(w, displayHeight * 2 - 50));
-        } else {
-            displayWithNames.setMaximumSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, 10000));//- and rev x, y
-            displayWithNames.setMinimumSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, 0));//- and rev x, y
-            displayWithNames.setPreferredSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, displayHeight));//- and rev x, y
-        }
-        mainPane.updateSizesAndHeights();
-
-        if (displayType == SEPARATE_DISPLAY) {
-            dialog = new DisplayDialog(chartFrame, "Total Scores", displayWithNames);
-        }
-        if (displayType == DEFAULT_DISPLAY) {
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            add(displayWithNames);
-            add(Box.createRigidArea(new Dimension(0, 5)));
-        }
-        if (displayType == SIDE_DISPLAY) {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            add(mainPaneWithNames);
-            add(Box.createHorizontalStrut(40));//-
-            add(Box.createGlue());
-            add(displayWithNames);
-        } else {
-            add(mainPaneWithNames);
-            if (displayType != SEPARATE_DISPLAY) {
-                //add (Box.createVerticalStrut(40));
-                //add (Box.createGlue());
-            }
-        }
-
-
+        rebuildMainPane();
     }
 
     private double readHeightRatio(ScanfReader scanReader)
@@ -891,7 +792,7 @@ public class ValueChart extends JPanel {
     }
 
     public void resetDisplay(int type, int colwd, boolean close, boolean graph) {
-        ValueChart ch = new ValueChart(con, filename, log, attrData, entryList, type, colwd, true, graph);
+        ValueChart ch = new ValueChart(con, filename, log, attrData, entryList, type, colwd, true, graph, displayUtilityWeights);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -909,7 +810,7 @@ public class ValueChart extends JPanel {
     }
 
     public void compareDisplay(int type, int colwd) {
-        ValueChart ch = new ValueChart(con, filename, log, type, colwd, false, show_graph); // TODO
+        ValueChart ch = new ValueChart(con, filename, log, type, colwd, false, show_graph, displayUtilityWeights); // TODO
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -971,6 +872,8 @@ public class ValueChart extends JPanel {
             if (mainPane != null) {
                 mainPane.updateSizesAndHeights();
                 mainPane.revalidate();
+                alignDisplayPanel();
+                displayPanel.revalidate();
             }
         }
     }
@@ -1159,19 +1062,12 @@ public class ValueChart extends JPanel {
     }
 
     void rebuildMainPane() {
-        mainPane = new TablePane();
-        renderMainPaneAttributes();
-        mainPane.adjustAttributesForDepth(mainPane.getDepth());
-
         mainPane.fillInEntries(entryList);
 
         mainPaneWithNames = new JPanel();
-        mainPaneWithNames.setLayout(new BoxLayout(mainPaneWithNames,
-                BoxLayout.Y_AXIS));
+        mainPaneWithNames.setLayout(new BoxLayout(mainPaneWithNames, BoxLayout.Y_AXIS));
 
-        mainEntryNames = new EntryNamePanel(entryList, colWidth,
-                mainPane.getDepth(), true, this);
-        // mainPaneWithNames.add(Box.createVerticalStrut(40));//-
+        mainEntryNames = new EntryNamePanel(entryList, colWidth, mainPane.getDepth(), true, this);
         JPanel pnlBottom = new JPanel();
         pnlBottom.setLayout(new BoxLayout(pnlBottom, BoxLayout.X_AXIS));
         pnlBottom.add(Box.createHorizontalGlue());
@@ -1182,103 +1078,87 @@ public class ValueChart extends JPanel {
 
         removeAll();
 
-        /*
-         * if (displayType == SIDE_DISPLAY){ setLayout (new BoxLayout (this,
-         * BoxLayout.X_AXIS)); add(mainPaneWithNames); } else{ setLayout (new
-         * BoxLayout (this, BoxLayout.Y_AXIS)); add(mainPaneWithNames); if
-         * (displayType != SEPARATE_DISPLAY){ add
-         * (Box.createVerticalStrut(colWidth)); add (Box.createGlue()); } }
-         */
+        /*      if (displayType == SIDE_DISPLAY){ 
+         setLayout (new BoxLayout (this, BoxLayout.X_AXIS));
+         add(mainPaneWithNames);
+         }
+         else{ 
+         setLayout (new BoxLayout (this, BoxLayout.Y_AXIS));
+         add(mainPaneWithNames);
+         if (displayType != SEPARATE_DISPLAY){ 
+         add (Box.createVerticalStrut(colWidth));
+         add (Box.createGlue());
+         }
+         }*/
 
         displayPanel = new DisplayPanel(colWidth);
         displayPanel.setRootPane(mainPane);
         displayPanel.setEntries(entryList);
 
-        JPanel pnlDisp = new JPanel();
+
+        pnlDisp = new JPanel();
         pnlDisp.setLayout(new BoxLayout(pnlDisp, BoxLayout.X_AXIS));
         pnlDom = new DomainValues(this);
         if (displayType == SIDE_DISPLAY) {
             pnlDisp.add(Box.createHorizontalGlue());
         } else {
-            pnlDisp.add(Box.createHorizontalStrut(colWidth));
             pnlOpt = new SensitivityAnalysisOptions(this);
+            pnlOpt.setAlignmentX(Component.LEFT_ALIGNMENT);
             pnlDisp.add(pnlOpt);
-            int blah = mainPane.getDepth();
-            // Note: subtracted 1 from mainPane depth, this might cause a
-            // problem if there is only one level.
-            pnlOpt.setPreferredSize(new Dimension((mainPane.getDepth() - 1)
-                    * headerWidth - colWidth + (show_graph ? graphWidth : 0),
-                    displayHeight));
-            pnlOpt.setMaximumSize(new Dimension((mainPane.getDepth() - 1)
-                    * headerWidth - colWidth, displayHeight));
+            //Note: subtracted 1 from mainPane depth, this might cause a problem if there is only one level.
+            pnlOpt.setPreferredSize(new Dimension((mainPane.getDepth() - 1) * headerWidth - colWidth + (show_graph ? graphWidth : 0), displayHeight));
+            pnlOpt.setMaximumSize(new Dimension((mainPane.getDepth() - 1) * headerWidth - colWidth, displayHeight));
         }
         pnlDisp.add(Box.createHorizontalGlue());
         pnlDisp.add(displayPanel);
 
         displayWithNames = new JPanel();
-        displayWithNames.setLayout(new BoxLayout(displayWithNames,
-                BoxLayout.Y_AXIS));
-        displayEntryNames = new EntryNamePanel(entryList, colWidth, 0, false,
-                this);
+        displayWithNames.setLayout(new BoxLayout(displayWithNames, BoxLayout.Y_AXIS));
+        displayEntryNames = new EntryNamePanel(entryList, colWidth, 0, false, this);
         JPanel pnlNames = new JPanel();
         pnlNames.setLayout(new BoxLayout(pnlNames, BoxLayout.X_AXIS));
         pnlNames.add(Box.createHorizontalGlue());
-        // pnlNames.add(displayEntryNames);
+        //pnlNames.add(displayEntryNames);
         pnlNames.add(Box.createRigidArea(new Dimension(colWidth, 0)));
+        displayWithNames.add(Box.createVerticalGlue());
         displayWithNames.add(pnlDisp);
         displayWithNames.add(pnlNames);
 
-        // int mainWidth = (entryList.size()+mainPane.getDepth())*colWidth;
+        //int mainWidth = (entryList.size()+mainPane.getDepth())*colWidth;
         int mainWidth = entryList.size() * colWidth;
-        // /**/ int dispWidth = entryList.size()*colWidth + colWidth;
+///**/  int dispWidth = entryList.size()*colWidth + colWidth;
         int dispWidth = entryList.size() * colWidth + colWidth;
 
         if (displayType == SIDE_DISPLAY) {
             displayPanel.setMaximumSize(new Dimension(dispWidth, 10000));
             displayPanel.setMinimumSize(new Dimension(dispWidth, 0));
-            // mainPaneWithNames.setAlignmentY(0.0f);
+            //mainPaneWithNames.setAlignmentY(0.0f);
         }
 
         graphWidth = (show_graph ? graphWidth : 0);
 
-        mainPaneWithNames
-                .setMaximumSize(new Dimension(mainWidth
-                        + ((mainPane.getDepth() - 1) * headerWidth)
-                        + graphWidth, 10000));
-        mainPaneWithNames.setMinimumSize(new Dimension(mainWidth
-                + ((mainPane.getDepth() - 1) * headerWidth) + graphWidth, 0));
-        mainPaneWithNames.setPreferredSize(new Dimension(mainWidth
-                + ((mainPane.getDepth() - 1) * headerWidth) + graphWidth,
-                displayType == SIDE_DISPLAY ? displayHeight * 2 - 50
-                        : displayHeight));
+        mainPaneWithNames.setMaximumSize(new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, 10000));
+        mainPaneWithNames.setMinimumSize(new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, 0));
+        mainPaneWithNames.setPreferredSize(
+                new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, displayType == SIDE_DISPLAY ? displayHeight * 2 - 50 : displayHeight));
 
-        int w = ((displayType == SIDE_DISPLAY) ? mainWidth + 40 : dispWidth)
-                + colWidth;// no real reason why it's 40
+        int w = ((displayType == SIDE_DISPLAY) ? mainWidth + 40 : dispWidth) + colWidth;//no real reason why it's 40
 
         if (displayType == SIDE_DISPLAY) {
             displayWithNames.setMaximumSize(new Dimension(w, 10000));
             displayWithNames.setMinimumSize(new Dimension(w, 0));
-            displayWithNames.setPreferredSize(new Dimension(w,
-                    displayHeight * 2 - 50));
+            displayWithNames.setPreferredSize(new Dimension(w, displayHeight * 2 - 50));
         } else {
-            displayWithNames.setMaximumSize(new Dimension(w
-                    + (mainPane.getDepth() - 1) * headerWidth + graphWidth,
-                    10000));// - and rev x, y
-            displayWithNames.setMinimumSize(new Dimension(w
-                    + (mainPane.getDepth() - 1) * headerWidth + graphWidth, 0));// -
-                                                                                // and
-                                                                                // rev
-                                                                                // x,
-                                                                                // y
-            displayWithNames.setPreferredSize(new Dimension(w
-                    + (mainPane.getDepth() - 1) * headerWidth + graphWidth,
-                    displayHeight));// - and rev x, y
+            displayWithNames.setMaximumSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, 10000));//- and rev x, y
+            displayWithNames.setMinimumSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, 0));//- and rev x, y
+            displayWithNames.setPreferredSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, displayHeight-50));//- and rev x, y
+            // seems to work with -50 to get rid of unnecessary padding. TODO resize is weird
         }
         mainPane.updateSizesAndHeights();
-
+        alignDisplayPanel();
+        
         if (displayType == SEPARATE_DISPLAY) {
-            dialog = new DisplayDialog(chartFrame, "Total Scores",
-                    displayWithNames);
+            dialog = new DisplayDialog(chartFrame, "Total Scores", displayWithNames);
         }
         if (displayType == DEFAULT_DISPLAY) {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -1288,17 +1168,17 @@ public class ValueChart extends JPanel {
         if (displayType == SIDE_DISPLAY) {
             setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             add(mainPaneWithNames);
-            add(Box.createHorizontalStrut(40));// -
+            add(Box.createHorizontalStrut(40));//-
             add(Box.createGlue());
             add(displayWithNames);
         } else {
             add(mainPaneWithNames);
             if (displayType != SEPARATE_DISPLAY) {
-                // add (Box.createVerticalStrut(40));
-                // add (Box.createGlue());
+                //add (Box.createVerticalStrut(40));
+                //add (Box.createGlue());
             }
+            add(Box.createVerticalStrut(10));
         }
-
     }
     
 
@@ -1364,5 +1244,22 @@ public class ValueChart extends JPanel {
 
     public void setLog(LogUserAction log) {
         this.log = log;
+    }
+    
+    public void updateHeaders() {
+        if (mainPane == null) return;
+        Iterator<BaseTableContainer> it;
+        for (it = mainPane.getRows(); it.hasNext();) {
+            BaseTableContainer btc = it.next();
+            btc.updateHeadersRecursively();
+        }
+    }
+    
+    public void alignDisplayPanel() {
+        displayPanel.setPrefHeight(mainPane.getHeight());
+        displayPanel.setMaximumSize(displayPanel.getPreferredSize());
+        displayPanel.setMinimumSize(displayPanel.getPreferredSize());
+        pnlDisp.setPreferredSize(mainPane.getSize());
+        pnlDisp.setMaximumSize(mainPane.getSize());
     }
 }

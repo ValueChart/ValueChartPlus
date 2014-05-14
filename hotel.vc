@@ -1,73 +1,73 @@
-color area 0.0 0.0 0.5
-color skytrain-distance 0.0 0.0 0.8
-color size 0.5 0.0 0.0
-color internet-access 0.8 0.0 0.0
-color rate 0.0 0.8 0.0
+color area 0.003921569 0.4 0.36862746
+color skytrain-distance 0.40392157 0.6627451 0.8117647
+color size 0.40392157 0.0 0.050980393
+color internet-access 0.8901961 0.101960786 0.10980392
+color rate 0.99607843 0.76862746 0.30980393
 
 
 attributes
 	attributes Hotel 1.0
 		attributes location *
-			area 0.46 { "uptown" 0.5, "downtown" 1.0, "eastend" 0.0 }
+			area 0.46 { "nightlife" 0.5, "beach" 1.0, "airport" 0.0 }
 				color=area end
-			skytrain-distance 0.09 { 1.0 1.0, 5.0 0.5, 9.0 0.0 }
+			skytrain-distance 0.09 { 1.0 1.0, 3.0 0.75, 5.0 0.5, 7.0 0.25, 9.0 0.0 }
 				color=skytrain-distance units=blocks end
-		 end
+		end
 		attributes room *
-			size 0.04 { 200.0 0.0, 250.0 0.5, 300.0 1.0 }
+			size 0.04 { 200.0 0.0, 237.5 0.25, 275.0 0.5, 312.5 0.75, 350.0 1.0 }
 				color=size units=sq-ft end
-			internet-access 0.21 { "none" 0.0, "highspeed" 1.0, "dialup" 0.24500000476837158 }
+			internet-access 0.21 { "none" 0.0, "highspeed" 1.0, "lowspeed" 0.24500000476837158 }
 				color=internet-access end
-		 end
-		rate 0.2 { 100.0 1.0, 125.0 0.5, 150.0 0.0 }
+		end
+		rate 0.2 { 100.0 1.0, 125.0 0.75, 150.0 0.5, 175.0 0.25, 200.0 0.0 }
 			color=rate units=CAD end
-	 end
+	end
 end
 
-entry "hotel1"
-	area "uptown"
+entry "Sheraton"
+	area "nightlife"
 	skytrain-distance 7.0
-	size 300.0
+	size 350.0
 	internet-access "highspeed"
-	rate 125.0
+	rate 150.0
 end
 
-entry "hotel2"
-	area "uptown"
+entry "BestWestern"
+	area "nightlife"
 	skytrain-distance 2.0
 	size 200.0
 	internet-access "highspeed"
 	rate 100.0
 end
 
-entry "hotel3"
-	area "downtown"
+entry "Hyatt"
+	area "beach"
 	skytrain-distance 2.0
-	size 250.0
-	internet-access "dialup"
-	rate 150
+	size 275.0
+	internet-access "lowspeed"
+	rate 200.0
 end
 
-entry "hotel4"
-	area "eastend"
+entry "Marriott"
+	area "airport"
 	skytrain-distance 9.0
 	size 200.0
-	internet-access "dialup"
-	rate 130
+	internet-access "lowspeed"
+	rate 160.0
 end
 
-entry "hotel5"
-	area "eastend"
+entry "HolidayInn"
+	area "airport"
 	skytrain-distance 1.0
-	size 225.0
+	size 237.5
 	internet-access "none"
 	rate 100.0
 end
 
-entry "hotel6"
-	area "downtown"
+entry "Ramada"
+	area "beach"
 	skytrain-distance 1.0
-	size 275.0
+	size 312.5
 	internet-access "none"
-	rate 110
+	rate 120.0
 end

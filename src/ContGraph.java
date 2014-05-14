@@ -163,10 +163,12 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
         String temp;
         g.setColor(Color.DARK_GRAY);
         for(int i = 0; i < items.length; i++){
-            temp = String.valueOf(weights[i]);
-            g.setFont(new Font ("Arial", Font.BOLD, 6));
-            if (getHeight() > 20){
-            	g.drawString(temp.substring(0,3), (p[i].x + 5), p[i].y < getHeight() - BOTTOM - 3 ? p[i].y + 5 : p[i].y);
+            if (chart.displayUtilityWeights) {
+                temp = String.valueOf(weights[i]*100);
+                g.setFont(new Font ("Arial", Font.BOLD, 6));
+                if (getHeight() > 20){
+                	g.drawString(temp.substring(0,3), (p[i].x + 5), p[i].y < getHeight() - BOTTOM - 3 ? p[i].y + 5 : p[i].y);
+                }
             }
             s[i] = p[i].getShape();
         }
