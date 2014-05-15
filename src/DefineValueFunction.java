@@ -94,7 +94,6 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 			lblObj.setHorizontalAlignment(JLabel.CENTER);
 			lblObj.addMouseListener(mouseListener);					
 			pnlObjList.add(lblObj);
-			con.repaint();	
 		}		
 		
 		//set initial status of objectives (0,1)
@@ -104,6 +103,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 			lbl_sel = (JLabel)pnlObjList.getComponent(0);
 		
 	    // set Value Function graph for first objective		
+		// also calls repaint on con
 		showGraph();   	 
 	}	
   	
@@ -117,6 +117,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		}
 		pnlGraph.add(ugraph);
 		lbl_sel.setBackground(new Color(100, 100, 100));
+		con.validate();
 		con.repaint();
 		
 	}
@@ -191,10 +192,12 @@ public class DefineValueFunction extends JPanel implements ActionListener{
     		pnlObjList.setPreferredSize(new Dimension(75, con.getHeight()-50));
     		for (int i=0; i < pnlObjList.getComponentCount(); i++){
     			JObjective lblObj = (JObjective)pnlObjList.getComponent(i);
-    			lblObj.setPreferredSize(new Dimension((getWidth())/objs.size(), 30));			
-    			lblObj.setMaximumSize(new Dimension((getWidth())/objs.size(), 30));
+    			lblObj.setPreferredSize(new Dimension(75, getHeight()/objs.size()));            
+	            lblObj.setMaximumSize(new Dimension(75, getHeight()/objs.size()));
     		}		
         	//System.out.println("resize vf " + getWidth());
+    		pnlObjList.validate();
+    		pnlObjList.repaint();
         }
     }
     
