@@ -128,6 +128,11 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     public void stateChanged(ChangeEvent ce) {
         JTabbedPane pane = (JTabbedPane) ce.getSource();
         int sel = pane.getSelectedIndex();
+        if (btnOK != null)
+            btnOK.setVisible(true);
+        if (btnCancel != null)
+            btnCancel.setVisible(true);
+
         switch (sel) {
         case 0:
             // Nothing will really need to be done b/c objs drive the data
@@ -144,6 +149,11 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             break;
         }
         case 3: {
+            if (btnOK != null)
+                btnOK.setVisible(false);
+            if (btnCancel != null)
+                btnCancel.setVisible(false);
+            
             if (pnlValueFunction.checkAllUtility()) {
                 pnlWeighting.setObjectiveList();
                 String problem  = "";
