@@ -25,9 +25,9 @@ class WeightingBySMARTER extends JPanel implements ActionListener{
     
     String q1a = "Imagine the worst possible ";
     String q1b = " (i.e. scoring worst on all criteria) ";
-    String q1c = "and you were given the opportunity to improve one criteria from its WORST value to its BEST. Which would you choose? ";
-    String q2 = "Next, imagine again the worst possible alternative and you are allowed to improve one of the following criteria from its WORST value to its BEST. Which would you choose?";
-    String q3 = " is the last criteria that you would choose to improve.  Click Finish to complete the SMARTER weighting technique.";
+    String q1c = "and you were given the opportunity to improve one criterion from its WORST value to its BEST. Which would you choose? ";
+    String q2 = "Next, imagine again the worst possible alternative and you are allowed to improve one of the following criterion from its WORST value to its BEST. Which would you choose?";
+    String q3 = " is the last criterion that you would choose to improve.  Click Finish to complete the SMARTER weighting technique.";
     JButton btnSelect; 
     JButton btnCancel;
     
