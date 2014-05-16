@@ -37,7 +37,6 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	private static final long serialVersionUID = 1L;
 
 	//all possible objective and alternative information from data file and/or objective construction
-	Vector<JObjective> all_objs;			//model of all objectives
 	Vector<HashMap<String,Object>> alts;				//model of all alternative info				
 	//for the table model: these are selected in objective construction				
 	Vector<Vector<String>> rows; 				//subset of all_objs
@@ -69,7 +68,6 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		con = c;
 		
 		//initialize data vectors
-		all_objs = new Vector<JObjective>();	
 		alts = new Vector<HashMap<String,Object>>();				
 		rows = new Vector<Vector<String>>();		
 		columns = new Vector<String>();		
@@ -115,12 +113,9 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	}
 	
 	//this method sets the initial values of the column headers and data
-	public void setFileAlternatives(Vector<JObjective> obj, Vector<HashMap<String,Object>> alt){
-		if (obj != null)
-			all_objs.addAll(obj);
+	public void setFileAlternatives(Vector<HashMap<String,Object>> alt){
 		alts.addAll(alt);
 		num_alts = alts.size();
-		updateObjectiveFields();
 	}
 	
 	//resets alternative constuction view to reflect any changes in objectives
@@ -140,7 +135,11 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			HashMap<String,Object> temp = alts.get(j);
 			data.add(temp.get("name").toString());
 			for (int i=0; i<objs.size(); i++){	//for each primitive objective, find each alternative's value
-				data.add(temp.get(objs.get(i).toString()).toString());			
+			    Object o = temp.get(objs.get(i).toString());
+			    if (o != null)
+			        data.add(o.toString());
+			    else
+			        data.add("");
 			}		
 		rows.add(data);
 		}
@@ -165,7 +164,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		for(int i=0; i<objs.size(); i++){	
 			//set combobox if discrete
 			TableColumn col = table.getColumnModel().getColumn(i+1);
-			JObjective obj = (JObjective)objs.get(i);
+			JObjective obj = objs.get(i);
 			if (obj.getDomainType() == AttributeDomainType.DISCRETE){
 				JComboBox<String> cboCell;
 				if (obj.getDomain().getElements() != null)
@@ -188,15 +187,6 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		checkAlternativeCount();
 	}
 	
-	public void updateAllObjs(JObjective obj){
-		all_objs.add(obj);		
-		for (int i=0; i<alts.size(); i++){
-			HashMap<String,Object> temp = alts.get(i);
-			if (!temp.containsKey(obj.getName()))	//new objective			
-				temp.put(obj.getName(), null);
-		}
-	}
-	
 	public void updateObjDetails(JObjective obj, String name){
 		//if there is a change in objective name
 		if(!obj.getName().equals(name))
@@ -205,17 +195,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 					temp.put(obj.getName(), temp.get(name));
 					temp.remove(name);
 			}		
-		//changes in objective details
-		for (int i=0; i<all_objs.size(); i++){
-			if ((all_objs.get(i).toString()).equals(obj.getName()) ||
-					(all_objs.get(i).toString()).equals(name)){
-				all_objs.remove(i);
-				all_objs.add(obj);
-				return;
-			}				
-		}
 	}
-	
 	void removeAlternative(int index) 
 	   {
 	     if(index!=-1)//At least one Row in Table
@@ -257,7 +237,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	    	Vector<String> data = new Vector<String>();
 	        data.addElement(new_name);	 
 	        for (int i=0; i<objs.size(); i++){
-	        		JObjective obj = (JObjective)objs.get(i);
+	        		JObjective obj = objs.get(i);
 	        		if (obj.getDomainType()==AttributeDomainType.DISCRETE){
 	        			data.addElement("");
 	        		}
@@ -272,8 +252,10 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        datamap.put("name", new_name);
 	        
 	        //add new blank field for all objs
+	        
+	        Vector<JObjective> all_objs = con.getObjPanel().getPrimitiveObjectives();
 	        for (int i=0; i<all_objs.size(); i++){
-        		JObjective obj = (JObjective)all_objs.get(i);
+        		JObjective obj = all_objs.get(i);
         		if (!obj.getName().equals("name")){
 	        		if (obj.getDomainType()==AttributeDomainType.DISCRETE){
 	        			datamap.put(obj.getName(), "");
@@ -296,8 +278,9 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     void updateObjectiveFields(){ //-->boolean from_const){     	
     	Vector<Object> v = new Vector<Object>();
     	double min = 0, max = 0;
+    	Vector<JObjective> all_objs = con.getObjPanel().getPrimitiveObjectives();
     	for(int i=0; i< all_objs.size(); i++){
-    		JObjective obj = (JObjective)all_objs.get(i);
+    		JObjective obj = all_objs.get(i);
     		//create a vector with unique discrete values
     		if (obj.getDomainType()==(AttributeDomainType.DISCRETE)){
     			//-->if (from_const){
@@ -458,19 +441,15 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		//check if data is valid:
 		        		//1. get the objective	        		
 		        		JObjective obj = null;
-//		        		JObjective prim = null; 
 		        		boolean found = false;
+		        		Vector<JObjective> all_objs = con.getObjPanel().getPrimitiveObjectives();
 		        		for (int i=0; i<all_objs.size(); i++){
 		        			if (all_objs.get(i).toString().equals((columns.get(table.getSelectedColumn()).toString()))){
-		        				obj = (JObjective)all_objs.get(i);	        				
-		        				for (int j=0; j<con.getObjPanel().prim_obj.size(); j++){
-		        					if (obj.getName()==con.getObjPanel().prim_obj.get(j).toString()){
-//		        						prim = (JObjective)con.getObjPanel().prim_obj.get(j);
-		        					}
-		        				}	        				
+		        				obj = all_objs.get(i);	        				        				
 		        				break;	        				
 		        			}
 		        		}	
+		        		
 		        		
 		        		//2. discrete items
 		        		//a) check if in list
@@ -506,6 +485,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		//3. continuous items
 		        		else
 		        			//a) check if within range
+		        		    try {
 			        		if((obj.minC>Double.valueOf(entered).doubleValue())||(obj.maxC<Double.valueOf(entered).doubleValue())){
 			        			//b)if not, prompt for confirmation
 		                        int n = JOptionPane.showConfirmDialog(
@@ -530,7 +510,13 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        	        		alts.set(table.getSelectedRow(), temp); 
 		        	        		table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
 		                        }                        	
-			        		}       	
+			        		}   
+		        		    } catch (NumberFormatException ex) {
+		        		        JOptionPane.showMessageDialog(this, "Invalid input: numeric value expected");
+                                temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
+                                alts.set(table.getSelectedRow(), temp); 
+                                table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
+		        		    }
 		        		}
 	        		else if (!last_value.equals(""))
 	        				table.setValueAt(last_value, table.getEditingRow(), table.getEditingColumn());

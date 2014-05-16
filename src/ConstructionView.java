@@ -261,7 +261,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         colors = new ColorList();
         int countblank = 0;
         for (int i = 0; i < pnlObjectives.prim_obj.size(); i++) {
-            JObjective obj = (JObjective) pnlObjectives.prim_obj.get(i);
+            JObjective obj = pnlObjectives.prim_obj.get(i);
             data = data + "color " + obj.getName() + " ";
             // if the obj already has a color assigned to it...
             if (obj.color != Color.WHITE) {
@@ -357,7 +357,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                         count2 = 0;
                         last_line = st.lineno();
                     }
-                    JObjective temp = (JObjective) obj_list.get(count2);
+                    JObjective temp = obj_list.get(count2);
                     if (temp.getDomainType() == AttributeDomainType.DISCRETE)
                         alt_data.put(temp.getName(), st.sval);
                     else {
@@ -376,7 +376,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             System.out.println("Exception: " + e);
         }
         pnlObjectives.setFileObjectives(obj_list);
-        pnlAlternatives.setFileAlternatives(obj_list, alts);
+        pnlAlternatives.setFileAlternatives(alts);
 
     }
 }

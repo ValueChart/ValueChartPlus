@@ -179,7 +179,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		pnlList.removeAll();		
 		//display all objectives except for "name"
 		for (int i=1; i<listed_objs.size(); i++){
-			JObjective lblObj = (JObjective)listed_objs.get(i);
+			JObjective lblObj = listed_objs.get(i);
 			lblObj.setMaximumSize(new Dimension(OBJ_WIDTH, OBJ_HEIGHT));
 			pnlList.add(lblObj);
 			lblObj.setTransferHandler(new ObjectiveTransferHandler());			
@@ -246,9 +246,8 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	add(obj1);
 	repaint();	
 		adjustSiblings(found_node, obj1);
-		pnlCon.getAltPanel().updateAllObjs(obj1);		
 		pnlCon.getAltPanel().updateTable();
-		checkObjectiveCount();
+		checkObjectiveValid();
 		 //this cascades the children for DnD: repaints the labels but does change model 
 		for (int i=0; i<new_node.getChildCount(); i++){
 			addToTree((DefaultMutableTreeNode)new_node.getChildAt(i), obj1, false);
@@ -285,7 +284,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		found_node.removeFromParent();		
 		adjustSiblings(parent_node, null);
 		pnlCon.getAltPanel().updateTable();		
-		checkObjectiveCount();		
+		checkObjectiveValid();		
 	}
 	
 	private void addBranchToList(){
@@ -311,7 +310,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 			}
 		}
 	}
-	boolean ok;//- 
+	boolean ok = false;//- 
 	public void setPrimitiveObjectives(){
 	ok = true;//-
 		prim_obj = new Vector<JObjective>();
@@ -319,7 +318,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		while (node != null){
 			JObjective obj = (JObjective)node.getUserObject();
 			prim_obj.add(obj);
-			if (obj.origin == 1)//-
+			if (obj.getDomainType() == AttributeDomainType.CONTINUOUS && obj.getUnit().isEmpty())//-
 				ok = false;//-
 			node = node.getNextLeaf();
 		}
@@ -343,11 +342,19 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
                 null,
                 null,
                 lblSel.getName());
-        //excepton handling needed here		
-        String name = lblSel.getName();
-		lblSel.setName(new_name);
-		pnlCon.getAltPanel().updateObjDetails(lblSel, name);   
-		pnlCon.getAltPanel().updateTable();		
+        // no change, return
+        if (new_name == null || new_name.isEmpty() 
+             || new_name.equals(lblSel.getName())) 
+            return;
+        
+        if (findDuplicate(new_name)) {
+            JOptionPane.showMessageDialog(this, "Objective name " + new_name + " already exists");
+        } else {
+            String name = lblSel.getName();
+    		lblSel.setName(new_name);
+    		pnlCon.getAltPanel().updateObjDetails(lblSel, name);   
+    		pnlCon.getAltPanel().updateTable();		
+        }
 	}
     
 	protected void showDetails() {
@@ -356,9 +363,9 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
         dlgDet.showFrame(true);
     }
 
-	void checkObjectiveCount(){
+	void checkObjectiveValid(){
 		setPrimitiveObjectives();
-		if (prim_obj.size()<2)
+		if (prim_obj.size()<2 || !ok)
 			pnlCon.constPane.setEnabledAt(1, false);
 		else
 			pnlCon.constPane.setEnabledAt(1, true);
@@ -548,7 +555,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 				//process export from list or tree
 				for (int i=0; i<listed_objs.size(); i++){
 					if (s.equals(listed_objs.get(i).toString())){
-						obj1 = (JObjective)listed_objs.get(i);
+						obj1 = listed_objs.get(i);
 						listed_objs.remove(i); 
 						repaintList();
 						found1 = true; break;
@@ -579,7 +586,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 					//process import to list or tree
 					else{
 						for (int i=0; i<listed_objs.size(); i++){
-							if (obj2==(JObjective)listed_objs.get(i)){
+							if (obj2==listed_objs.get(i)){
 								found2 = true;
 								if (found1)
 									addToList(i + 1, obj1);

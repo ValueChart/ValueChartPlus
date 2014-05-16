@@ -268,10 +268,10 @@ public class ValueChart extends JPanel {
     }
 
     public void setConnectingFields() {
-        for (Iterator it = getPrims().iterator(); it.hasNext();) {
-            BaseTableContainer btc = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = getPrims().iterator(); it.hasNext();) {
+            BaseTableContainer btc = it.next();
             for (int i = 0; i < con.getObjPanel().getPrimitiveObjectives().size(); i++) {
-                JObjective obj = (JObjective) con.getObjPanel().getPrimitiveObjectives().get(i);
+                JObjective obj = con.getObjPanel().getPrimitiveObjectives().get(i);
                 if (obj.getName().equals(btc.getName())) {
                     AttributeCell ac = (AttributeCell) btc.getTable();
                     obj.setDomain(ac.getDomain());
@@ -333,8 +333,8 @@ public class ValueChart extends JPanel {
             ChartEntry entry =  it.next();
             datamap.put("name", entry.name);
             datamap.putAll(entry.map);
-            for (Iterator it2 = objs.iterator(); it2.hasNext();) {
-                JObjective obj = (JObjective) (it2.next());
+            for (Iterator<JObjective> it2 = objs.iterator(); it2.hasNext();) {
+                JObjective obj = it2.next();
                 if (!datamap.containsKey(obj.getName())) {
                     datamap.put(obj.getName(), "0");
                 } else {
@@ -415,7 +415,7 @@ public class ValueChart extends JPanel {
         setObjs(mainPane, "root");
         alts = new Vector<HashMap<String,Object>>();
         alts = setAlts();
-        con.getAltPanel().setFileAlternatives(null, alts);
+        con.getAltPanel().setFileAlternatives(alts);
         con.getAltPanel().updateTable();
         con.setChart(this);
         //for vc w/other data
@@ -633,6 +633,7 @@ public class ValueChart extends JPanel {
         setConnectingFields();
         log.setOldAttrData(LogUserAction.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
         con.constPane.setSelectedIndex(idx);
+        con.getObjPanel().checkObjectiveValid();
         con.frame.setVisible(true);
     }
 
@@ -1030,7 +1031,6 @@ public class ValueChart extends JPanel {
             container = new BaseTableContainer(subpane, name, this, colWidth);
         } else {
             AttributePrimitiveData prim = a.getPrimitive();
-            AttributeDomain domain = prim.getDomain();
 
             AttributeCell cell = new AttributeCell(this, prim);
             cell.setColWidth(colWidth);

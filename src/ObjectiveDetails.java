@@ -117,6 +117,7 @@ public class ObjectiveDetails extends JPanel implements ActionListener{
     		con.getAltPanel().updateObjDetails(objective, name);    		
             con.getAltPanel().updateTable();
         	frame.setVisible(false);
+        	con.getObjPanel().checkObjectiveValid();
             } 
         else if ("btnCancel".equals(e.getActionCommand())) 
         	frame.setVisible(false);

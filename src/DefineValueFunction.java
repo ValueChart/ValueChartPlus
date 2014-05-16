@@ -98,8 +98,8 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		
 		//set initial status of objectives (0,1)
 		for (int i=0; i<objs.size(); i++)
-			checkUtility((JObjective)objs.get(i), (JLabel)pnlObjList.getComponent(i));
-			obj_sel = (JObjective)objs.get(0);
+			checkUtility(objs.get(i), (JLabel)pnlObjList.getComponent(i));
+			obj_sel = objs.get(0);
 			lbl_sel = (JLabel)pnlObjList.getComponent(0);
 		
 	    // set Value Function graph for first objective		
@@ -145,7 +145,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 			repaintDisplay();
 		}
 		for (int i=0; i<objs.size(); i++)
-			checkUtility((JObjective)objs.get(i), (JLabel)pnlObjList.getComponent(i));		
+			checkUtility(objs.get(i), (JLabel)pnlObjList.getComponent(i));		
 			if (!all_set){
 				JOptionPane.showMessageDialog(this,
 						"All value functions must have a 0 and a 1.0 value set",
@@ -261,7 +261,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
             		String str = me.getComponent().toString();     
             		for (int i=0; i<objs.size(); i++){
             			if (str.equals(objs.get(i).toString()))
-            				obj_sel = (JObjective)objs.get(i);
+            				obj_sel = objs.get(i);
             		}            			
             		showGraph();
             		//repaintDisplay();          

@@ -170,7 +170,7 @@ public class TablePane extends JLayeredPane {
     public BaseTableContainer nextRow(BaseTableContainer comp) {
         int idx = rowList.indexOf(comp);
         if (idx > 0) {
-            return (BaseTableContainer) rowList.get(idx - 1);
+            return rowList.get(idx - 1);
         } else {
             return null;
         }

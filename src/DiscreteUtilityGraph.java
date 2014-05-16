@@ -247,7 +247,8 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
 	    //ddomain.addElement(items[clicki],((float) (205 - y) / 200));
         
 	    ddomain.changeWeight(items[clicki],((float) (205 - y) / 200));
-	    acell.dg.plotPoints();
+	    if (acell != null)
+	        acell.dg.plotPoints();
 	    //Update Value Chart
 	    if (chart!=null)        
 	        chart.updateAll();

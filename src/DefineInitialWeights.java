@@ -194,7 +194,7 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 			tabModel.fireTableCellUpdated(i, 4);
 
 			//update objective weight
-			JObjective obj = (JObjective)obj_map.get(v.get(0));
+			JObjective obj = obj_map.get(v.get(0));
 			obj.setWeight(String.valueOf(df.format(w)));
 			
 			con.btnOK.setEnabled(true);
@@ -264,7 +264,7 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
             tabModel.fireTableCellUpdated(i, 4);
 
             //update objective weight
-            JObjective obj = (JObjective)obj_map.get(v.get(0));
+            JObjective obj = obj_map.get(v.get(0));
             obj.setWeight(df.format(weights.get(i)));
         }
         con.btnOK.setEnabled(true);
