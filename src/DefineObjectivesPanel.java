@@ -283,7 +283,6 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		}
 		found_node.removeFromParent();		
 		adjustSiblings(parent_node, null);
-		pnlCon.getAltPanel().updateTable();		
 		checkObjectiveValid();		
 	}
 	
@@ -353,7 +352,6 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
             String name = lblSel.getName();
     		lblSel.setName(new_name);
     		pnlCon.getAltPanel().updateObjDetails(lblSel, name);   
-    		pnlCon.getAltPanel().updateTable();		
         }
 	}
     

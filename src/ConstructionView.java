@@ -137,7 +137,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         case 0:
             // Nothing will really need to be done b/c objs drive the data
         case 1: {
-            repaint();
+            if (pnlAlternatives != null)
+                pnlAlternatives.updateTable();
             break;
         }
         case 2: {
