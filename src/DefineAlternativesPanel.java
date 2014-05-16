@@ -62,7 +62,8 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	int num_alts;
 	ConstructionView con;
 	String last_value;
-	Vector<JObjective> objs;
+	// may want to remove this and use getPrimitiveObjectives from ObjectivesPanel if data doesn't sync between panels
+	Vector<JObjective> objs; 
 	
 	DefineAlternativesPanel(ConstructionView c){
 		con = c;
@@ -79,6 +80,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		table.getModel().addTableModelListener(this);		
         table.setAutoCreateColumnsFromModel(true);
         table.setRowSelectionAllowed(true);   
+        table.getTableHeader().setReorderingAllowed(false);
         
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane);   
@@ -184,7 +186,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 				
 		}		
 		
-		checkAlternativeCount();
+		checkAlternativeValid();
 	}
 	
 	public void updateObjDetails(JObjective obj, String name){
@@ -205,11 +207,11 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        alts.removeElementAt(index);
 	       }
 	     num_alts--;
-	     checkAlternativeCount();
+	     checkAlternativeValid();
 	   }
 	
-    public void checkAlternativeCount(){
-    	if ((num_alts<2) || ((num_alts>=2)&&(!con.constPane.isEnabledAt(1))) || !con.getObjPanel().ok){//- last part
+    public void checkAlternativeValid(){
+    	if ((num_alts<2) || ((num_alts>=2)&&(!con.constPane.isEnabledAt(1))) || !con.getObjPanel().ok || !checkFields()){//- last part
     		con.constPane.setEnabledAt(2, false);
     		con.constPane.setEnabledAt(3, false); 
             con.constPane.setEnabledAt(4, false); 
@@ -242,7 +244,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        			data.addElement("");
 	        		}
 	        		else
-	        			data.addElement("");
+	        			data.addElement(Double.valueOf(obj.minC).toString());
 	        }
 	        rows.add(data);
 	        tabModel.fireTableRowsInserted(rows.size(), rows.size());   
@@ -268,7 +270,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        alts.add(datamap);
 	        counter++;     	
 	        num_alts++;
-	        checkAlternativeCount();
+	        checkAlternativeValid();
         }	        
     }
     
@@ -354,13 +356,8 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     	for (Iterator<Vector<String>> it=rows.iterator(); it.hasNext();){
     		Vector<String> data = it.next();
     		for (Iterator<String> it2=data.iterator(); it2.hasNext();)
-    			if ((it2.next().toString()).equals("")){
-                    JOptionPane.showMessageDialog(this,
-                            "All data values must be input before proceeding",
-                            "Missing data",
-                            JOptionPane.WARNING_MESSAGE);                    		
-                    		return false;
-                    }    				
+    			if ((it2.next().toString()).equals(""))
+    			    return false;
     	}    		
     	return true;
     }
@@ -520,6 +517,8 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		}
 	        		else if (!last_value.equals(""))
 	        				table.setValueAt(last_value, table.getEditingRow(), table.getEditingColumn());
+	        		
+	        		checkAlternativeValid();
 	        		break;}
 	        		catch (ArrayIndexOutOfBoundsException ex){}  
 	        		catch (NullPointerException ne){}         		

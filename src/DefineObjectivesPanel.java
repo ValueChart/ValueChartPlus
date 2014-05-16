@@ -375,7 +375,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 			if (!obj.getWeight().equals("*"))
 				weights += obj.getWeightNumeric();			
 		}
-		pnlCon.getAltPanel().checkAlternativeCount();
+		pnlCon.getAltPanel().checkAlternativeValid();
 		if (weights <= 0.98 || weights >= 1.02){
 			pnlCon.btnOK.setEnabled(false);		
 		}

@@ -215,7 +215,8 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         cdomain.removeKnot(items[clicki]);
         cdomain.addKnot(items[clicki],((float) (205 - y) / 200));
         
-        acell.cg.plotPoints();
+        if (acell != null)
+            acell.cg.plotPoints();
         
         if (chart!=null){        	
         	chart.updateAll();
@@ -288,9 +289,15 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
             }
             else{
                 g.setFont(new Font(null, Font.PLAIN, 12));
-            }           
-           DecimalFormat df = acell.obj.decimalFormat;;            
-           g.drawString((df.format(items[i])),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+40 ,220);
+            }    
+           
+           if (acell != null) {
+               DecimalFormat df = acell.obj.decimalFormat;
+               g.drawString((df.format(items[i])),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+40 ,220);
+           } else {
+               g.drawString(Double.valueOf(items[i]).toString(),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+40 ,220);
+           }
+               
         }	
         
         //Drawing the Undo and Redo button

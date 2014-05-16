@@ -875,8 +875,10 @@ public class ValueChart extends JPanel {
             if (mainPane != null) {
                 mainPane.updateSizesAndHeights();
                 mainPane.revalidate();
-                alignDisplayPanel();
-                displayPanel.revalidate();
+                if (displayPanel != null) {
+                    alignDisplayPanel();
+                    displayPanel.revalidate();
+                }
             }
         }
     }
@@ -1258,6 +1260,7 @@ public class ValueChart extends JPanel {
     }
     
     public void alignDisplayPanel() {
+        if (displayPanel == null) return;
         displayPanel.setPrefHeight(mainPane.getHeight());
         displayPanel.setMaximumSize(displayPanel.getPreferredSize());
         displayPanel.setMinimumSize(displayPanel.getPreferredSize());

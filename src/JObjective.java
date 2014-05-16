@@ -159,6 +159,11 @@ public class JObjective extends JLabel{
 	
 	void setDomain(AttributeDomain ad){
 		domain = ad;
+		// set the range
+		if (domain.getType() == AttributeDomainType.CONTINUOUS) {
+            minC = ((ContinuousAttributeDomain)domain).getMin();
+            maxC = ((ContinuousAttributeDomain)domain).getMax();
+		}
 	}
 	
 	//default flat
