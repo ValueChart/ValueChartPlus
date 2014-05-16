@@ -2,7 +2,7 @@ import java.util.*;
 
 //This class is for comparing weights.
 
-public class WeightComparator implements Comparator
+public class WeightComparator implements Comparator<ChartEntry>
 {
 	   BaseTableContainer baseTab;
 
@@ -10,11 +10,11 @@ public class WeightComparator implements Comparator
 	    { baseTab = tab;
 	    }
 
-	   public int compare (Object o1, Object o2)
+	   public int compare (ChartEntry o1, ChartEntry o2)
 	      throws ClassCastException
 	    { 
-	      double w1 = baseTab.entryWeight((ChartEntry)o1);
-	      double w2 = baseTab.entryWeight((ChartEntry)o2);
+	      double w1 = baseTab.entryWeight(o1);
+	      double w2 = baseTab.entryWeight(o2);
 	      if (w1 > w2)
 	       { return -1;
 	       }
@@ -26,10 +26,10 @@ public class WeightComparator implements Comparator
 	       }
 	    }
 
-	   public boolean equals (Object o1, Object o2)
+	   public boolean equals (ChartEntry o1, ChartEntry o2)
 	    {
-	      double w1 = baseTab.entryWeight((ChartEntry)o1);
-	      double w2 = baseTab.entryWeight((ChartEntry)o2);
+	      double w1 = baseTab.entryWeight(o1);
+	      double w2 = baseTab.entryWeight(o2);
 	      return w1 == w2;
 	    }
 }

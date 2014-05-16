@@ -47,11 +47,11 @@ public class ValueChart extends JPanel {
     Reader initReader = null;
     ResizeHandler resizeHandler;
     JPanel pnlDisp;
-    Vector entryList;
+    Vector<ChartEntry> entryList;
     String filename;
-    Vector objs;
-    Vector alts;
-    Vector prims;
+    Vector<JObjective> objs;
+    Vector<HashMap<String,Object>> alts;
+    private Vector<BaseTableContainer> prims;
     ConstructionView con;
     boolean pump = false;
     boolean sort = false;
@@ -96,7 +96,7 @@ public class ValueChart extends JPanel {
     }
 
     public ValueChart(ConstructionView c, String file, LogUserAction l,
-            Vector<AttributeData> data, Vector entry, int type, int colwd,
+            Vector<AttributeData> data, Vector<ChartEntry> entry, int type, int colwd,
             boolean b, boolean g, boolean dispUtil) {
         super();
         show_graph = g;
@@ -161,7 +161,7 @@ public class ValueChart extends JPanel {
     }
     
     
-    private void constructFromAttribute(Vector<AttributeData> data, Vector entry, LogUserAction l, int colwd) {
+    private void constructFromAttribute(Vector<AttributeData> data, Vector<ChartEntry> entry, LogUserAction l, int colwd) {
 
 
         menuOptions = new OptionsMenu(this);
@@ -238,7 +238,7 @@ public class ValueChart extends JPanel {
     }
 
     public void reorderEntries(BaseTableContainer baseTab) {
-        Comparator weightComparator = new WeightComparator(baseTab);
+        Comparator<ChartEntry> weightComparator = new WeightComparator(baseTab);
         Collections.sort(entryList, weightComparator);
         mainEntryNames.relabel(entryList);
         displayEntryNames.relabel(entryList);
@@ -325,12 +325,12 @@ public class ValueChart extends JPanel {
         }
     }
 
-    Vector setAlts() {
-        Iterator it;
-        Vector alts = new Vector();
+    Vector<HashMap<String,Object>> setAlts() {
+        Iterator<ChartEntry> it;
+        Vector<HashMap<String,Object>> alts = new Vector<HashMap<String,Object>>();
         for (it = entryList.iterator(); it.hasNext();) {
-            HashMap datamap = new HashMap();
-            ChartEntry entry = (ChartEntry) it.next();
+            HashMap<String,Object> datamap = new HashMap<String,Object>();
+            ChartEntry entry =  it.next();
             datamap.put("name", entry.name);
             datamap.putAll(entry.map);
             for (Iterator it2 = objs.iterator(); it2.hasNext();) {
@@ -348,7 +348,7 @@ public class ValueChart extends JPanel {
         return alts;
     }
 
-    public Vector getPrims() {
+    public Vector<BaseTableContainer> getPrims() {
         return prims;
     }
 
@@ -368,10 +368,10 @@ public class ValueChart extends JPanel {
         }
         con.setChart(this);
         //set prim obj list for rolling up the absolute tree    	
-        prims = new Vector();
+        prims = new Vector<BaseTableContainer>();
         setPrims(mainPane);
-        for (Iterator it = prims.iterator(); it.hasNext();) {
-            BaseTableContainer btc = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = prims.iterator(); it.hasNext();) {
+            BaseTableContainer btc = it.next();
             btc.setRollUp();
         }
         mainPane.getRowAt(0).setAbstractRatios();
@@ -395,10 +395,10 @@ public class ValueChart extends JPanel {
         }
         con.setChart(this);
         // set prim obj list for rolling up the absolute tree
-        prims = new Vector();
+        prims = new Vector<BaseTableContainer>();
         setPrims(mainPane);
-        for (Iterator it = prims.iterator(); it.hasNext();) {
-            BaseTableContainer btc = (BaseTableContainer) it.next();
+        for (Iterator<BaseTableContainer> it = prims.iterator(); it.hasNext();) {
+            BaseTableContainer btc = it.next();
             btc.setRollUp();
         }
         mainPane.getRowAt(0).setAbstractRatios();
@@ -411,9 +411,9 @@ public class ValueChart extends JPanel {
     }
 
     private void setConst() {
-        objs = new Vector();
+        objs = new Vector<JObjective>();
         setObjs(mainPane, "root");
-        alts = new Vector();
+        alts = new Vector<HashMap<String,Object>>();
         alts = setAlts();
         con.getAltPanel().setFileAlternatives(null, alts);
         con.getAltPanel().updateTable();
@@ -424,8 +424,8 @@ public class ValueChart extends JPanel {
     private void doread(ScanfReader scanReader)
             throws IOException {
 
-        entryList = new Vector(10);
-        HashMap colorList = new HashMap(10);
+        entryList = new Vector<ChartEntry>(10);
+        HashMap<String, Color> colorList = new HashMap<String, Color>(10);
         boolean attributesRead = false;
 
         colorList.put("red", Color.red);
@@ -496,7 +496,7 @@ public class ValueChart extends JPanel {
     }
 
     private void readAttributes(ScanfReader scanReader,
-            Vector<AttributeData> attrList, HashMap colorList)
+            Vector<AttributeData> attrList, HashMap<String, Color> colorList)
             throws IOException {
         String name = null;
         while (!(name = scanReader.scanString()).equals("end")) {
@@ -631,7 +631,7 @@ public class ValueChart extends JPanel {
 //BOOLS
     public void showEditView(int idx) {
         setConnectingFields();
-        log.setOldAttrData(log.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
+        log.setOldAttrData(LogUserAction.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
         con.constPane.setSelectedIndex(idx);
         con.frame.setVisible(true);
     }
@@ -803,8 +803,8 @@ public class ValueChart extends JPanel {
         ch.getDisplayPanel().setScore(getDisplayPanel().score);
         ch.getDisplayPanel().setRuler(getDisplayPanel().ruler);
         for (int j = 0; j < entryList.size(); j++) {
-            if (((ChartEntry) entryList.get(j)).getShowFlag()) {
-                ((ChartEntry) (ch.entryList.get(j))).setShowFlag(true);
+            if (( entryList.get(j)).getShowFlag()) {
+                ( (ch.entryList.get(j))).setShowFlag(true);
                 ch.updateAll();
             }
         }
@@ -821,8 +821,8 @@ public class ValueChart extends JPanel {
         ch.getDisplayPanel().setScore(getDisplayPanel().score);
         ch.getDisplayPanel().setRuler(getDisplayPanel().ruler);
         for (int j = 0; j < entryList.size(); j++) {
-            if (((ChartEntry) entryList.get(j)).getShowFlag()) {
-                ((ChartEntry) (ch.entryList.get(j))).setShowFlag(true);
+            if (( entryList.get(j)).getShowFlag()) {
+                ( (ch.entryList.get(j))).setShowFlag(true);
                 ch.updateAll();
             }
         }
@@ -885,7 +885,7 @@ public class ValueChart extends JPanel {
     }
 
     public void showDomainVals(int i) {
-        ChartEntry c = (ChartEntry) entryList.get(i);
+        ChartEntry c =  entryList.get(i);
         pnlDom.showData(c);
     }
 

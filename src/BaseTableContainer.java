@@ -910,10 +910,10 @@ public class BaseTableContainer extends Box implements ActionListener {
 
         public void pump(BaseTableContainer base, boolean up) {
             chart.setLogOldAttributeData(LogUserAction.getDataOutput(chart.attrData, LogUserAction.OUTPUT_WEIGHT));
-            Vector prims = chart.getPrims();
+            Vector<BaseTableContainer> prims = chart.getPrims();
             double othercount = -1;
-            for (Iterator it = prims.iterator(); it.hasNext();) {
-                BaseTableContainer b = (BaseTableContainer) it.next(); 
+            for (Iterator<BaseTableContainer> it = prims.iterator(); it.hasNext();) {
+                BaseTableContainer b = it.next(); 
                 if (b.data.getWeight() > 0) {
                     othercount = othercount + 1;
                 }
@@ -922,8 +922,8 @@ public class BaseTableContainer extends Box implements ActionListener {
             if (!up) {
                 pump = -pump;
             }
-            for (Iterator it = prims.iterator(); it.hasNext();) {
-                BaseTableContainer b = (BaseTableContainer) it.next();
+            for (Iterator<BaseTableContainer> it = prims.iterator(); it.hasNext();) {
+                BaseTableContainer b = it.next();
                 //int bsize = b.getHeight(); //height of primitive at start			
                 if (b == base) {
                     b.setRollUpRatio(b.data.getWeight() + pump);

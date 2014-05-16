@@ -138,7 +138,7 @@ public class TablePane extends JLayeredPane {
     }
 
     //-finds the primitive objectives to set alternative entries
-    public void fillInEntries(Vector entryList) {
+    public void fillInEntries(Vector<ChartEntry> entryList) {
         for (Iterator<BaseTableContainer> it = rowList.iterator(); it.hasNext();) {	//-for each objective
             BaseTableContainer comp = it.next();//-iterate through each basetablecontainer
             if (comp.getTable() instanceof TablePane) //-if it is an abstract objective, keep drilling down

@@ -37,11 +37,11 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	private static final long serialVersionUID = 1L;
 
 	//all possible objective and alternative information from data file and/or objective construction
-	Vector 	all_objs,			//model of all objectives
-			alts,				//model of all alternative info				
+	Vector<JObjective> all_objs;			//model of all objectives
+	Vector<HashMap<String,Object>> alts;				//model of all alternative info				
 	//for the table model: these are selected in objective construction				
-			rows, 				//subset of all_objs
-			columns;			//subset of alts
+	Vector<Vector<String>> rows; 				//subset of all_objs
+	Vector<String> columns;			//subset of alts
 
 	//gui table components
 	static JTable table;	
@@ -63,16 +63,16 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	int num_alts;
 	ConstructionView con;
 	String last_value;
-	Vector objs;
+	Vector<JObjective> objs;
 	
 	DefineAlternativesPanel(ConstructionView c){
 		con = c;
 		
 		//initialize data vectors
-		all_objs = new Vector();	
-		alts = new Vector();				
-		rows = new Vector();		
-		columns = new Vector();		
+		all_objs = new Vector<JObjective>();	
+		alts = new Vector<HashMap<String,Object>>();				
+		rows = new Vector<Vector<String>>();		
+		columns = new Vector<String>();		
 				
 		//set up table model and component
 		tabModel = new DefaultTableModel();
@@ -115,7 +115,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	}
 	
 	//this method sets the initial values of the column headers and data
-	public void setFileAlternatives(Vector obj, Vector alt){
+	public void setFileAlternatives(Vector<JObjective> obj, Vector<HashMap<String,Object>> alt){
 		if (obj != null)
 			all_objs.addAll(obj);
 		alts.addAll(alt);
@@ -126,7 +126,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	//resets alternative constuction view to reflect any changes in objectives
 	public void updateTable(){
 		//add columns
-		columns = new Vector();
+		columns = new Vector<String>();
 		columns.addElement("Alternatives");		
 		objs = con.getObjPanel().getPrimitiveObjectives();	//do we really need this temp holder?
 		for(int i=0; i<objs.size(); i++){
@@ -134,13 +134,13 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		}  		
 		
 		//add data
-		rows = new Vector();
+		rows = new Vector<Vector<String>>();
 		for (int j=0; j<alts.size(); j++){
-			Vector data = new Vector();
-			HashMap temp = (HashMap)alts.get(j);
-			data.add(temp.get("name"));
+			Vector<String> data = new Vector<String>();
+			HashMap<String,Object> temp = alts.get(j);
+			data.add(temp.get("name").toString());
 			for (int i=0; i<objs.size(); i++){	//for each primitive objective, find each alternative's value
-				data.add(temp.get(objs.get(i).toString()));			
+				data.add(temp.get(objs.get(i).toString()).toString());			
 			}		
 		rows.add(data);
 		}
@@ -167,11 +167,11 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			TableColumn col = table.getColumnModel().getColumn(i+1);
 			JObjective obj = (JObjective)objs.get(i);
 			if (obj.getDomainType() == AttributeDomainType.DISCRETE){
-				JComboBox cboCell;
+				JComboBox<String> cboCell;
 				if (obj.getDomain().getElements() != null)
-					cboCell = new JComboBox(obj.getDomain().getElements());
+					cboCell = new JComboBox<String>(obj.getDomain().getElements());
 				else
-					cboCell = new JComboBox();
+					cboCell = new JComboBox<String>();
 				col.setCellEditor(new DefaultCellEditor(cboCell));
 		        cboCell.setEditable(true);
 			} 		
@@ -191,8 +191,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	public void updateAllObjs(JObjective obj){
 		all_objs.add(obj);		
 		for (int i=0; i<alts.size(); i++){
-			HashMap temp = new HashMap();
-			temp = (HashMap)alts.get(i);
+			HashMap<String,Object> temp = alts.get(i);
 			if (!temp.containsKey(obj.getName()))	//new objective			
 				temp.put(obj.getName(), null);
 		}
@@ -202,7 +201,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		//if there is a change in objective name
 		if(!obj.getName().equals(name))
 			for (int i=0; i<alts.size(); i++){			
-					HashMap temp = (HashMap)alts.get(i);
+					HashMap<String,Object> temp = alts.get(i);
 					temp.put(obj.getName(), temp.get(name));
 					temp.remove(name);
 			}		
@@ -255,7 +254,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                 "Alt(" + counter + ")");
         if ((new_name != null) && (new_name.length() > 0)) {
 	        //adding to data to update the current model
-	    	Vector data = new Vector();
+	    	Vector<String> data = new Vector<String>();
 	        data.addElement(new_name);	 
 	        for (int i=0; i<objs.size(); i++){
 	        		JObjective obj = (JObjective)objs.get(i);
@@ -269,7 +268,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        tabModel.fireTableRowsInserted(rows.size(), rows.size());   
    
 	        //adding to hashmap to update main model
-	        HashMap datamap = new HashMap();
+	        HashMap<String,Object> datamap = new HashMap<String,Object>();
 	        datamap.put("name", new_name);
 	        
 	        //add new blank field for all objs
@@ -295,16 +294,16 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     //need to check if we need the flag:  for now only one method callng it with "true"
     //delete comments staring with //-->
     void updateObjectiveFields(){ //-->boolean from_const){     	
-    	Vector v = new Vector();
+    	Vector<Object> v = new Vector<Object>();
     	double min = 0, max = 0;
     	for(int i=0; i< all_objs.size(); i++){
     		JObjective obj = (JObjective)all_objs.get(i);
     		//create a vector with unique discrete values
     		if (obj.getDomainType()==(AttributeDomainType.DISCRETE)){
     			//-->if (from_const){
-	    			v = new Vector();
+	    			v = new Vector<Object>();
 		    		for (int j=0; j<alts.size(); j++){
-		    			HashMap temp = (HashMap)alts.get(j);
+		    			HashMap<String,Object> temp = alts.get(j);
 	    				if(!v.contains(temp.get(all_objs.get(i).toString())))
                         	v.add(temp.get(all_objs.get(i).toString()));         
 		    		}
@@ -315,7 +314,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     		else {    		   //has not been initially set
     			if (!obj.init){//objective domain is CONTINUOUS
     				for (int j=0; j<alts.size(); j++){	    			
-			    			HashMap temp = (HashMap)alts.get(j);
+			    			HashMap<String,Object> temp = alts.get(j);
 			    			Double d = Double.valueOf(temp.get(all_objs.get(i).toString()).toString());
 			    			if(j==0)
 			    				min=max=d.doubleValue();
@@ -348,12 +347,12 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     		
     		for (int i=0; i<alts.size(); i++){
     			str = str + "\nentry ";    			
-    			HashMap hm = (HashMap)alts.get(i);
+    			HashMap<String,Object> hm = alts.get(i);
     			str = str + "\"" + hm.get("name") + "\"" + "\n";
     			for (int j=1; j<columns.size(); j++){
     				str = str + "\t" + columns.get(j).toString() + " ";
     				for (int k=0; k<objs.size(); k++){
-    					JObjective obj = (JObjective)objs.get(k);
+    					JObjective obj = objs.get(k);
     					if ((obj.getName()).equals(columns.get(j).toString()))
     						if (obj.getDomainType() == AttributeDomainType.DISCRETE)
     							str = str + "\"" + hm.get(columns.get(j).toString()) + "\"" + "\n";
@@ -369,9 +368,9 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     }
     
     public boolean checkFields(){    
-    	for (Iterator it=rows.iterator(); it.hasNext();){
-    		Vector data = (Vector)it.next();
-    		for (Iterator it2=data.iterator(); it2.hasNext();)
+    	for (Iterator<Vector<String>> it=rows.iterator(); it.hasNext();){
+    		Vector<String> data = it.next();
+    		for (Iterator<String> it2=data.iterator(); it2.hasNext();)
     			if ((it2.next().toString()).equals("")){
                     JOptionPane.showMessageDialog(this,
                             "All data values must be input before proceeding",
@@ -423,8 +422,10 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
             	try{
 	            	JTable tab = (JTable)(me.getSource());
 	            	if (tab.isEditing()){
-	            		last_value = (tab.getValueAt(tab.getSelectedRow(), tab.getSelectedColumn())).toString();
-	            		System.out.println("last_value: " + last_value);
+	            	    if (tab.getValueAt(tab.getSelectedRow(), tab.getSelectedColumn()) != null) {
+    	            		last_value = (tab.getValueAt(tab.getSelectedRow(), tab.getSelectedColumn())).toString();
+    	            		System.out.println("last_value: " + last_value);
+	            	    }
 	            	}
             	}	catch (java.lang.ClassCastException cce){}
         			catch (java.lang.NumberFormatException nfe){}
@@ -449,7 +450,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        		//update the new data	
 	        		String entered = table.getValueAt(table.getSelectedRow(),table.getSelectedColumn()).toString();
 	        		if (!entered.equals("")){
-		        		HashMap temp = (HashMap)alts.get(table.getSelectedRow());
+		        		HashMap<String,Object> temp = alts.get(table.getSelectedRow());
 		        		//last_value = (temp.get((columns.get(table.getSelectedColumn()).toString()))).toString();
 	
 		        		temp.put((columns.get(table.getSelectedColumn()).toString()), entered);

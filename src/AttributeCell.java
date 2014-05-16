@@ -19,7 +19,7 @@ public class AttributeCell extends JComponent {
 
     private static final long serialVersionUID = 1L;
     static public final int DEFAULT_HEIGHT = 64;
-    private Vector entryList;
+    private Vector<ChartEntry> entryList;
     private String attributeName;
     private int colWidth = ValueChart.DEFAULT_COL_WIDTH;
     private Color color = Color.red;
@@ -89,7 +89,7 @@ public class AttributeCell extends JComponent {
     }
 
     //-sets the entry list for the cell
-    public void setEntryList(String name, Vector list) {
+    public void setEntryList(String name, Vector<ChartEntry> list) {
         attributeName = name;
         entryList = list;
         Dimension dim =
@@ -112,8 +112,8 @@ public class AttributeCell extends JComponent {
     public double[] getWeights() {
         double[] weights = new double[entryList.size()];
         int i = 0;
-        for (Iterator it = entryList.iterator(); it.hasNext();) {
-            AttributeValue value = ((ChartEntry) it.next()).attributeValue(attributeName);
+        for (Iterator<ChartEntry> it = entryList.iterator(); it.hasNext();) {
+            AttributeValue value = it.next().attributeValue(attributeName);
             if (value != null) {
                 weights[i] = value.weight();
             } else {
@@ -272,7 +272,7 @@ public class AttributeCell extends JComponent {
             //Now create an instance for each controller
             for (int i = 0; i < entries; i++) {
                 //Get the entry information
-                ChartEntry tempentry = (ChartEntry) entryList.get(i);
+                ChartEntry tempentry = entryList.get(i);
 
                 //get the report location if associated with the entries
                 File reportFile = (File) tempentry.map.get("report");
@@ -402,8 +402,8 @@ public class AttributeCell extends JComponent {
         int x = 0;
         int thresholdPos = (int) (height - ((height) * threshold));
 
-        for (Iterator it = entryList.iterator(); it.hasNext();) {
-            ChartEntry entry = (ChartEntry) it.next();
+        for (Iterator<ChartEntry> it = entryList.iterator(); it.hasNext();) {
+            ChartEntry entry = it.next();
             AttributeValue value = (AttributeValue) entry.map.get(attributeName);
             int h = 0;
             int hpos = height;
@@ -532,8 +532,8 @@ public class AttributeCell extends JComponent {
                 }
                 threshold = (height - thresholdPos) / (double) (height);//-
                 boolean redisplay = false;
-                for (Iterator it = entryList.iterator(); it.hasNext();) {
-                    ChartEntry entry = (ChartEntry) it.next();
+                for (Iterator<ChartEntry> it = entryList.iterator(); it.hasNext();) {
+                    ChartEntry entry = it.next();
                     AttributeValue value = (AttributeValue) entry.map.get(attributeName);
                     double h = (value != null ? value.weight() : 0);
                     if (threshold <= 0) {
@@ -601,7 +601,7 @@ public class AttributeCell extends JComponent {
             } else if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
                 final int index = e.getX() / colWidth;
                 if (index >= 0 && index < entryList.size()) {
-                    ChartEntry entry = (ChartEntry) entryList.get(index);
+                    ChartEntry entry =  entryList.get(index);
                     AttributeValue value = (AttributeValue) entry.map.get(attributeName);
 
                     //***added to retreive the report location from the hash map (data structure)
@@ -634,7 +634,7 @@ public class AttributeCell extends JComponent {
                             @Override
                             public void actionPerformed(ActionEvent b) {
                                 System.out.print("Report Clicked");
-                                ChartEntry tempentry = (ChartEntry) entryList.get(index); //get the current entry
+                                ChartEntry tempentry =  entryList.get(index); //get the current entry
                                 if (tempentry.map.get("Report Frame") != null) { //check if the entry has an associated report
                                     //The JFram and SwingController inputs were created in ValueChart.java when the initial data was loaded
                                     zoomToReport((JFrame) tempentry.map.get("Report Frame"), (SwingController) tempentry.map.get("Report Controller"), (OutlineItem) tempentry.map.get("OutlineItem"), bookmarkIndex, true); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
@@ -653,7 +653,7 @@ public class AttributeCell extends JComponent {
                                 System.out.print("Report Open Clicked");
                                 //loop through each entry
                                 for (int i = 0; i < entryList.size(); i++) {
-                                    ChartEntry tempentry = (ChartEntry) entryList.get(i); //get the entry
+                                    ChartEntry tempentry =  entryList.get(i); //get the entry
                                     if (tempentry.map.get("Report Frame") != null) { //check if there is an associated report
                                         //The JFrame and SwingController inputs were created in ValueChart.java when the initial data was loaded
                                         int tempbookmarkIndex = criteriaBookmarkExistsInReport((OutlineItem) tempentry.map.get("OutlineItem"), tempentry.name.toString(), attributeName);
@@ -676,7 +676,7 @@ public class AttributeCell extends JComponent {
                                 System.out.print("Report All Clicked");
                                 //loop through each entry
                                 for (int i = 0; i < entryList.size(); i++) {
-                                    ChartEntry tempentry = (ChartEntry) entryList.get(i); //get the entry
+                                    ChartEntry tempentry =  entryList.get(i); //get the entry
                                     if (tempentry.map.get("Report Frame") != null) { //check if there is an associated report
                                         //The JFram and SwingController inputs were created in ValueChart.java when the initial data was loaded
                                         int tempbookmarkIndex = criteriaBookmarkExistsInReport((OutlineItem) tempentry.map.get("OutlineItem"), tempentry.name.toString(), attributeName);

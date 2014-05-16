@@ -27,7 +27,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
     public static Font VLABELFONT = LABELFONT.deriveFont(ANGLEFONT);
     private static final int ANG_WD = 90;
     private static final int ANG_HT = 50;
-    Vector labelList;
+    Vector<String> labelList;
     int panelHeight = 0;
     int colWidth = 0;
     int numTopBlanks = 0;
@@ -37,8 +37,8 @@ public class EntryNamePanel extends JPanel implements ActionListener {
     ValueChart chart;
     JLabel selected_entry;
 
-    public EntryNamePanel(Vector entryList, int colWidth, int numTopBlanks, boolean main, ValueChart chart) {
-        labelList = new Vector();
+    public EntryNamePanel(Vector<ChartEntry> entryList, int colWidth, int numTopBlanks, boolean main, ValueChart chart) {
+        labelList = new Vector<String>();
 
         int maxheight = 0;
         addMouseListener(mh);
@@ -47,8 +47,8 @@ public class EntryNamePanel extends JPanel implements ActionListener {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(Box.createHorizontalGlue());
 
-        for (Iterator it = entryList.iterator(); it.hasNext();) {
-            ChartEntry entry = (ChartEntry) it.next();
+        for (Iterator<ChartEntry> it = entryList.iterator(); it.hasNext();) {
+            ChartEntry entry = it.next();
             labelList.add(entry.name);
         }
 
@@ -85,7 +85,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             g.drawString(labelList.get(i).toString(), (i * colWidth) + (30 + ((int) (colWidth - 30) / 2)), ANG_HT); //center the entry name
             g.setColor(Color.GRAY);
             g.drawLine((i * colWidth), ANG_HT, (i * colWidth) + ANG_WD, 0);
-            if (((ChartEntry) chart.entryList.get(i)).getIsMarked()) {
+            if (chart.entryList.get(i).getIsMarked()) {
                 g.setColor(Color.blue);
                 //code a polygon or something
                 g.drawString(labelList.get(i).toString(), (i * colWidth) + 21, ANG_HT - 1);
@@ -115,11 +115,11 @@ public class EntryNamePanel extends JPanel implements ActionListener {
 
     }
 
-    public void relabel(Vector entryList) {
+    public void relabel(Vector<ChartEntry> entryList) {
         labelList.clear();
 
-        for (Iterator ei = entryList.iterator(); ei.hasNext();) {
-            ChartEntry entry = (ChartEntry) ei.next();
+        for (Iterator<ChartEntry> ei = entryList.iterator(); ei.hasNext();) {
+            ChartEntry entry = ei.next();
             labelList.add(entry.name);
         }
 
@@ -204,9 +204,9 @@ public class EntryNamePanel extends JPanel implements ActionListener {
         //listener for popup menu
         if ("Mark".equals(ae.getActionCommand()) || "Unmark".equals(ae.getActionCommand())) {
             if ("Mark".equals(ae.getActionCommand())) {
-                ((ChartEntry) chart.entryList.get(rightClicked)).setIsMarked(true);
+                chart.entryList.get(rightClicked).setIsMarked(true);
             } else {
-                ((ChartEntry) chart.entryList.get(rightClicked)).setIsMarked(false);
+                chart.entryList.get(rightClicked).setIsMarked(false);
             }
             updateBoth();
             /*			if (chart.mainEntryNames.isAncestorOf(selected_entry))
@@ -226,7 +226,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             System.out.println("Report Clicked");
             
             //Get the current entry
-            ChartEntry tempentry = (ChartEntry) chart.entryList.get(rightClicked); //get the current entry
+            ChartEntry tempentry = chart.entryList.get(rightClicked); //get the current entry
             
             if (tempentry.map.get("Report Frame") != null) { //check if the entry has an associated report
                 //The JFrame and SwingController inputs were created in ValueChart.java when the initial data was loaded
@@ -241,7 +241,6 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             }
         }
     }
-    Vector marked = new Vector();
     /**/
 
     void markMatchingLabel(EntryNamePanel enp, Color color) {
@@ -258,7 +257,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
 
     void toggleDetails(boolean show) {
         //offset fom extra label added for ruler
-        ((ChartEntry) chart.entryList.get(rightClicked)).setShowFlag(show);
+        chart.entryList.get(rightClicked).setShowFlag(show);
         chart.updateAll();
     }
 
@@ -273,20 +272,20 @@ public class EntryNamePanel extends JPanel implements ActionListener {
         int idx = 0;
 
         public void mousePressed(MouseEvent me) {
-            //((ChartEntry)chart.entryList.get(idx)).setShowFlag(true);	
+            //(chart.entryList.get(idx)).setShowFlag(true);	
             if (idx != -1) {
                 chart.showDomainVals(idx);
             }
             //System.out.println("IDX___________ " + idx);
             chart.updateAll();
             if (SwingUtilities.isRightMouseButton(me)) {
-                if (((ChartEntry) chart.entryList.get(idx)).getIsMarked()) {
+                if (chart.entryList.get(idx).getIsMarked()) {
                     ((JMenuItem) popEntry.getComponent(0)).setText("Unmark");
                 } else {
                     ((JMenuItem) popEntry.getComponent(0)).setText("Mark");
                 }
                 if (idx != -1) {
-                    if (((ChartEntry) chart.entryList.get(idx)).getShowFlag()) {
+                    if (chart.entryList.get(idx).getShowFlag()) {
                         ((JMenuItem) popEntry.getComponent(3)).setText("Hide Details");
                     } else {
                         ((JMenuItem) popEntry.getComponent(3)).setText("Show Details");

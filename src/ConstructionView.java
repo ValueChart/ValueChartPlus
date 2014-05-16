@@ -39,7 +39,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     String data; // main data string: all data for data file
     ColorList colors; // vc primitive objective colors
     Vector<JObjective> obj_list; // can represent all possible objectives (columns of table)
-    Vector alts; // data (rows of table)
+    Vector<HashMap<String,Object>> alts; // data (rows of table)
 
     int display_type = DEFAULT_DISPLAY;
     boolean abs = true;
@@ -56,7 +56,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         chart = null; // at first there will be no chart attached
         type = i;
         obj_list = new Vector<JObjective>();
-        alts = new Vector();
+        alts = new Vector<HashMap<String,Object>>();
 
         // Set up the Tabbed Panes
         constPane = new JTabbedPane(JTabbedPane.TOP);
@@ -320,7 +320,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             st.whitespaceChars(44, 44);
             int count2 = 0; // running count to add alternative data
             int last_line = 1;
-            HashMap alt_data = null;
+            HashMap<String,Object> alt_data = null;
             while (st.nextToken() != StreamTokenizer.TT_EOF) {
                 // read first line into objective list
                 if (st.lineno() == 1) {
@@ -353,7 +353,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                     if (last_line != st.lineno()) {
                         if (st.lineno() != 2)
                             alts.add(alt_data);
-                        alt_data = new HashMap();
+                        alt_data = new HashMap<String,Object>();
                         count2 = 0;
                         last_line = st.lineno();
                     }

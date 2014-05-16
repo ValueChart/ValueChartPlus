@@ -6,14 +6,14 @@ import java.util.*;
 public class ChartEntry
 {
 	String name;
-	HashMap map;
+	HashMap<String, Object> map;
 	HashSet maskingAttributes;
 	/**/private boolean showFlag;
 	/**/private boolean isMarked;
 
 	public ChartEntry (String name){
 		this.name = name;
-		map = new HashMap();
+		map = new HashMap<String, Object>();
 		maskingAttributes = new HashSet();
 		/**/showFlag=false;
 	}

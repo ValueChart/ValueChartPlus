@@ -21,7 +21,7 @@ public class DisplayPanel extends JComponent {
     private TablePane rootPane;
     private int colWidth = ValueChart.DEFAULT_COL_WIDTH;
     private int prefHeight = -1;
-    private Vector entryList;
+    private Vector<ChartEntry> entryList;
     
     JPopupMenu domainMeta = new JPopupMenu();
     
@@ -44,7 +44,7 @@ public class DisplayPanel extends JComponent {
         rootPane = pane;
     }
 
-    public void setEntries(Vector list) {
+    public void setEntries(Vector<ChartEntry> list) {
         entryList = list;
         Dimension dim = getPreferredSize();
 
@@ -101,7 +101,7 @@ public class DisplayPanel extends JComponent {
             for (int i = 0; i < numEntries; i++) {
                 accumulatedRatios[i] += or * weights[i];
                 h = (int) Math.round(accumulatedRatios[i] * totalHeight) - ypos[i];
-                ChartEntry entry = (ChartEntry) entryList.get(i);
+                ChartEntry entry =  entryList.get(i);
                 if (entry.isMasked()) {
                     g.setColor(Color.lightGray);
                 } else {
