@@ -2,22 +2,26 @@
 
 public class ColorMap{
     String color;
-    double red;
-    double green;
-    double blue;        
+    int red;
+    int green;
+    int blue;        
    
-    ColorMap(String c, double r, double g, double b){
+    ColorMap(String c, int r, int g, int b){
         color = c;
         red = r;
         green = g;
-            blue = b;
+        blue = b;
     }
     
     String getColor(){
         return color;
     }
     
-    String getCode(){
+    String getCodeInt(){
         return new String(red + " " + green + " " + blue);
+    }
+    
+    String getCodeDec() {
+        return new String(((double)red)/255 + " " + ((double)green)/255 + " " + ((double)blue)/255);
     }
 }

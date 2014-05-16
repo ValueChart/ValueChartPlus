@@ -29,7 +29,7 @@ public class JObjective extends JLabel{
 	//Discrete
 	int num_points = 6;	
 	
-	Color color;
+	Color color = Color.WHITE;
 
 	double minC = 0;		
 	double maxC = 100;
