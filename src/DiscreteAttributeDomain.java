@@ -9,7 +9,7 @@ public class DiscreteAttributeDomain extends AttributeDomain
     //Again, the basis data management is done through a Vector List. I personally do not think this is a good idea.
     //However, I am guessing this is not going to change until the next rewrite.
     //I personally would create a object class and go from there.
-	Vector set;
+	Vector<Entry> set;
 
 	public class Entry
 	 {
@@ -26,7 +26,7 @@ public class DiscreteAttributeDomain extends AttributeDomain
         //The rest of the functions are self-explanatory.
 	DiscreteAttributeDomain()
 	 { super();
-	   set = new Vector(32);
+	   set = new Vector<Entry>(32);
 	 }
 
 	public AttributeDomainType getType()
@@ -34,8 +34,8 @@ public class DiscreteAttributeDomain extends AttributeDomain
 	 }
 	
 	public Entry getEntry (String elem)
-	 { for (Iterator it=set.iterator(); it.hasNext(); ) 
-	    { Entry e = (Entry)it.next();
+	 { for (Iterator<Entry> it=set.iterator(); it.hasNext(); ) 
+	    { Entry e = it.next();
 	      if (e.name.equals(elem))
 	       { return e;
 	       }
@@ -57,8 +57,8 @@ public class DiscreteAttributeDomain extends AttributeDomain
 	 {
 	   String[] elems = new String[set.size()];
 	   int index = 0;
-	   for (Iterator it=set.iterator(); it.hasNext(); )
-	    { elems[index++] = ((Entry)it.next()).name;
+	   for (Iterator<Entry> it=set.iterator(); it.hasNext(); )
+	    { elems[index++] = it.next().name;
 	    }
 	   return elems;
 	 }
@@ -67,8 +67,8 @@ public class DiscreteAttributeDomain extends AttributeDomain
 	 {
 	   double[] weights = new double[set.size()];
 	   int index = 0;
-	   for (Iterator it=set.iterator(); it.hasNext(); )
-	    { weights[index++] = ((Entry)it.next()).weight;
+	   for (Iterator<Entry> it=set.iterator(); it.hasNext(); )
+	    { weights[index++] = it.next().weight;
 	    }
 	   return weights;
 	 }

@@ -164,7 +164,7 @@ public class JObjective extends JLabel{
 	//default flat
 	void setContinuous(){
 		num_points = 6;
-		Vector values = new Vector();
+		Vector<Double> values = new Vector<Double>();
 		for (int i=0; i<num_points; i++){
 			values.add(Double.valueOf(0.5));
 		}	
@@ -174,7 +174,7 @@ public class JObjective extends JLabel{
 	//linear: positive or negative
 	void setContinuous(boolean pos){
 		num_points = 5;
-		Vector values = new Vector();
+		Vector<Double> values = new Vector<Double>();
 		if (pos)
 			for (int i=0; i<num_points; i++)
 				values.add (new Double(1.0/(num_points-1)*(i)));
@@ -187,7 +187,7 @@ public class JObjective extends JLabel{
 
 	void setContinuous(double peak){
 		num_points = 5;
-		Vector values = new Vector();
+		Vector<Double> values = new Vector<Double>();
 
 		values.add(Double.valueOf(0));
 		values.add(Double.valueOf(1));
@@ -195,7 +195,7 @@ public class JObjective extends JLabel{
 		
 		//seting domain as would in setCDomain
     	domain = null;		
-    	Vector knots = new Vector();
+    	Vector<Object> knots = new Vector<Object>();
 		domain_type = AttributeDomainType.CONTINUOUS;		
 
 		knots.add(Double.valueOf(minC));
@@ -205,10 +205,10 @@ public class JObjective extends JLabel{
 		domain = AttributeDomain.getInfo(knots, values, domain_type);	
 	}
 	
-	void setCDomain(Vector v){
+	void setCDomain(Vector<Double> v){
     	domain = null;		
-		Vector values = v;
-		Vector knots = new Vector();
+		Vector<Double> values = v;
+		Vector<Object> knots = new Vector<Object>();
 		domain_type = AttributeDomainType.CONTINUOUS;		
 		for (int i=0; i<num_points; i++){
 			Double knt = new Double(minC+((maxC-minC)/(num_points-1)*(i)));
@@ -218,17 +218,17 @@ public class JObjective extends JLabel{
 	}
 	
 	void setDiscrete(){
-		Vector values = new Vector();	//reset value vector	
-		Vector elements = new Vector();	
+		Vector<Double> values = new Vector<Double>();	//reset value vector	
+		Vector<Object> elements = new Vector<Object>();	
     	domain = null;		
 		domain_type = AttributeDomainType.DISCRETE;
 		domain = AttributeDomain.getInfo(elements, values, domain_type);			
 	}
 	
 	
-	void setDiscrete(Vector v){
-		Vector values = new Vector();	//reset value vector	
-		Vector elements = new Vector();	
+	void setDiscrete(Vector<Object> v){
+		Vector<Double> values = new Vector<Double>();	//reset value vector	
+		Vector<Object> elements = new Vector<Object>();	
     	domain = null;		
 		domain_type = AttributeDomainType.DISCRETE;
 		elements = v;

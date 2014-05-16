@@ -70,19 +70,19 @@ public abstract class AttributeDomain
 
 	*/
 	
-	public static AttributeDomain getInfo(Vector xval, Vector yval, AttributeDomainType type){
+	public static AttributeDomain getInfo(Vector<Object> xval, Vector<Double> yval, AttributeDomainType type){
 		AttributeDomain domain = null;
 		if (type == AttributeDomainType.DISCRETE){	      	
 			domain = new DiscreteAttributeDomain();
             for (int i=0; i<yval.size(); i++ ){	      	
-            	Double dbl = (Double) yval.get(i);
+            	Double dbl = yval.get(i);
             	((DiscreteAttributeDomain)domain).addElement(xval.get(i).toString(), dbl.doubleValue());
             }
 		}	
 		else {
 	      	domain = new ContinuousAttributeDomain();
             for (int i=0; i<yval.size(); i++ ){	    
-	      		Double d =  (Double)yval.get(i);
+	      		Double d =  yval.get(i);
 	      		Double k =  (Double)xval.get(i);	      		
 	      		((ContinuousAttributeDomain)domain).addKnot(k.doubleValue(), d.doubleValue());      		
             }

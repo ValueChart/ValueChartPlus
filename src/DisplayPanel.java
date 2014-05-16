@@ -84,15 +84,15 @@ public class DisplayPanel extends JComponent {
             return;
         }
 
-        Vector cellList = new Vector(16);
+        Vector<AttributeCell> cellList = new Vector<AttributeCell>(16);
         rootPane.getAttributeCells(cellList);
         double[] weights;	//array of entry weights (values)
         double[] accumulatedRatios = new double[numEntries];
         int[] ypos = new int[numEntries];	//position of x, starts all at 0
         //for each primobj
-        for (Iterator it = cellList.iterator(); it.hasNext();) {
+        for (Iterator<AttributeCell> it = cellList.iterator(); it.hasNext();) {
             //for each objective, get the (array)domain value of each alternative
-            AttributeCell cell = (AttributeCell) it.next();
+            AttributeCell cell = it.next();
             weights = cell.getWeights();
             //absolute weight
             double or = cell.getOverallRatio();

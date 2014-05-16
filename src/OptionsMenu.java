@@ -372,7 +372,7 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		//Getting the list of vc files
         File f = new File(".");
         String files[] = f.list(); 
-        Vector tempFiles = new Vector();
+        Vector<String> tempFiles = new Vector<String>();
         for(int i = 0; i<files.length;i++){
         	if(files[i].endsWith(".vc")){
         		tempFiles.add(files[i]);

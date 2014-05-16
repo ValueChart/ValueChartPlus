@@ -25,8 +25,8 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	 }
 	
 	public Knot getKnot (double ord)
-	 { for (Iterator it=knotList.iterator(); it.hasNext(); ) 
-	    { Knot k = (Knot)it.next();
+	 { for (Iterator<Knot> it=knotList.iterator(); it.hasNext(); ) 
+	    { Knot k = it.next();
 	      if (k.ord == ord)
 	       { return k;
 	       }
@@ -34,12 +34,12 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	   return null;
 	 }
 
-	Vector knotList;
+	Vector<Knot> knotList;
 
         //the constructor carries a Vector list of elements
 	public ContinuousAttributeDomain()
 	 { super();
-	   knotList = new Vector(32);
+	   knotList = new Vector<Knot>(32);
 	 }
 
         //Returns type.
@@ -55,16 +55,16 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	   if (knotList.size() < 2)
 	    { throw new IllegalStateException ("incomplete knot list"); 
 	    }
-	   Iterator it = knotList.iterator();
-	   k1 = (Knot)it.next();
-	   k2 = (Knot)it.next();
+	   Iterator<Knot> it = knotList.iterator();
+	   k1 = it.next();
+	   k2 = it.next();
 	   if (x < k1.ord)
 	    { throw new IllegalArgumentException (
 "input " + x + " is out of range");
 	    }
 	   while (x > k2.ord && it.hasNext())
 	    { k1 = k2;
-	      k2 = (Knot)it.next();
+	      k2 = it.next();
 	    }
 	   if (x > k2.ord)
 	    { throw new IllegalArgumentException (
@@ -78,8 +78,8 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	 {
 	   double[] knotvals = new double[knotList.size()];
 	   int i = 0;
-	   for (Iterator it=knotList.iterator(); it.hasNext(); ) 
-	    { Knot knot = (Knot)it.next();
+	   for (Iterator<Knot> it=knotList.iterator(); it.hasNext(); ) 
+	    { Knot knot = it.next();
 	      knotvals[i++] = knot.ord;
 	    }
 	   return knotvals;
@@ -90,8 +90,8 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	 {
 	   double[] weights = new double[knotList.size()];
 	   int i = 0;
-	   for (Iterator it=knotList.iterator(); it.hasNext(); ) 
-	    { Knot knot = (Knot)it.next();
+	   for (Iterator<Knot> it=knotList.iterator(); it.hasNext(); ) 
+	    { Knot knot = it.next();
 	      weights[i++] = knot.val;
 	    }
 	   return weights;
@@ -132,8 +132,8 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	      return;
 	    }
 	   Knot k1;
-	   Iterator it = knotList.iterator();
-	   k1 = (Knot)it.next();
+	   Iterator<Knot> it = knotList.iterator();
+	   k1 = it.next();
 	   int index = 0;
 	   while (ord > k1.ord && it.hasNext())
 	    { k1 = (Knot)it.next();
@@ -156,9 +156,9 @@ public class ContinuousAttributeDomain extends AttributeDomain
         //This one is for removing domain values.
 	public void removeKnot (double ord)
 	 {
-	   Iterator it = knotList.iterator();
+	   Iterator<Knot> it = knotList.iterator();
 	   while (it.hasNext())
-	    { if (((Knot)it.next()).ord == ord)
+	    { if (it.next().ord == ord)
 	       { it.remove();
 		 break;
 	       }

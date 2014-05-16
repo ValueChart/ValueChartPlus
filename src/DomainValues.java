@@ -16,19 +16,19 @@ import javax.swing.table.DefaultTableModel;
 		JLabel lblAlt;
     	JTable table;	
     	DefaultTableModel tabModel;  
-    	Vector rows;
-    	Vector cols;
-		Vector data;
+    	Vector<Vector<String>> rows;
+    	Vector<String> cols;
+		Vector<String> data;
 		String sel;		// string of selected objective
 		ValueChart chart;
 		
 		DomainValues(ValueChart chart){			
 			this.chart = chart;
-	        cols = new Vector();
+	        cols = new Vector<String>();
 	        cols.add(" ");
 	        cols.add(" ");
-			rows = new Vector();
-			data = new Vector();
+			rows = new Vector<Vector<String>>();
+			data = new Vector<String>();
 
 			lblAlt= new JLabel(" ");
 			//lblAlt.setBorder(BorderFactory.createLineBorder(Color.red));
@@ -58,7 +58,7 @@ import javax.swing.table.DefaultTableModel;
 		
 		public void showData(ChartEntry entry){
 
-			rows = new Vector();
+			rows = new Vector<Vector<String>>();
 			Vector<BaseTableContainer> prims = chart.getPrims();
 			//lblAlt.setText(entry.name);
 			//lblAlt.setLocation(0, lblAlt.getLocation().y);
@@ -67,7 +67,7 @@ import javax.swing.table.DefaultTableModel;
 			
 	        setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0,0,0,0), entry.name, 0, 0));
 			for (Iterator<BaseTableContainer> it = prims.iterator(); it.hasNext();){
-				data = new Vector();
+				data = new Vector<String>();
 				BaseTableContainer base = it.next();
 				String s = (base.getName());				
 				AttributeValue val = (AttributeValue)entry.map.get(s);				

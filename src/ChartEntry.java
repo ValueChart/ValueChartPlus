@@ -7,14 +7,14 @@ public class ChartEntry
 {
 	String name;
 	HashMap<String, Object> map;
-	HashSet maskingAttributes;
+	HashSet<AttributeCell> maskingAttributes;
 	/**/private boolean showFlag;
 	/**/private boolean isMarked;
 
 	public ChartEntry (String name){
 		this.name = name;
 		map = new HashMap<String, Object>();
-		maskingAttributes = new HashSet();
+		maskingAttributes = new HashSet<AttributeCell>();
 		/**/showFlag=false;
 	}
 

@@ -28,8 +28,8 @@ public class ValueChartsPlus extends JPanel
     protected JTextField txtName; 
     protected static JFrame frame;
     
-    JList lstFiles;    
-    DefaultListModel listModel;
+    JList<String> lstFiles;    
+    DefaultListModel<String> listModel;
     JScrollPane scrList;     
     JButton btnOpenCreate;
     JButton btnCancel;    
@@ -44,8 +44,8 @@ public class ValueChartsPlus extends JPanel
 	JPopupMenu popList; 
 	JMenuItem menuRemove;
     
-    Vector vc_files;
-    Vector csv_files;
+    Vector<String> vc_files;
+    Vector<String> csv_files;
     
     String filename;
     static ValueChart chart;
@@ -78,8 +78,8 @@ public class ValueChartsPlus extends JPanel
         pnlOptions.add(optVC);
         
         //Set up the File List
-        listModel = new DefaultListModel(); 
-        lstFiles = new JList(listModel);
+        listModel = new DefaultListModel<String>(); 
+        lstFiles = new JList<String>(listModel);
         lstFiles.addMouseListener(new MouseHandler());
         lstFiles.setEnabled(false);
         lstFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -215,8 +215,8 @@ public class ValueChartsPlus extends JPanel
     
     //List all the vc files
     void prepLists(){
-    	vc_files = new Vector();
-    	csv_files = new Vector();
+    	vc_files = new Vector<String>();
+    	csv_files = new Vector<String>();
         //String[] filenames;
         File f = new File(".");
         String files[] = f.list();
@@ -228,7 +228,7 @@ public class ValueChartsPlus extends JPanel
         }    	
     }
     
-    void setList(Vector file_list){
+    void setList(Vector<String> file_list){
 		lstFiles.setEnabled(true);  
 		listModel.clear();
 		//sort the list
@@ -238,7 +238,7 @@ public class ValueChartsPlus extends JPanel
 		   String[] a = new String[numItems];
 		   for (int i=0;i<numItems;i++)
 		   {
-		     a[i] = (String)listModel.getElementAt(i);
+		     a[i] = listModel.getElementAt(i);
 		   }
 		   sortArray(a);
 		   lstFiles.setListData(a);
@@ -248,7 +248,7 @@ public class ValueChartsPlus extends JPanel
 		btnOpenCreate.setText("  Open ");
     }
   
-    public Vector getFileNames(String name, Vector list){
+    public Vector<String> getFileNames(String name, Vector<String> list){
     	try{
     		FileReader fr = new FileReader(name);
     		BufferedReader br = new BufferedReader(fr);
