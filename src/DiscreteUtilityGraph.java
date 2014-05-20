@@ -294,7 +294,13 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         
         g.setColor(Color.red);
         for(int i = 0; i < items.length; i++){
-            g.fill(s[i]);
+            if ((weights[i] == 0.0) || (weights[i] == 1.0)) {
+                g.setColor(Color.yellow);
+                g.fill(s[i]);
+                g.setColor(Color.red);
+            } else {
+                g.fill(s[i]);
+            }
         }
         g.setColor(Color.black);
         for(int i = 0; i < items.length; i++){

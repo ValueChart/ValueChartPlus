@@ -148,7 +148,6 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     }
     
     public void mousePressed(MouseEvent me) {
-        xaxis = me.getX();
         for (int i = 0; i < items.length; i++) {
             //This long if statement is only to make the dragging point more sensitive. There is nothing interesting about it.
             if ((p[i].hit(me.getX(), me.getY())) || (p[i].hit(me.getX() + 1, me.getY() + 1)) || (p[i].hit(me.getX() - 1, me.getY() - 1))
@@ -165,6 +164,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
                 //}
                 //else{
                 	setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+                    xaxis = (int)p[i].x;
                 	moving = p[i];
                 	clicki = i;
                 	if (chart != null && fromChart)
@@ -257,7 +257,13 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         g.setColor(Color.red);      
         //g.fill(s0);  g.fill(s1);
         for(int i = 0; i < items.length; i++){
-            g.fill(s[i]);
+            if ((weights[i] == 0.0) || (weights[i] == 1.0)) {
+                g.setColor(Color.yellow);
+                g.fill(s[i]);
+                g.setColor(Color.red);
+            } else {
+                g.fill(s[i]);
+            }
         }
         g.setColor(Color.black);    
        // g.draw(s0);  g.draw(s1);
