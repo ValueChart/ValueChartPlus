@@ -120,6 +120,15 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		num_alts = alts.size();
 	}
 	
+	public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return true;
+	}
+	
 	//resets alternative constuction view to reflect any changes in objectives
 	public void updateTable(){
 		//add columns
@@ -138,8 +147,16 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			data.add(temp.get("name").toString());
 			for (int i=0; i<objs.size(); i++){	//for each primitive objective, find each alternative's value
 			    Object o = temp.get(objs.get(i).toString());
-			    if (o != null)
-			        data.add(o.toString());
+			    if (o != null) {
+			        boolean numeric = isNumeric(o.toString());
+			        if (objs.get(i).getDomainType() == AttributeDomainType.CONTINUOUS && !numeric) {
+	                     data.add("");
+			        } else if (objs.get(i).getDomainType() == AttributeDomainType.DISCRETE && numeric) {
+			            data.add("");
+			        } else {
+			            data.add(o.toString());
+			        }
+			    }
 			    else
 			        data.add("");
 			}		
