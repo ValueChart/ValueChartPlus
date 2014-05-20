@@ -186,8 +186,9 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 				
 		}		
 		
-		checkAlternativeValid();
-	}
+        if (con != null)
+            con.validateTabs();      
+    }
 	
 	public void updateObjDetails(JObjective obj, String name){
 		//if there is a change in objective name
@@ -207,23 +208,10 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        alts.removeElementAt(index);
 	       }
 	     num_alts--;
-	     checkAlternativeValid();
+	     if (con != null)
+	            con.validateTabs(); 
 	   }
-	
-    public void checkAlternativeValid(){
-    	if ((num_alts<2) || ((num_alts>=2)&&(!con.constPane.isEnabledAt(1))) || !con.getObjPanel().ok || !checkFields()){//- last part
-    		con.constPane.setEnabledAt(2, false);
-    		con.constPane.setEnabledAt(3, false); 
-            con.constPane.setEnabledAt(4, false); 
-            con.btnOK.setEnabled(false);
-    	}
-    	else{
-    		con.constPane.setEnabledAt(2, true);
-    		con.constPane.setEnabledAt(3, true);
-            con.constPane.setEnabledAt(4, true); 
-    		con.btnOK.setEnabled(true);
-    	}
-    }
+
     
     void addAlternative(){
         String new_name = (String)JOptionPane.showInputDialog(
@@ -270,7 +258,8 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        alts.add(datamap);
 	        counter++;     	
 	        num_alts++;
-	        checkAlternativeValid();
+	        if (con != null)
+	            con.validateTabs(); 
         }	        
     }
     
@@ -518,7 +507,8 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        		else if (!last_value.equals(""))
 	        				table.setValueAt(last_value, table.getEditingRow(), table.getEditingColumn());
 	        		
-	        		checkAlternativeValid();
+	        		if (con != null)
+	                    con.validateTabs(); 
 	        		break;}
 	        		catch (ArrayIndexOutOfBoundsException ex){}  
 	        		catch (NullPointerException ne){}         		

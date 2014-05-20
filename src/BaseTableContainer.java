@@ -1047,7 +1047,7 @@ public class BaseTableContainer extends Box implements ActionListener {
         } else if (("Set Color...").equals(ae.getActionCommand())) {
             new ColorSelection(table, chart, header);
         } else if (("Edit").equals(ae.getActionCommand())) {
-            chart.showEditView(0);
+            chart.showConstructionModel();
         } else if (("Criteria Details in Report").equals(ae.getActionCommand())) {
             //go to the valuechart report
             chart.zoomToReport(this.getName());

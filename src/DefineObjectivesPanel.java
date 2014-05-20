@@ -247,8 +247,9 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	repaint();	
 		adjustSiblings(found_node, obj1);
 		pnlCon.getAltPanel().updateTable();
-		checkObjectiveValid();
-		 //this cascades the children for DnD: repaints the labels but does change model 
+        if (pnlCon != null)
+            pnlCon.validateTabs();      
+        //this cascades the children for DnD: repaints the labels but does change model 
 		for (int i=0; i<new_node.getChildCount(); i++){
 			addToTree((DefaultMutableTreeNode)new_node.getChildAt(i), obj1, false);
 		}		
@@ -283,7 +284,8 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		}
 		found_node.removeFromParent();		
 		adjustSiblings(parent_node, null);
-		checkObjectiveValid();		
+		if (pnlCon != null)
+		    pnlCon.validateTabs();		
 	}
 	
 	private void addBranchToList(){
@@ -360,24 +362,6 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
         dlgDet.updateFields(lblSel);        
         dlgDet.showFrame(true);
     }
-
-	void checkObjectiveValid(){
-		setPrimitiveObjectives();
-		if (prim_obj.size()<2 || !ok)
-			pnlCon.constPane.setEnabledAt(1, false);
-		else
-			pnlCon.constPane.setEnabledAt(1, true);
-		double weights=0.0;
-		for (Iterator<JObjective> it = prim_obj.iterator(); it.hasNext();){
-			JObjective obj = it.next();
-			if (!obj.getWeight().equals("*"))
-				weights += obj.getWeightNumeric();			
-		}
-		pnlCon.getAltPanel().checkAlternativeValid();
-		if (weights <= 0.98 || weights >= 1.02){
-			pnlCon.btnOK.setEnabled(false);		
-		}
-	}
 	
 //OUTPUT
 	

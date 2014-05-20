@@ -221,8 +221,9 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         if (chart!=null){        	
         	chart.updateAll();
         }
-        if (!fromChart)
-        	dvf.checkUtility(dvf.obj_sel, dvf.lbl_sel);       
+        if (!fromChart) {
+        	dvf.con.validateTabs();
+        }
         
         //Updating weights
         weights = cdomain.getWeights();

@@ -629,14 +629,27 @@ public class ValueChart extends JPanel {
     }
 
 //BOOLS
-    public void showEditView(int idx) {
+    
+    public void showConstructionModel() {
         setConnectingFields();
         log.setOldAttrData(LogUserAction.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
-        con.constPane.setSelectedIndex(idx);
-        con.getObjPanel().checkObjectiveValid();
+        con.setConstructionModel();
         con.frame.setVisible(true);
     }
-
+    
+    public void showPreferenceModel() {
+        setConnectingFields();
+        log.setOldAttrData(LogUserAction.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
+        con.setPreferenceModel();
+        con.frame.setVisible(true);
+    }
+    
+    public boolean allowPreferenceModel() {
+        if (con == null) return false;
+        
+        return con.allowPreferenceModel();
+    }
+    
     public boolean isPumpSelected() {
         return pump;
     }

@@ -47,6 +47,7 @@ class OptionsMenu extends JMenuBar implements ActionListener{
     CheckBoxMenuEntry logChangeMenuItem;
     CheckBoxMenuEntry logAllMenuItem;
     CheckBoxMenuEntry utilDispMenuItem;
+    MenuEntry prefModelMenuItem;
     MenuEntry logStateMenuItem;
     MenuEntry menuItem;  
     MenuEntry menuUndo;
@@ -90,14 +91,10 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         menuRedo.setEnabled(false);
 		menu.add(menuRedo);
 		menu.addSeparator();
-        menuItem = new MenuEntry("Objectives");  
+        menuItem = new MenuEntry("Construction Model");  
         menu.add(menuItem);
-        menuItem = new MenuEntry("Alternatives"); 
-        menu.add(menuItem);
-        menuItem = new MenuEntry("Value Function");  
-        menu.add(menuItem);
-        menuItem = new MenuEntry("Weighting");  
-        menu.add(menuItem);  
+        prefModelMenuItem = new MenuEntry("Preference Model"); 
+        menu.add(prefModelMenuItem);
         add(menu);
         
         MenuTitle submenu;        
@@ -208,6 +205,8 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         	case LogUserAction.LOG_ALL: {
                 logAllMenuItem.setSelected(true); break;}
     	}
+    	if (!chart.allowPreferenceModel())
+    	    prefModelMenuItem.setEnabled(false);
     }
     
     public void deselectLogItems() {
@@ -258,17 +257,12 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 			chart.next_int.undo();
 		}	
 		
-		else if ("Objectives".equals(ae.getActionCommand())){
-			chart.showEditView(0);		}
-		else if ("Alternatives".equals(ae.getActionCommand())){
-			chart.showEditView(1);
+		else if ("Construction Model".equals(ae.getActionCommand())){
+			chart.showConstructionModel();		
 		}
-		else if ("Value Function".equals(ae.getActionCommand())){
-			chart.showEditView(2);
-		}
-		else if ("Weighting".equals(ae.getActionCommand())){
-			chart.showEditView(4);
-		}		
+		else if ("Preference Model".equals(ae.getActionCommand())){
+			chart.showPreferenceModel();
+		}	
 		else if ("Vertical".equals(ae.getActionCommand())){
 			chart.resetDisplay(1, chart.getColWidth(), true, chart.show_graph);		
 		}		

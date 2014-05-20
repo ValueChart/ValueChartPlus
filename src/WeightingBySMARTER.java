@@ -180,7 +180,7 @@ class WeightingBySMARTER extends JPanel implements ActionListener{
                     if (fromConstruction) { // from ConstructionView tab
                         con.getWeightPanel().completedSMARTER = true;
                         count = 0; 
-                        con.constPane.setSelectedIndex(4);
+                        con.gotoWeighting();
                     }
                 }
 

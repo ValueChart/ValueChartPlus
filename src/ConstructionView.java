@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.StreamTokenizer;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -19,6 +20,12 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 	static final int	DEFAULT_DISPLAY = 1,
 						SIDE_DISPLAY = 2,
 						SEPARATE_DISPLAY = 3;
+	static final String TAB_OBJECTIVES = "Objectives",
+	                    TAB_ALTERNATIVES = "Alternatives",
+	                    TAB_VALUES = "Values",
+	                    TAB_SMARTER = "SMARTER",
+	                    TAB_WEIGHTING = "Weighting";
+
 	int type = 1;
 	ValueChart chart;
 
@@ -63,16 +70,16 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         constPane.addChangeListener(this);
         constPane.setPreferredSize(new Dimension(600, 400));
         pnlObjectives = new DefineObjectivesPanel(type, this);
-        constPane.addTab("Objectives", pnlObjectives);
+        constPane.addTab(TAB_OBJECTIVES, pnlObjectives);
 
         pnlAlternatives = new DefineAlternativesPanel(this);
-        constPane.addTab("Alternatives", pnlAlternatives);
+        constPane.addTab(TAB_ALTERNATIVES, pnlAlternatives);
         pnlValueFunction = new DefineValueFunction(this);
-        constPane.addTab("Values", pnlValueFunction);
+        constPane.addTab(TAB_VALUES, pnlValueFunction);
         pnlWeighting = new DefineInitialWeights(this);
         pnlSMARTER = new WeightingBySMARTER(this, true);
-        constPane.addTab("SMARTER", pnlSMARTER);
-        constPane.addTab("Weighting", pnlWeighting);
+        constPane.addTab(TAB_SMARTER, pnlSMARTER);
+        constPane.addTab(TAB_WEIGHTING, pnlWeighting);
 
         // disable other tabs at first
         constPane.setEnabledAt(1, false);
@@ -81,7 +88,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         constPane.setEnabledAt(4, false);
 
         // Set up the command buttons
-        btnOK = new JButton("    OK    ");
+        btnOK = new JButton("Update Chart");
         btnOK.setActionCommand("btnOK");
         btnOK.addActionListener(this);
         btnOK.setEnabled(false);
@@ -133,51 +140,59 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         if (btnCancel != null)
             btnCancel.setVisible(true);
 
-        switch (sel) {
-        case 0:
-            // Nothing will really need to be done b/c objs drive the data
-        case 1: {
-            if (pnlAlternatives != null)
-                pnlAlternatives.updateTable();
-            break;
+        validateTabs();
+        
+        // initial construction
+        if (pane.getTabCount() > 3) {
+            switch (sel) {
+            case 1: {
+                if (pnlAlternatives != null)
+                    pnlAlternatives.updateTable();
+                break;
+            }
+            case 2: {
+                pnlValueFunction.repaintDisplay();
+                break;
+            }
+            case 3: {
+                if (btnOK != null)
+                    btnOK.setVisible(false);
+                if (btnCancel != null)
+                    btnCancel.setVisible(false);
+                
+                if (pnlValueFunction.checkAllUtility(true)) {
+                    pnlWeighting.setObjectiveList();
+                    String problem  = "";
+                    if (chart != null) problem = chart.getChartTitle();
+                    pnlSMARTER.startWeighting(problem);
+                }
+                break;
+            }
+            case 4: {
+                if (pnlValueFunction.checkAllUtility(true))
+                    pnlWeighting.setObjectiveList();
+                break;
+            }
+            }
         }
-        case 2: {
-            if (pnlAlternatives.checkFields()) {
-                if (vf_flag)
-                    pnlValueFunction.repaintDisplay();
-            } else
-                pane.setSelectedIndex(1);
-            break;
-        }
-        case 3: {
-            if (btnOK != null)
-                btnOK.setVisible(false);
-            if (btnCancel != null)
-                btnCancel.setVisible(false);
-            
-            if (pnlValueFunction.checkAllUtility()) {
+        // preference model
+        else {
+           String title = pane.getTitleAt(sel);
+            if (title.equals(TAB_VALUES)) {
+                pnlValueFunction.repaintDisplay();
+            } else if (title.equals(TAB_SMARTER)) {
+                if (btnOK != null)
+                    btnOK.setVisible(false);
+                if (btnCancel != null)
+                    btnCancel.setVisible(false);
+                
                 pnlWeighting.setObjectiveList();
                 String problem  = "";
                 if (chart != null) problem = chart.getChartTitle();
                 pnlSMARTER.startWeighting(problem);
-            }
-            else {
-                vf_flag = false;
-                pane.setSelectedIndex(2);
-                vf_flag = true;
-            }
-            break;
-        }
-        case 4: {
-            if (pnlValueFunction.checkAllUtility())
+            } else if (title.equals(TAB_WEIGHTING)) {
                 pnlWeighting.setObjectiveList();
-            else {
-                vf_flag = false;
-                pane.setSelectedIndex(2);
-                vf_flag = true;
             }
-            break;
-        }
         }
 
     }
@@ -379,5 +394,133 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         pnlObjectives.setFileObjectives(obj_list);
         pnlAlternatives.setFileAlternatives(alts);
 
+    }
+    
+    
+    // returns true if Objectives tab valid
+    public boolean checkObjectiveValid(){
+        pnlObjectives.setPrimitiveObjectives();
+        Vector<JObjective> prim_obj = pnlObjectives.getPrimitiveObjectives();
+        
+        if (prim_obj.size()<2 || !pnlObjectives.ok)
+            return false;
+
+        return true;
+    }
+    
+    // returns true if Alternative panel valid
+    public boolean checkAlternativeValid(){
+        int num_alts = pnlAlternatives.num_alts;
+        if ((num_alts<2) || !pnlAlternatives.checkFields()){//- last part
+            return false;
+        }
+
+        return true;
+    }
+    
+    // returns true if weights all defined properly
+    public boolean checkWeightsValid() {
+        Vector<JObjective> prim_obj = pnlObjectives.getPrimitiveObjectives();
+
+        double weights=0.0;
+        for (Iterator<JObjective> it = prim_obj.iterator(); it.hasNext();){
+            JObjective obj = it.next();
+            if (!obj.getWeight().equals("*"))
+                weights += obj.getWeightNumeric();          
+        }
+        if (weights <= 0.98 || weights >= 1.02){
+            return false;
+        }
+        return true;
+    }
+    
+    // TODO possible rename?
+    public void setConstructionModel() {
+        if (constPane == null || pnlObjectives == null || pnlAlternatives == null)
+            return;
+        
+        constPane.removeAll();
+        
+        constPane.addTab(TAB_OBJECTIVES, pnlObjectives);
+        constPane.addTab(TAB_ALTERNATIVES, pnlAlternatives);
+        constPane.addTab(TAB_VALUES, pnlValueFunction);
+        constPane.addTab(TAB_SMARTER, pnlSMARTER);
+        constPane.addTab(TAB_WEIGHTING, pnlWeighting);
+        
+        validateTabs();
+        constPane.setSelectedIndex(0);
+    }
+    
+    public void setPreferenceModel() {
+        if (constPane == null || pnlObjectives == null || pnlAlternatives == null)
+            return;
+        
+        constPane.removeAll();        
+        
+        constPane.addTab(TAB_VALUES, pnlValueFunction);
+        constPane.addTab(TAB_SMARTER, pnlSMARTER);
+        constPane.addTab(TAB_WEIGHTING, pnlWeighting);
+        
+        validateTabs();
+        constPane.setSelectedIndex(0);
+    }
+    
+    public boolean allowPreferenceModel() {
+        return (checkObjectiveValid() && checkAlternativeValid());
+    }
+    
+    public void gotoWeighting() {
+        constPane.setSelectedIndex(constPane.getTabCount()-1);
+    }
+    
+    public void validateTabs() {
+        if (constPane == null || frame == null || !frame.isVisible()) 
+            return;
+        
+        // construction
+        if (constPane.getTabCount() > 3) {
+            constPane.setEnabledAt(1, false);
+            constPane.setEnabledAt(2, false);
+            constPane.setEnabledAt(3, false);
+            constPane.setEnabledAt(4, false);
+            
+            if (checkObjectiveValid()) {
+                constPane.setEnabledAt(1, true);
+                if (checkAlternativeValid()) {
+                    constPane.setEnabledAt(2, true);
+                    if (pnlValueFunction.checkAllUtility(false)) {
+                        constPane.setEnabledAt(3, true);
+                        constPane.setEnabledAt(4, true);
+                        if (checkWeightsValid()) {
+                            btnOK.setEnabled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+            btnOK.setEnabled(false);
+        }
+        // preference model
+        else {
+            if (constPane.getTabCount() < 3) return;
+
+            constPane.setEnabledAt(0, false);
+            constPane.setEnabledAt(1, false);
+            constPane.setEnabledAt(2, false);
+            
+            if (checkAlternativeValid()){
+                constPane.setEnabledAt(0, true);
+                if (pnlValueFunction.checkAllUtility(false)) {
+                   constPane.setEnabledAt(1, true);
+                   constPane.setEnabledAt(2, true);
+                   if (checkWeightsValid()) {
+                       btnOK.setEnabled(true);
+                       return;
+                   }
+                }
+                    
+            }
+            btnOK.setEnabled(false);
+        }
     }
 }

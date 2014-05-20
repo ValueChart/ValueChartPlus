@@ -250,10 +250,12 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
 	    if (acell != null)
 	        acell.dg.plotPoints();
 	    //Update Value Chart
-	    if (chart!=null)        
+	    if (chart!=null) {  
 	        chart.updateAll();
-        if (!fromChart)
-        	dvf.checkUtility(dvf.obj_sel, dvf.lbl_sel);        
+	    }
+        if (!fromChart) {
+            dvf.con.validateTabs();
+        }
         
     }
     

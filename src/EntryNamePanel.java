@@ -220,7 +220,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
                 toggleDetails(false);
             }
         } else if ("Edit".equals(ae.getActionCommand())) {
-            chart.showEditView(1);
+            chart.showConstructionModel();
         } else if ("Show Report".equals(ae.getActionCommand())) {
             //This menu item opens one pdf report specific for this entry for the given attribute
             System.out.println("Report Clicked");

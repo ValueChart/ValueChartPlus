@@ -139,16 +139,16 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 	
 	}
 	
-    public boolean checkAllUtility(){
+    public boolean checkAllUtility(boolean showDialog){
 		all_set=true;
 		if (objs == null){
 			repaintDisplay();
 		}
 		for (int i=0; i<objs.size(); i++)
 			checkUtility(objs.get(i), (JLabel)pnlObjList.getComponent(i));		
-			if (!all_set){
+			if (!all_set && showDialog){
 				JOptionPane.showMessageDialog(this,
-						"All value functions must have a 0 and a 1.0 value set",
+						"All value functions must have a 0 (WORST) and a 1.0 (BEST) value set",
 						"Missing information",
 						JOptionPane.WARNING_MESSAGE);
 			}	
