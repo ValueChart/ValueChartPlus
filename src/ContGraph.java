@@ -81,11 +81,11 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
     public void mouseExited(MouseEvent me) { }
     public void mouseMoved(MouseEvent me) { }
     public void mousePressed(MouseEvent me) {
-        xaxis = me.getX();
         for (int i = 0; i < items.length; i++) {
             if (p[i].hit(me.getX(), me.getY())) {
                 undo = cdomain.getWeights();
                 moving = p[i];
+                xaxis = (int)p[i].x;
                 clicki = i;
                 LastInteraction interact = new LastInteraction(chart);
                 interact.setUndoUtil(this, null, items[i], weights[i], cdomain);
