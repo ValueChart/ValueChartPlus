@@ -62,8 +62,8 @@ public class ValueChart extends JPanel {
     public DomainValues pnlDom;
     OptionsMenu menuOptions;
     boolean isNew = true;
-    LastInteraction last_int;
-    LastInteraction next_int;
+    private Stack<LastInteraction> undo_int;
+    private Stack<LastInteraction> redo_int;
     Vector<AttributeData> attrData;
     LogUserAction log;
     boolean displayUtilityWeights = false;
@@ -121,8 +121,8 @@ public class ValueChart extends JPanel {
         if (!isNew) {
             menuOptions.setVisible(false);
         }
-        last_int = new LastInteraction(menuOptions.menuUndo);
-        next_int = new LastInteraction(menuOptions.menuRedo);
+        undo_int = new Stack<LastInteraction>();
+        redo_int = new Stack<LastInteraction>();
         setColWidth(colwd);
         showAbsoluteRatios = true;
         try {
@@ -169,8 +169,8 @@ public class ValueChart extends JPanel {
         if (!isNew) {
             menuOptions.setVisible(false);
         }
-        last_int = new LastInteraction(menuOptions.menuUndo);
-        next_int = new LastInteraction(menuOptions.menuRedo);
+        undo_int = new Stack<LastInteraction>();
+        redo_int = new Stack<LastInteraction>();
         setColWidth(colwd);
 
         showAbsoluteRatios = true;
@@ -905,128 +905,42 @@ public class ValueChart extends JPanel {
         pnlDom.showData(c);
     }
 
-    public class LastInteraction {
-
-        public static final int NO_UNDO = 0,
-                SLIDE = 1,
-                PUMP = 2,
-                UTIL = 3;
-        int type;
-        int delY;
-        int dragY;
-        BaseTableContainer base;
-        boolean pump;
-        boolean east;
-        JMenuItem menu;
-        String elt;
-        double weight;
-        double knot;
-        JPanel pnlUtil;
-        AttributeDomain domain;
-
-        LastInteraction(JMenuItem m) {
-            type = NO_UNDO;
-            menu = m;
-        }
-
-        void reset() {
-            type = NO_UNDO;
-            menu.setEnabled(false);
-        }
-
-        void setUndoUtil(JPanel p, String e, double k, double wt, AttributeDomain ad) {
-            type = UTIL;
-            menu.setEnabled(true);
-            next_int.menu.setEnabled(false);
-            pnlUtil = p;
-            elt = e;
-            knot = k;
-            weight = wt;
-            domain = ad;
-        }
-
-        void setUndoSlide(BaseTableContainer b, int dy, int ry, boolean e) {
-            type = SLIDE;
-            menu.setEnabled(true);
-            next_int.menu.setEnabled(false);
-            base = b;
-            dragY = ry;
-            delY = dy;
-            east = e;
-        }
-
-        void setUndoPump(BaseTableContainer b, boolean p) {
-            type = PUMP;
-            menu.setEnabled(true);
-            next_int.menu.setEnabled(false);
-            base = b;
-            pump = p;
-        }
-
-        void setRedo(LastInteraction last) {
-            last.menu.setEnabled(true);
-            last.type = type;
-            last.dragY = dragY;
-            last.delY = -delY;
-            last.pump = pump ? false : true;
-            last.base = base;
-            last.pnlUtil = pnlUtil;
-            last.knot = knot;
-            last.elt = elt;
-            last.domain = domain;
-            if (domain != null) {
-                if (domain.getType() == AttributeDomainType.DISCRETE) {
-                    DiscreteAttributeDomain d = ((DiscreteAttributeDomain) domain);
-                    last.weight = (d.getEntry(elt)).weight;
-                } else {
-                    ContinuousAttributeDomain c = ((ContinuousAttributeDomain) domain);
-                    last.weight = (c.getKnot(knot)).val;
-                }
-            }
-
-        }
-
-        void undo() {
-            switch (type) {
-                case SLIDE: {
-                    base.dragY = dragY;
-                    //if (east)
-                    base.mouseHandler.setEastRollup(base);
-                    /*	    			else
-                     base.mouseHandler.setWestRollup(base);*/
-                    base.mouseHandler.eastRollupStretchDrag(delY);
-                    updateAll();
-                    break;
-                }
-                case PUMP: {
-                    base.mouseHandler.pump(base, pump);
-                    break;
-                }
-                case UTIL: {
-                    if (pnlUtil instanceof ContGraph) {
-                        ContGraph cg = (ContGraph) pnlUtil;
-                        cg.cdomain.changeWeight(knot, weight);
-                        cg.plotPoints();
-                    } else if (pnlUtil instanceof DiscGraph) {
-                        DiscGraph dg = (DiscGraph) pnlUtil;
-                        dg.ddomain.changeWeight(elt, weight);
-                        dg.plotPoints();
-                    } else if (pnlUtil instanceof ContinuousUtilityGraph) {
-                        ContinuousUtilityGraph cug = (ContinuousUtilityGraph) pnlUtil;
-                        ((ContinuousAttributeDomain) domain).changeWeight(knot, weight);
-                        cug.acell.cg.plotPoints();
-                    } else if (pnlUtil instanceof DiscreteUtilityGraph) {
-                        DiscreteUtilityGraph dug = (DiscreteUtilityGraph) pnlUtil;
-                        ((DiscreteAttributeDomain) domain).changeWeight(elt, weight);
-                        dug.acell.dg.plotPoints();
-                    }
-                    updateAll();
-                }
-            }
-            reset();
-        }
+    
+    void addInteraction(LastInteraction last) {
+        undo_int.push(last);
+        redo_int.clear();
+        updateUndoRedoMenu();
     }
     
+    void updateUndoRedoMenu() {
+        if (!undo_int.isEmpty()) 
+            menuOptions.menuUndo.setEnabled(true);
+        else
+            menuOptions.menuUndo.setEnabled(false);
+        
+        if (!redo_int.isEmpty())
+            menuOptions.menuRedo.setEnabled(true);
+        else
+            menuOptions.menuRedo.setEnabled(false);
+    }
+    
+    void undo() {
+        LastInteraction undo = undo_int.pop();
+        LastInteraction redo = new LastInteraction(this);
+        undo.setRedo(redo);
+        undo.execute();
+        redo_int.push(redo);
+        updateUndoRedoMenu();
+    }
+    
+    void redo() {
+        LastInteraction redo = redo_int.pop();
+        LastInteraction undo = new LastInteraction(this);
+        redo.setRedo(undo);
+        redo.execute();
+        undo_int.push(undo);
+        updateUndoRedoMenu();
+    }
     
     void renderAttribute(TablePane pane, AttributeData a) {
         BaseTableContainer container;

@@ -449,8 +449,6 @@ public class BaseTableContainer extends Box implements ActionListener {
             switch (dragMode) {
                 case MOVE_DRAG: {
                     setCursor(defaultCursor);
-                    chart.last_int.reset();
-                    chart.next_int.reset();
                     int newy = Math.max(0, Math.min(psize.height - size.height, pos.y + delY));
                     setLocation(pos.x, newy);
                     if (delY < 0 && prevComp != null) { // moved to the left
@@ -959,7 +957,10 @@ public class BaseTableContainer extends Box implements ActionListener {
                 if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
 //                    if (e.getClickCount() == 1) {
                         if (chart.getDirectionSA() == UP) {
-                            chart.last_int.setUndoPump(BaseTableContainer.this, chart.pump_increase ? false : true);
+                            LastInteraction interact = new LastInteraction(chart);
+                            interact.setUndoPump(BaseTableContainer.this, chart.pump_increase ? false : true);
+                            chart.addInteraction(interact);
+                            
                             pump(BaseTableContainer.this, chart.pump_increase);
                         } else {
                             TablePane par = null;
@@ -1004,7 +1005,9 @@ public class BaseTableContainer extends Box implements ActionListener {
             int relY = e.getY() + getLocation().y;
             int dy = undoY - relY;
             if (dragMode == EAST_ROLLUP_STRETCH_DRAG) {
-                chart.last_int.setUndoSlide(BaseTableContainer.this, dy, relY, true);
+                LastInteraction interact = new LastInteraction(chart);
+                interact.setUndoSlide(BaseTableContainer.this, dy, relY, true);
+                chart.addInteraction(interact);
                 
                 chart.logDrag(bSel.getData(), bNei.getData());
             }

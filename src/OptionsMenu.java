@@ -248,13 +248,11 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		}		
 			
 		if ("Undo".equals(ae.getActionCommand())){
-			chart.last_int.setRedo(chart.next_int);
-			chart.last_int.undo();
+			chart.undo();
 		}
 		
 		else if ("Redo".equals(ae.getActionCommand())){
-			chart.next_int.setRedo(chart.last_int);
-			chart.next_int.undo();
+			chart.redo();
 		}	
 		
 		else if ("Construction Model".equals(ae.getActionCommand())){
