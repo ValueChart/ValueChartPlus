@@ -57,10 +57,10 @@ public class LastInteraction {
         if (domain != null) {
             if (domain.getType() == AttributeDomainType.DISCRETE) {
                 DiscreteAttributeDomain d = ((DiscreteAttributeDomain) domain);
-                last.weight = (d.getEntry(elt)).weight;
+                last.weight = d.getEntryWeight(elt);
             } else {
                 ContinuousAttributeDomain c = ((ContinuousAttributeDomain) domain);
-                last.weight = (c.getKnot(knot)).val;
+                last.weight = c.getValue(knot);
             }
         }
 

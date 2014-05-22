@@ -15,7 +15,7 @@ public class AttributeValue
 		if (d.getType() != AttributeDomainType.DISCRETE)
 			throw new IllegalArgumentException ("Symbolic values must be associated with discrete domains");	    
 		try{
-			((DiscreteAttributeDomain)d).weight(s);
+			((DiscreteAttributeDomain)d).getEntryWeight(s);
 	    }catch (Exception e){
 	    	throw new IllegalArgumentException ("Attribute value " + s + " unknown"); 
 	    }
@@ -57,7 +57,7 @@ public class AttributeValue
 	public double weight()
 	 {
 	   if (domain.getType() == AttributeDomainType.DISCRETE)
-	    { return ((DiscreteAttributeDomain)domain).weight (str);
+	    { return ((DiscreteAttributeDomain)domain).getEntryWeight (str);
 	    }
 	   else
 	    { return ((ContinuousAttributeDomain)domain).weight (num);

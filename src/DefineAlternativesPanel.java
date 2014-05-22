@@ -148,7 +148,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			for (int i=0; i<objs.size(); i++){	//for each primitive objective, find each alternative's value
                 JObjective obj = objs.get(i);
 		        if (j == 0)
-		            obj.objValuesMap.clear();
+		            obj.clearObjValueMap();
 
 			    Object o = temp.get(objs.get(i).toString());
 			    if (o != null) {
@@ -159,16 +159,15 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			            } else {
 			                data.add(o.toString());
 			                double val = Double.valueOf(o.toString()).doubleValue();
-			                if (obj.objValuesMap.containsKey(val)) {
-			                    obj.objValuesMap.put(val, obj.objValuesMap.get(val)+1);
-			                } else {
-			                    obj.objValuesMap.put(val, 1);
-			                }
+			                obj.addToObjValueMap(val);
 			            }
-			        } else if (obj.getDomainType() == AttributeDomainType.DISCRETE && numeric) {
-			            data.add("");
-			        } else {
-			            data.add(o.toString());
+			        } else if (obj.getDomainType() == AttributeDomainType.DISCRETE) {
+			            if (numeric) {
+			                data.add("");
+			            } else {
+			                data.add(o.toString());
+			                obj.addToObjValueMap(o.toString());
+			            }
 			        }
 			    }
 			    else
@@ -376,7 +375,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     	for (Iterator<Vector<String>> it=rows.iterator(); it.hasNext();){
     		Vector<String> data = it.next();
     		for (Iterator<String> it2=data.iterator(); it2.hasNext();)
-    			if ((it2.next().toString()).equals(""))
+    			if (it2.next().equals(""))
     			    return false;
     	}    		
     	return true;
@@ -472,17 +471,11 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		//2. discrete items
 		        		//a) check if in list
 		        		if (obj!=null && obj.getDomainType()==AttributeDomainType.DISCRETE){
-		        			String elts[] = obj.getDomain().getElements();
-		        			try{
-			        			for (int i=0; i<elts.length; i++){
-			        				if (entered.equals(elts[i])){ 
-			        						found = true; 
-			        						break;
-				        			}
-			        			}	
-		        			}catch(NullPointerException ne){}
+		        		    found = obj.containsKey(entered);
+                            obj.replaceInObjValueMap(last_value, entered);
+
 		        			//b) if new, prompt for confirmation 
-		        			if (!found || elts.length == 0){	        	
+		        			if (!found){	        	
 		                        int n = JOptionPane.showConfirmDialog(
 		                                this, "This is not currently a value on the list.  Would you like to add it?",
 		                                "New discrete value",
@@ -507,6 +500,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        	        		temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
 		        	        		alts.set(table.getSelectedRow(), temp); 
 		        	        		table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
+		                            obj.replaceInObjValueMap(entered, last_value);
 		                        }
 		        			}
 		        		}	        		
@@ -562,11 +556,12 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                     if (value != null) {
                                         value.num = lastVal;
                                     }
+                                    entered = last_value;
 		                        }                        	
 			        		}   
 			        		// a) check if range is smaller
-			        		else if (  (obj.minC==lastVal && !obj.objValuesMap.containsKey(lastVal)) 
-			        		        || (obj.maxC==lastVal && !obj.objValuesMap.containsKey(lastVal)) ) {
+			        		else if (  (obj.minC==lastVal && !obj.containsKey(lastVal)) 
+			        		        || (obj.maxC==lastVal && !obj.containsKey(lastVal)) ) {
 	                               //b)if yes, prompt for confirmation
                                 int n = JOptionPane.showConfirmDialog(
                                         this, "The value you entered requires updating the current range.  Are you sure you would like to enter it?",
@@ -574,11 +569,11 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                         JOptionPane.YES_NO_CANCEL_OPTION);
                                 //c)update the range information
                                 if (n == JOptionPane.YES_OPTION){
-                                    Iterator<Double> it = obj.objValuesMap.keySet().iterator();
+                                    Iterator<Object> it = obj.getKeySet().iterator();
                                     double newMax = Double.MIN_VALUE;
                                     double newMin = Double.MAX_VALUE;
                                     while (it.hasNext()) {
-                                        Double curr = it.next();
+                                        Double curr = (Double)it.next();
                                         if (curr > newMax)
                                             newMax = curr;
                                         if (curr < newMin)
@@ -607,6 +602,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                     if (value != null) {
                                         value.num = lastVal;
                                     }
+                                    entered = last_value;
                                 } 
 			        		    
 			        		}
@@ -620,6 +616,8 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        		}
 	        		else if (!last_value.equals(""))
 	        				table.setValueAt(last_value, table.getEditingRow(), table.getEditingColumn());
+	        		
+	        		last_value = entered;
 	        		
 	        		if (con != null)
 	                    con.validateTabs(); 

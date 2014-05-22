@@ -6,95 +6,67 @@ import java.util.*;
 
 public class DiscreteAttributeDomain extends AttributeDomain
 {
-    //Again, the basis data management is done through a Vector List. I personally do not think this is a good idea.
-    //However, I am guessing this is not going to change until the next rewrite.
-    //I personally would create a object class and go from there.
-	Vector<Entry> set;
 
-	public class Entry
-	 {
-             //In disrete domain, the x-axis value is a string, and y-axis value is a double.
-	   String name;
-	   double weight;
-
-	   Entry (String name, double weight)
-	    { this.name = name;
-	      this.weight = weight;
-	    }
-	 }
+	LinkedHashMap<String, Double> entryMap;
 
         //The rest of the functions are self-explanatory.
 	DiscreteAttributeDomain()
 	 { super();
-	   set = new Vector<Entry>(32);
+	   entryMap = new LinkedHashMap<String, Double>();
 	 }
 
 	public AttributeDomainType getType()
 	 { return AttributeDomainType.DISCRETE;
 	 }
 	
-	public Entry getEntry (String elem)
-	 { for (Iterator<Entry> it=set.iterator(); it.hasNext(); ) 
-	    { Entry e = it.next();
-	      if (e.name.equals(elem))
-	       { return e;
-	       }
-	    }
-	   return null;
+	public Double getEntryWeight (String elem) { 
+	    Double e =  entryMap.get(elem);
+        if (e == null) {
+            throw new IllegalArgumentException("element " + elem + " not found");
+        }
+        return e;
 	 }
+	
+	public boolean setEntryWeight(String elem, Double weight) {
+	    if (!entryMap.containsKey(elem)) return false;
+	    entryMap.put(elem, weight);
+	    return true;
+	}
 
-	public double weight (String elem)
-	 {
-	   Entry e = getEntry(elem);
-	   if (e == null)
-	    { throw new IllegalArgumentException (
-"element " + elem + " not found");
-	    }
-	   return e.weight;
-	 }
+    public String[] getElements() {
+        String[] elems = new String[entryMap.size()];
+        int index = 0;
+        for (Iterator<String> it = entryMap.keySet().iterator(); it.hasNext();) {
+            elems[index++] = it.next();
+        }
+        return elems;
+    }
 
-	public String[] getElements ()
-	 {
-	   String[] elems = new String[set.size()];
-	   int index = 0;
-	   for (Iterator<Entry> it=set.iterator(); it.hasNext(); )
-	    { elems[index++] = it.next().name;
-	    }
-	   return elems;
-	 }
+    public double[] getWeights() {
+        double[] weights = new double[entryMap.size()];
+        int index = 0;
+        for (Map.Entry<String, Double> entry : entryMap.entrySet()) {
+            weights[index++] = entry.getValue();
+        }
+        return weights;
+    }
 
-	public double[] getWeights ()
-	 {
-	   double[] weights = new double[set.size()];
-	   int index = 0;
-	   for (Iterator<Entry> it=set.iterator(); it.hasNext(); )
-	    { weights[index++] = it.next().weight;
-	    }
-	   return weights;
-	 }
+    public void addElement(String elem, double weight) {
+        entryMap.put(elem, weight);
+    }
 
-	public void addElement (String elem, double weight)
-	 {
-	   set.add (new Entry (elem, weight));
-	 }
-
-	public void removeElement (String elem)
-	 {
-	   Entry e = getEntry(elem);
-	   if (e != null)
-	    { set.remove (e);
-	    }
-	 }
+    public void removeElement(String elem) {
+        entryMap.remove(elem);
+    }
 
 	//added for utility graph: so position does not change
 	public void changeWeight(String elem, double wt){
-		Entry e = getEntry(elem);		
 		if(wt > 1.0)
-			e.weight = Math.min(wt, 1.0);
+		    setEntryWeight(elem, Math.min(wt, 1.0));
 		else if(wt < 0.0)
-			e.weight = Math.max(wt, 0.0);
+		    setEntryWeight(elem, Math.max(wt, 0.0));
 		else
-			e.weight = wt;
-//		System.out.println(elem+" "+wt+" "+e.weight);
+		    setEntryWeight(elem, wt);
 	}
+	
 }

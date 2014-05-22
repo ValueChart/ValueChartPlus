@@ -203,7 +203,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                 System.exit(0);
             else {
                 frame.dispose(); // edit view
-                chart.newConst();
+                if (pnlAlternatives.alts.size() > 10)
+                    display_type = SIDE_DISPLAY;
+                showChart(true);
             }
         else if ("btnOK".equals(e.getActionCommand())) {
             frame.setVisible(false);
@@ -252,8 +254,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 
             @Override
             public void windowClosing(WindowEvent e) {
-                if (chart != null)
-                    chart.newConst();
+                if (pnlAlternatives.alts.size() > 10)
+                    display_type = SIDE_DISPLAY;
+                showChart(true);
             }
         };
         frame.addWindowListener(exitListener);
@@ -264,7 +267,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         // frame.setJMenuBar(ValueChart.menubar);
         if (type == FROM_VC)
             frame.setVisible(false);
-        else
+        else 
             frame.setVisible(true);
     }
 
@@ -439,6 +442,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         if (constPane == null || pnlObjectives == null || pnlAlternatives == null)
             return;
         
+        // create data file so cancel will restore previous settings
+        createDataFile("test.vc", false);
+        
         constPane.removeAll();
         
         constPane.addTab(TAB_OBJECTIVES, pnlObjectives);
@@ -454,6 +460,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     public void setPreferenceModel() {
         if (constPane == null || pnlObjectives == null || pnlAlternatives == null)
             return;
+        
+        // create data file so cancel will restore previous settings
+        createDataFile("test.vc", false);
         
         constPane.removeAll();        
         

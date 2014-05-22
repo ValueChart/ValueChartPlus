@@ -3,6 +3,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -36,9 +37,8 @@ public class JObjective extends JLabel{
 	double minC = 0;		
 	double maxC = 100;
 	// number of alternatives that hold distinct objective values
-	// used only for continuous domain
 	// key: objective value, value: count
-	HashMap<Double, Integer> objValuesMap; 
+	private HashMap<Object, Integer> objValuesMap; 
 	
 	// UI data
 	private AttributeDomain domain;	
@@ -68,7 +68,7 @@ public class JObjective extends JLabel{
         weight = "*";
         origin = CREATED;   //defaults to newly created objective
         init = false;
-        objValuesMap = new HashMap<Double,Integer>();
+        objValuesMap = new HashMap<Object,Integer>();
         
         //set component details
         setText(getName());      
@@ -278,7 +278,10 @@ public class JObjective extends JLabel{
     	decimalFormat = new DecimalFormat(df);
     }
     
-    public void replaceInObjValueMap(Double oldVal, Double newVal) {
+    public void replaceInObjValueMap(Object oldVal, Object newVal) {
+        if (!objValuesMap.containsKey(oldVal)) 
+            return;
+        
         if (objValuesMap.get(oldVal) == 1) {
             objValuesMap.remove(oldVal);
         } else {
@@ -289,6 +292,26 @@ public class JObjective extends JLabel{
         } else {
             objValuesMap.put(newVal, 1);
         }
+    }
+    
+    public void addToObjValueMap(Object val) {
+        if (objValuesMap.containsKey(val)) {
+            objValuesMap.put(val, objValuesMap.get(val)+1);
+        } else {
+            objValuesMap.put(val, 1);
+        }
+    }
+    
+    public void clearObjValueMap() {
+        objValuesMap.clear();
+    }
+    
+    public boolean containsKey(Object key) {
+        return objValuesMap.containsKey(key);
+    }
+    
+    public Set<Object> getKeySet() {
+        return objValuesMap.keySet();
     }
 }
 
