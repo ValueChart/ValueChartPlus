@@ -146,12 +146,26 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			HashMap<String,Object> temp = alts.get(j);
 			data.add(temp.get("name").toString());
 			for (int i=0; i<objs.size(); i++){	//for each primitive objective, find each alternative's value
+                JObjective obj = objs.get(i);
+		        if (j == 0)
+		            obj.objValuesMap.clear();
+
 			    Object o = temp.get(objs.get(i).toString());
 			    if (o != null) {
 			        boolean numeric = isNumeric(o.toString());
-			        if (objs.get(i).getDomainType() == AttributeDomainType.CONTINUOUS && !numeric) {
-	                     data.add("");
-			        } else if (objs.get(i).getDomainType() == AttributeDomainType.DISCRETE && numeric) {
+			        if (obj.getDomainType() == AttributeDomainType.CONTINUOUS) { 
+			            if(!numeric) {
+			                data.add("");
+			            } else {
+			                data.add(o.toString());
+			                double val = Double.valueOf(o.toString()).doubleValue();
+			                if (obj.objValuesMap.containsKey(val)) {
+			                    obj.objValuesMap.put(val, obj.objValuesMap.get(val)+1);
+			                } else {
+			                    obj.objValuesMap.put(val, 1);
+			                }
+			            }
+			        } else if (obj.getDomainType() == AttributeDomainType.DISCRETE && numeric) {
 			            data.add("");
 			        } else {
 			            data.add(o.toString());
@@ -489,7 +503,19 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		else
 		        			//a) check if within range
 		        		    try {
-			        		if((obj.minC>Double.valueOf(entered).doubleValue())||(obj.maxC<Double.valueOf(entered).doubleValue())){
+		        		        double enteredVal = Double.valueOf(entered).doubleValue();
+		        		        double lastVal = Double.valueOf(last_value).doubleValue();
+                                if (obj.objValuesMap.get(lastVal) == 1) {
+                                    obj.objValuesMap.remove(lastVal);
+                                } else {
+                                    obj.objValuesMap.put(lastVal, obj.objValuesMap.get(lastVal)-1);
+                                }
+                                if (obj.objValuesMap.containsKey(enteredVal)) {
+                                    obj.objValuesMap.put(enteredVal, obj.objValuesMap.get(enteredVal)+1);
+                                } else {
+                                    obj.objValuesMap.put(enteredVal, 1);
+                                }
+			        		if((obj.minC>enteredVal)||(obj.maxC<enteredVal)){
 			        			//b)if not, prompt for confirmation
 		                        int n = JOptionPane.showConfirmDialog(
 		                                this, "The value you entered is not within the current range.  Are you sure you would like to enter it?",
@@ -497,23 +523,90 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                                JOptionPane.YES_NO_CANCEL_OPTION);
 		                        //c)update the range information
 		                        if (n == JOptionPane.YES_OPTION){
-		                            JOptionPane.showMessageDialog(this,		//inform the user that value function is affected
+		                            double newMin = (obj.minC < enteredVal ? obj.minC : enteredVal);
+		                            double newMax = (obj.maxC > enteredVal ? obj.maxC : enteredVal);
+		                            
+		                            boolean updated = ((ContinuousAttributeDomain)obj.getDomain()).updateRange(newMin, newMax);
+		                            obj.minC = newMin;
+                                    obj.maxC = newMax;
+                                    
+		                            if (!updated) {
+		                                JOptionPane.showMessageDialog(this,		//inform the user that value function is affected
 		                                    "The value function for this objective must be reset.",
 		                                    "Reminder",
 		                                    JOptionPane.INFORMATION_MESSAGE);
-		                         	if (obj.minC>Double.valueOf(entered).doubleValue()){
-		                        		obj.minC = Double.valueOf(entered).doubleValue();
-		                        	}
-		                        	else
-		                        		obj.maxC = Double.valueOf(entered).doubleValue();                        	
-		                        	obj.setContinuous();	//reset to default value function
+
+		                                obj.setContinuous();	//reset to default value function
+		                            }
 		                        }
 		                        else{ //reset for cancel or no
 		        	        		temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
 		        	        		alts.set(table.getSelectedRow(), temp); 
 		        	        		table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
+                                    if (obj.objValuesMap.get(enteredVal) == 1) {
+                                        obj.objValuesMap.remove(enteredVal);
+                                    } else {
+                                        obj.objValuesMap.put(enteredVal, obj.objValuesMap.get(enteredVal)-1);
+                                    }
+                                    if (obj.objValuesMap.containsKey(lastVal)) {
+                                        obj.objValuesMap.put(lastVal, obj.objValuesMap.get(lastVal)+1);
+                                    } else {
+                                        obj.objValuesMap.put(lastVal, 1);
+                                    }
 		                        }                        	
 			        		}   
+			        		// a) check if range is smaller
+			        		else if (  (obj.minC==lastVal && !obj.objValuesMap.containsKey(lastVal)) 
+			        		        || (obj.maxC==lastVal && !obj.objValuesMap.containsKey(lastVal)) ) {
+	                               //b)if yes, prompt for confirmation
+                                int n = JOptionPane.showConfirmDialog(
+                                        this, "The value you entered requires updating the current range.  Are you sure you would like to enter it?",
+                                        "Value out of range",
+                                        JOptionPane.YES_NO_CANCEL_OPTION);
+                                //c)update the range information
+                                if (n == JOptionPane.YES_OPTION){
+                                    Iterator<Double> it = obj.objValuesMap.keySet().iterator();
+                                    double newMax = Double.MIN_VALUE;
+                                    double newMin = Double.MAX_VALUE;
+                                    while (it.hasNext()) {
+                                        Double curr = it.next();
+                                        if (curr > newMax)
+                                            newMax = curr;
+                                        if (curr < newMin)
+                                            newMin = curr;
+                                    }
+                                    
+                                    boolean updated = ((ContinuousAttributeDomain)obj.getDomain()).updateRange(newMin, newMax);
+                                    obj.minC = newMin;
+                                    obj.maxC = newMax;
+                                    
+                                    if (!updated) {
+                                        JOptionPane.showMessageDialog(this,     //inform the user that value function is affected
+                                            "The value function for this objective must be reset.",
+                                            "Reminder",
+                                            JOptionPane.INFORMATION_MESSAGE);
+
+                                        obj.setContinuous();    //reset to default value function
+                                    }
+
+                                }
+                                else{ //reset for cancel or no
+                                    temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
+                                    alts.set(table.getSelectedRow(), temp); 
+                                    table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
+                                    if (obj.objValuesMap.get(enteredVal) == 1) {
+                                        obj.objValuesMap.remove(enteredVal);
+                                    } else {
+                                        obj.objValuesMap.put(enteredVal, obj.objValuesMap.get(enteredVal)-1);
+                                    }
+                                    if (obj.objValuesMap.containsKey(lastVal)) {
+                                        obj.objValuesMap.put(lastVal, obj.objValuesMap.get(lastVal)+1);
+                                    } else {
+                                        obj.objValuesMap.put(lastVal, 1);
+                                    }
+                                } 
+			        		    
+			        		}
 		        		    } catch (NumberFormatException ex) {
 		        		        JOptionPane.showMessageDialog(this, "Invalid input: numeric value expected");
                                 temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);

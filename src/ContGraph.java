@@ -35,6 +35,7 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
     public ContGraph(ValueChart ch, ContinuousAttributeDomain dd, double[] it, double[] we, String un, String att, Color col, AttributeCell ac) {
         //Setting variable names
         cdomain = dd;
+        cdomain.contGraph = this;
         chart = ch;
         items = it;
         weights = we;

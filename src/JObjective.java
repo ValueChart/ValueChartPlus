@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -31,8 +32,13 @@ public class JObjective extends JLabel{
 	
 	Color color = Color.WHITE;
 
+	// TODO these should depend on the map
 	double minC = 0;		
 	double maxC = 100;
+	// number of alternatives that hold distinct objective values
+	// used only for continuous domain
+	// key: objective value, value: count
+	HashMap<Double, Integer> objValuesMap; 
 	
 	// UI data
 	private AttributeDomain domain;	
@@ -62,6 +68,7 @@ public class JObjective extends JLabel{
         weight = "*";
         origin = CREATED;   //defaults to newly created objective
         init = false;
+        objValuesMap = new HashMap<Double,Integer>();
         
         //set component details
         setText(getName());      
