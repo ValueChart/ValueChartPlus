@@ -277,5 +277,18 @@ public class JObjective extends JLabel{
     public void setDecimalFormat(String df){
     	decimalFormat = new DecimalFormat(df);
     }
+    
+    public void replaceInObjValueMap(Double oldVal, Double newVal) {
+        if (objValuesMap.get(oldVal) == 1) {
+            objValuesMap.remove(oldVal);
+        } else {
+            objValuesMap.put(oldVal, objValuesMap.get(oldVal)-1);
+        }
+        if (objValuesMap.containsKey(newVal)) {
+            objValuesMap.put(newVal, objValuesMap.get(newVal)+1);
+        } else {
+            objValuesMap.put(newVal, 1);
+        }
+    }
 }
 

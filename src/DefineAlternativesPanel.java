@@ -452,9 +452,10 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        		if (!entered.equals("")){
 		        		HashMap<String,Object> temp = alts.get(table.getSelectedRow());
 		        		//last_value = (temp.get((columns.get(table.getSelectedColumn()).toString()))).toString();
-	
-		        		temp.put((columns.get(table.getSelectedColumn()).toString()), entered);
+		        		String objName = (columns.get(table.getSelectedColumn()).toString());
+		        		temp.put(objName, entered);
 		        		alts.set(table.getSelectedRow(), temp); 
+		        		
 		        		//check if data is valid:
 		        		//1. get the objective	        		
 		        		JObjective obj = null;
@@ -490,6 +491,16 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                        if (n == JOptionPane.YES_OPTION) {
 		                        	DiscreteAttributeDomain dom = (DiscreteAttributeDomain)obj.getDomain();
 		                        	dom.addElement(entered, 0.5); 		                        	
+		                            String name = temp.get("name").toString();
+		                            for (Iterator<ChartEntry> it = con.chart.entryList.iterator(); it.hasNext();) {
+		                                ChartEntry entry = it.next();
+		                                if (entry.name.equals(name)) {
+		                                    AttributeValue value = (AttributeValue) entry.map.get(objName);
+		                                    if (value != null) {
+		                                        value.str = entered;
+		                                    }
+		                                }
+		                            }
 		                        	updateTable(); //d. update for new combobox item
 		                        }
 		                        else{ //reset for cancel or no
@@ -500,20 +511,24 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        			}
 		        		}	        		
 		        		//3. continuous items
-		        		else
+		        		else {
+                            AttributeValue value = null;
+
 		        			//a) check if within range
 		        		    try {
 		        		        double enteredVal = Double.valueOf(entered).doubleValue();
 		        		        double lastVal = Double.valueOf(last_value).doubleValue();
-                                if (obj.objValuesMap.get(lastVal) == 1) {
-                                    obj.objValuesMap.remove(lastVal);
-                                } else {
-                                    obj.objValuesMap.put(lastVal, obj.objValuesMap.get(lastVal)-1);
-                                }
-                                if (obj.objValuesMap.containsKey(enteredVal)) {
-                                    obj.objValuesMap.put(enteredVal, obj.objValuesMap.get(enteredVal)+1);
-                                } else {
-                                    obj.objValuesMap.put(enteredVal, 1);
+		        		        obj.replaceInObjValueMap(lastVal, enteredVal);
+		        		        
+                                String name = temp.get("name").toString();
+                                for (Iterator<ChartEntry> it = con.chart.entryList.iterator(); it.hasNext();) {
+                                    ChartEntry entry = it.next();
+                                    if (entry.name.equals(name)) {
+                                        value = (AttributeValue) entry.map.get(objName);
+                                        if (value != null) {
+                                            value.num = enteredVal;
+                                        }
+                                    }
                                 }
 			        		if((obj.minC>enteredVal)||(obj.maxC<enteredVal)){
 			        			//b)if not, prompt for confirmation
@@ -543,15 +558,9 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        	        		temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
 		        	        		alts.set(table.getSelectedRow(), temp); 
 		        	        		table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
-                                    if (obj.objValuesMap.get(enteredVal) == 1) {
-                                        obj.objValuesMap.remove(enteredVal);
-                                    } else {
-                                        obj.objValuesMap.put(enteredVal, obj.objValuesMap.get(enteredVal)-1);
-                                    }
-                                    if (obj.objValuesMap.containsKey(lastVal)) {
-                                        obj.objValuesMap.put(lastVal, obj.objValuesMap.get(lastVal)+1);
-                                    } else {
-                                        obj.objValuesMap.put(lastVal, 1);
+	                                obj.replaceInObjValueMap(enteredVal, lastVal);
+                                    if (value != null) {
+                                        value.num = lastVal;
                                     }
 		                        }                        	
 			        		}   
@@ -594,15 +603,9 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                     temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
                                     alts.set(table.getSelectedRow(), temp); 
                                     table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
-                                    if (obj.objValuesMap.get(enteredVal) == 1) {
-                                        obj.objValuesMap.remove(enteredVal);
-                                    } else {
-                                        obj.objValuesMap.put(enteredVal, obj.objValuesMap.get(enteredVal)-1);
-                                    }
-                                    if (obj.objValuesMap.containsKey(lastVal)) {
-                                        obj.objValuesMap.put(lastVal, obj.objValuesMap.get(lastVal)+1);
-                                    } else {
-                                        obj.objValuesMap.put(lastVal, 1);
+                                    obj.replaceInObjValueMap(enteredVal, lastVal);
+                                    if (value != null) {
+                                        value.num = lastVal;
                                     }
                                 } 
 			        		    
@@ -614,6 +617,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                 table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
 		        		    }
 		        		}
+	        		}
 	        		else if (!last_value.equals(""))
 	        				table.setValueAt(last_value, table.getEditingRow(), table.getEditingColumn());
 	        		
