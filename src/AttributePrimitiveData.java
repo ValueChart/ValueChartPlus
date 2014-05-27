@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.util.HashMap;
 
 public class AttributePrimitiveData implements AttributeData {
 
@@ -150,6 +151,18 @@ public class AttributePrimitiveData implements AttributeData {
                 + "\" color=\"" + getName() 
                 + "\" units=\"" + (getDomain().getType() == AttributeDomainType.DISCRETE ? "" : getUnitsName()) + "\"/>\n";
         return str;
+    }
+
+    @Override
+    public AttributeData getDeepCopy(HashMap<String, AttributeData> attrMap) {
+        AttributePrimitiveData newData = new AttributePrimitiveData();
+        newData.setWeight(attributeWeight);
+        newData.setName(attributeName);
+        newData.setDomain(domain.getDeepCopy());
+        newData.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+        newData.setUnitsName(unitsName);
+        
+        return newData;
     }
     
 }

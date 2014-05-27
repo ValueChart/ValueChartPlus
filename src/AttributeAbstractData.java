@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Vector;
 
 public class AttributeAbstractData implements AttributeData {
@@ -124,6 +125,18 @@ public class AttributeAbstractData implements AttributeData {
         
         str += "</Attribute>\n";
         return str;
+    }
+
+    @Override
+    public AttributeData getDeepCopy(HashMap<String, AttributeData> attrMap) {
+        AttributeAbstractData newData = new AttributeAbstractData();
+        newData.setName(attributeName);
+        for (AttributeData child : children) {
+            AttributeData newChild = child.getDeepCopy(attrMap);
+            newData.addChild(newChild);
+            attrMap.put(newChild.getName(), newChild);
+        }
+        return newData;
     }
 
 }

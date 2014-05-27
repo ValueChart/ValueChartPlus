@@ -47,11 +47,11 @@ public class ValueChart extends JPanel {
     Reader initReader = null;
     ResizeHandler resizeHandler;
     JPanel pnlDisp;
-    Vector<ChartEntry> entryList;
     String filename;
     Vector<JObjective> objs;
     Vector<HashMap<String,Object>> alts;
     private Vector<BaseTableContainer> prims;
+    private HashMap<String, BaseTableContainer> prims_map;
     ConstructionView con;
     boolean pump = false;
     boolean sort = false;
@@ -64,10 +64,12 @@ public class ValueChart extends JPanel {
     boolean isNew = true;
     private Stack<LastInteraction> undo_int;
     private Stack<LastInteraction> redo_int;
-    Vector<AttributeData> attrData;
+
     LogUserAction log;
     boolean displayUtilityWeights = false;
+    private ChartData chartData;
 
+    
     //***Added so that there is one frame that allows display of pdf reports from value chart. This window is not used for each of the attribute/entry reports.
     //Those are contained within the AttributeCell class. Rather, this is for anywhere else on the interface (it started with a need to have one report window to display the report for the criteria details)
     SwingController controller; //Used for each window that controls a pdf document
@@ -96,7 +98,7 @@ public class ValueChart extends JPanel {
     }
 
     public ValueChart(ConstructionView c, String file, LogUserAction l,
-            Vector<AttributeData> data, Vector<ChartEntry> entry, int type, int colwd,
+            ChartData data, int type, int colwd,
             boolean b, boolean g, boolean dispUtil) {
         super();
         show_graph = g;
@@ -105,17 +107,18 @@ public class ValueChart extends JPanel {
         setDisplayType(type);
         displayUtilityWeights = dispUtil;
 
-        if (data == null || entry == null)
+        if (data == null)
             constructFromFile(l, colwd);
         else {
             filename = file;
-            constructFromAttribute(data, entry, l, colwd);
+            constructFromAttribute(data, l, colwd);
         }
     }
     
     
     private void constructFromFile(LogUserAction l, int colwd) {
-
+        chartData = new ChartData(this);
+        
         menuOptions = new OptionsMenu(this);
         menuOptions.createMenu();
         if (!isNew) {
@@ -161,8 +164,8 @@ public class ValueChart extends JPanel {
     }
     
     
-    private void constructFromAttribute(Vector<AttributeData> data, Vector<ChartEntry> entry, LogUserAction l, int colwd) {
-
+    private void constructFromAttribute(ChartData data, LogUserAction l, int colwd) {
+        chartData = data;
 
         menuOptions = new OptionsMenu(this);
         menuOptions.createMenu();
@@ -174,8 +177,7 @@ public class ValueChart extends JPanel {
         setColWidth(colwd);
 
         showAbsoluteRatios = true;
-        attrData = data;
-        entryList = entry;
+        chartData = data;
         resizeHandler = new ResizeHandler();
         addComponentListener(resizeHandler);
 
@@ -212,9 +214,9 @@ public class ValueChart extends JPanel {
     }
 
     public int getPreferredWidth() {
-        int w = ((mainPane.getDepth() -1) + entryList.size()) * colWidth;
+        int w = ((mainPane.getDepth() -1) + chartData.getEntryList().size()) * colWidth;
         if (displayType == SIDE_DISPLAY) {
-            w += (2 + entryList.size()) * colWidth;
+            w += (2 + chartData.getEntryList().size()) * colWidth;
         }
         return w;
     }
@@ -239,9 +241,9 @@ public class ValueChart extends JPanel {
 
     public void reorderEntries(BaseTableContainer baseTab) {
         Comparator<ChartEntry> weightComparator = new WeightComparator(baseTab);
-        Collections.sort(entryList, weightComparator);
-        mainEntryNames.relabel(entryList);
-        displayEntryNames.relabel(entryList);
+        Collections.sort(chartData.getEntryList(), weightComparator);
+        mainEntryNames.relabel(chartData.getEntryList());
+        displayEntryNames.relabel(chartData.getEntryList());
         displayPanel.repaint();
         mainPane.repaintEntries();
     }
@@ -260,6 +262,7 @@ public class ValueChart extends JPanel {
             BaseTableContainer btc = it.next();
             if (btc.table instanceof AttributeCell) {
                 prims.add(btc);
+                prims_map.put(btc.getName(), btc);
                 btc.adjustHeaderWidth();//added for rotate
             } else {
                 setPrims((TablePane) btc.table);
@@ -268,33 +271,31 @@ public class ValueChart extends JPanel {
     }
 
     public void setConnectingFields() {
-        for (Iterator<BaseTableContainer> it = getPrims().iterator(); it.hasNext();) {
-            BaseTableContainer btc = it.next();
-            for (int i = 0; i < con.getObjPanel().getPrimitiveObjectives().size(); i++) {
-                JObjective obj = con.getObjPanel().getPrimitiveObjectives().get(i);
-                if (obj.getName().equals(btc.getName())) {
-                    AttributeCell ac = (AttributeCell) btc.getTable();
-                    obj.setDomain(ac.getDomain());
-                    obj.setUnit(ac.getUnits());
-                    double pc = btc.getOverallRatio();
-                    AttributeData data = btc.getData();
-                    if (data != null && !data.isAbstract()) pc = data.getWeight();
-                    obj.setWeight(String.valueOf(pc));
-                    //connect ac and obj
-                    ac.obj = obj;
-                    obj.acell = ac;
-                    if (obj.getDomainType() == AttributeDomainType.CONTINUOUS) {
-                        if (obj.getUnit().equals("CAD")) {
-                            obj.setDecimalFormat("0.00");
-                        }
-                        if (obj.maxC > 100) {
-                            obj.setDecimalFormat("0");
-                        } else {
-                            obj.setDecimalFormat("0.0");
-                        }
-                        if (ac.cg != null) {
-                            ac.cg.repaint();
-                        }
+        for (int i = 0; i < con.getObjPanel().getPrimitiveObjectives().size(); i++) {
+            JObjective obj = con.getObjPanel().getPrimitiveObjectives().get(i);
+            BaseTableContainer btc = getPrimContainer(obj.getName());
+            if (btc != null) {
+                AttributeCell ac = (AttributeCell) btc.getTable();
+                obj.setDomain(ac.getDomain());
+                obj.setUnit(ac.getUnits());
+                double pc = btc.getOverallRatio();
+                AttributeData data = btc.getData();
+                if (data != null && !data.isAbstract()) pc = data.getWeight();
+                obj.setWeight(String.valueOf(pc));
+                //connect ac and obj
+                ac.obj = obj;
+                obj.acell = ac;
+                if (obj.getDomainType() == AttributeDomainType.CONTINUOUS) {
+                    if (obj.getUnit().equals("CAD")) {
+                        obj.setDecimalFormat("0.00");
+                    }
+                    if (obj.maxC > 100) {
+                        obj.setDecimalFormat("0");
+                    } else {
+                        obj.setDecimalFormat("0.0");
+                    }
+                    if (ac.cg != null) {
+                        ac.cg.repaint();
                     }
                 }
             }
@@ -328,7 +329,7 @@ public class ValueChart extends JPanel {
     Vector<HashMap<String,Object>> setAlts() {
         Iterator<ChartEntry> it;
         Vector<HashMap<String,Object>> alts = new Vector<HashMap<String,Object>>();
-        for (it = entryList.iterator(); it.hasNext();) {
+        for (it = chartData.getEntryList().iterator(); it.hasNext();) {
             HashMap<String,Object> datamap = new HashMap<String,Object>();
             ChartEntry entry =  it.next();
             datamap.put("name", entry.name);
@@ -340,7 +341,8 @@ public class ValueChart extends JPanel {
                 } else {
                     AttributeValue val = (AttributeValue) datamap.get(obj.getName());
                     datamap.put(obj.getName(), val.stringValue());
-                    obj.setDomainType(val.domain.getType());
+                    AttributeDomain domain = getDomain(val.attributeName);
+                    obj.setDomainType(domain.getType());
                 }
             }
             alts.add(datamap);
@@ -350,6 +352,10 @@ public class ValueChart extends JPanel {
 
     public Vector<BaseTableContainer> getPrims() {
         return prims;
+    }
+    
+    public BaseTableContainer getPrimContainer(String name) {
+        return prims_map.get(name);
     }
 
 //READS
@@ -369,6 +375,7 @@ public class ValueChart extends JPanel {
         con.setChart(this);
         //set prim obj list for rolling up the absolute tree    	
         prims = new Vector<BaseTableContainer>();
+        prims_map = new HashMap<String, BaseTableContainer>();
         setPrims(mainPane);
         for (Iterator<BaseTableContainer> it = prims.iterator(); it.hasNext();) {
             BaseTableContainer btc = it.next();
@@ -379,7 +386,7 @@ public class ValueChart extends JPanel {
     }
     
     private void readFromAttribute() {
-        if (attrData == null)
+        if (chartData == null || chartData.getAttrData() == null)
             return;
 
         mainPane = new TablePane();
@@ -396,6 +403,7 @@ public class ValueChart extends JPanel {
         con.setChart(this);
         // set prim obj list for rolling up the absolute tree
         prims = new Vector<BaseTableContainer>();
+        prims_map = new HashMap<String, BaseTableContainer>();
         setPrims(mainPane);
         for (Iterator<BaseTableContainer> it = prims.iterator(); it.hasNext();) {
             BaseTableContainer btc = it.next();
@@ -424,7 +432,7 @@ public class ValueChart extends JPanel {
     private void doread(ScanfReader scanReader)
             throws IOException {
 
-        entryList = new Vector<ChartEntry>(10);
+        chartData.setEntryList(new Vector<ChartEntry>(10));
         HashMap<String, Color> colorList = new HashMap<String, Color>(10);
         boolean attributesRead = false;
 
@@ -444,8 +452,8 @@ public class ValueChart extends JPanel {
             }
             if (keyword.equals("attributes")) {
                 mainPane = new TablePane();
-                attrData = new Vector<AttributeData>();
-                readAttributes(scanReader, attrData, colorList);
+                chartData.setAttrData(new Vector<AttributeData>());
+                readAttributes(scanReader, null, colorList);
                 renderMainPaneAttributes();
                 mainPane.adjustAttributesForDepth(mainPane.getDepth());
                 attributesRead = true;
@@ -459,7 +467,7 @@ public class ValueChart extends JPanel {
                 if (!attributesRead) {
                     throw new IOException("Entry specified before attributes");
                 }
-                entryList.add(readEntry(scanReader, mainPane));
+                chartData.addChartEntry(readEntry(scanReader, mainPane));
             } else if (keyword.startsWith("report=")) {
                 //Sets the report location for thie ValueCharts parent interface (there is another reportFileLocation, which is specific to the AttributeCell bar charts)
                 reportFile = new File(keyword.substring(7).replace("$", " ").replace("\\", "\\\\"));
@@ -496,7 +504,7 @@ public class ValueChart extends JPanel {
     }
 
     private void readAttributes(ScanfReader scanReader,
-            Vector<AttributeData> attrList, HashMap<String, Color> colorList)
+            AttributeData attr, HashMap<String, Color> colorList)
             throws IOException {
         String name = null;
         while (!(name = scanReader.scanString()).equals("end")) {
@@ -508,7 +516,7 @@ public class ValueChart extends JPanel {
                 name = scanReader.scanString();
                 a.setName(name);
                 hr = readHeightRatio(scanReader);
-                readAttributes(scanReader, a.getAbstract().children, colorList);
+                readAttributes(scanReader, a, colorList);
 
             } else { // if no keyword is primitive
                 a = new AttributePrimitiveData();
@@ -539,7 +547,7 @@ public class ValueChart extends JPanel {
                 }
             }
 
-            attrList.addElement(a);
+            chartData.addAttributeData(attr, a);
         }
     }
 
@@ -558,7 +566,7 @@ public class ValueChart extends JPanel {
             //         This method also adds a double slash when the user enters a single (necessary for java opening the file)
             if (attributeName.startsWith("report=")) {
                 File reportFileLocation = new File(attributeName.substring(7).replace("$", " ").replace("\\", "\\\\"));
-                entry.map.put("report", reportFileLocation);
+                entry.setReport(reportFileLocation);
 
                 //***Now create the windows necessary to hold the pdf in view
                 //build a controller
@@ -588,8 +596,8 @@ public class ValueChart extends JPanel {
                 window.setSize(new Dimension(800,600));
                 
                 //The Frame and controller are the only aspects of the report frame that need to be modified from elsewhere in the program (particularly AttributeCell, so they become part of the hashmap
-                entry.map.put("Report Frame", window);
-                entry.map.put("Report Controller", controller);
+                entry.setReportFrame(window);
+                entry.setReportController(controller);
 
                 //Now add the outline and bookmark items to the hash map
                 OutlineItem entryItem = null;
@@ -604,7 +612,7 @@ public class ValueChart extends JPanel {
                     // find the node you need
                 }
                 
-                entry.map.put("OutlineItem", entryItem);
+                entry.setOutlineItem(entryItem);
                 //entry.map.put("Outlines", entryOutlines); //this doesn't need to be added, it is only the items that are needed for locating
                 
                 
@@ -617,10 +625,10 @@ public class ValueChart extends JPanel {
                 AttributeValue value;
                 if (domain.getType() == AttributeDomainType.DISCRETE) {
                     String name = scanReader.scanString("%S");
-                    value = new AttributeValue(name, domain);
+                    value = new AttributeValue(name, domain, attributeName, this);
                 } else { // type == AttributeDomain.CONTINUOUS
                     double x = scanReader.scanDouble();
-                    value = new AttributeValue(x, domain);
+                    value = new AttributeValue(x, domain, attributeName, this);
                 }
                 entry.map.put(attributeName, value);
             }
@@ -632,14 +640,14 @@ public class ValueChart extends JPanel {
     
     public void showConstructionModel() {
         setConnectingFields();
-        log.setOldAttrData(LogUserAction.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
+        log.setOldAttrData(LogUserAction.getDataOutput(chartData.getAttrData(), LogUserAction.OUTPUT_STATE));
         con.setConstructionModel();
         con.frame.setVisible(true);
     }
     
     public void showPreferenceModel() {
         setConnectingFields();
-        log.setOldAttrData(LogUserAction.getDataOutput(attrData, LogUserAction.OUTPUT_STATE));
+        log.setOldAttrData(LogUserAction.getDataOutput(chartData.getAttrData(), LogUserAction.OUTPUT_STATE));
         con.setPreferenceModel();
         con.frame.setVisible(true);
     }
@@ -808,7 +816,7 @@ public class ValueChart extends JPanel {
     }
 
     public void resetDisplay(int type, int colwd, boolean close, boolean graph) {
-        ValueChart ch = new ValueChart(con, filename, log, attrData, entryList, type, colwd, true, graph, displayUtilityWeights);
+        ValueChart ch = new ValueChart(con, filename, log, chartData, type, colwd, true, graph, displayUtilityWeights);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -816,9 +824,10 @@ public class ValueChart extends JPanel {
         ch.sa_dir = sa_dir;
         ch.getDisplayPanel().setScore(getDisplayPanel().score);
         ch.getDisplayPanel().setRuler(getDisplayPanel().ruler);
+        Vector<ChartEntry> entryList = chartData.getEntryList();
         for (int j = 0; j < entryList.size(); j++) {
             if (( entryList.get(j)).getShowFlag()) {
-                ( (ch.entryList.get(j))).setShowFlag(true);
+                ( (ch.chartData.getEntryList().get(j))).setShowFlag(true);
                 ch.updateAll();
             }
         }
@@ -834,9 +843,10 @@ public class ValueChart extends JPanel {
         ch.sa_dir = sa_dir;
         ch.getDisplayPanel().setScore(getDisplayPanel().score);
         ch.getDisplayPanel().setRuler(getDisplayPanel().ruler);
+        Vector<ChartEntry> entryList = chartData.getEntryList();
         for (int j = 0; j < entryList.size(); j++) {
             if (( entryList.get(j)).getShowFlag()) {
-                ( (ch.entryList.get(j))).setShowFlag(true);
+                ( (ch.chartData.getEntryList().get(j))).setShowFlag(true);
                 ch.updateAll();
             }
         }
@@ -901,7 +911,7 @@ public class ValueChart extends JPanel {
     }
 
     public void showDomainVals(int i) {
-        ChartEntry c =  entryList.get(i);
+        ChartEntry c =  chartData.getEntryList().get(i);
         pnlDom.showData(c);
     }
 
@@ -961,7 +971,7 @@ public class ValueChart extends JPanel {
         } else {
             AttributePrimitiveData prim = a.getPrimitive();
 
-            AttributeCell cell = new AttributeCell(this, prim);
+            AttributeCell cell = new AttributeCell(this, a.getName());
             cell.setColWidth(colWidth);
             cell.setColor(prim.getColor());
             cell.setUnits(prim.getUnitsName());
@@ -972,11 +982,11 @@ public class ValueChart extends JPanel {
         pane.addRow(container);
         container.setHeightRatio(hr);
         container.setRollUpRatio(hr);
-        container.setData(a);
+        container.setName(name);
     }
 
     void renderMainPaneAttributes() {
-        for (AttributeData a : attrData) {
+        for (AttributeData a : chartData.getAttrData()) {
             renderAttribute(mainPane, a);
         }
     }
@@ -993,12 +1003,12 @@ public class ValueChart extends JPanel {
     }
 
     void rebuildMainPane() {
-        mainPane.fillInEntries(entryList);
+        mainPane.fillInEntries(chartData.getEntryList());
 
         mainPaneWithNames = new JPanel();
         mainPaneWithNames.setLayout(new BoxLayout(mainPaneWithNames, BoxLayout.Y_AXIS));
 
-        mainEntryNames = new EntryNamePanel(entryList, colWidth, mainPane.getDepth(), true, this);
+        mainEntryNames = new EntryNamePanel(chartData.getEntryList(), colWidth, mainPane.getDepth(), true, this);
         JPanel pnlBottom = new JPanel();
         pnlBottom.setLayout(new BoxLayout(pnlBottom, BoxLayout.X_AXIS));
         pnlBottom.add(Box.createHorizontalGlue());
@@ -1024,7 +1034,7 @@ public class ValueChart extends JPanel {
 
         displayPanel = new DisplayPanel(colWidth);
         displayPanel.setRootPane(mainPane);
-        displayPanel.setEntries(entryList);
+        displayPanel.setEntries(chartData.getEntryList());
 
 
         pnlDisp = new JPanel();
@@ -1045,7 +1055,7 @@ public class ValueChart extends JPanel {
 
         displayWithNames = new JPanel();
         displayWithNames.setLayout(new BoxLayout(displayWithNames, BoxLayout.Y_AXIS));
-        displayEntryNames = new EntryNamePanel(entryList, colWidth, 0, false, this);
+        displayEntryNames = new EntryNamePanel(chartData.getEntryList(), colWidth, 0, false, this);
         JPanel pnlNames = new JPanel();
         pnlNames.setLayout(new BoxLayout(pnlNames, BoxLayout.X_AXIS));
         pnlNames.add(Box.createHorizontalGlue());
@@ -1056,9 +1066,9 @@ public class ValueChart extends JPanel {
         displayWithNames.add(pnlNames);
 
         //int mainWidth = (entryList.size()+mainPane.getDepth())*colWidth;
-        int mainWidth = entryList.size() * colWidth;
+        int mainWidth = chartData.getEntryList().size() * colWidth;
 ///**/  int dispWidth = entryList.size()*colWidth + colWidth;
-        int dispWidth = entryList.size() * colWidth + colWidth;
+        int dispWidth = chartData.getEntryList().size() * colWidth + colWidth;
 
         if (displayType == SIDE_DISPLAY) {
             displayPanel.setMaximumSize(new Dimension(dispWidth, 10000));
@@ -1116,10 +1126,10 @@ public class ValueChart extends JPanel {
     
     public boolean logAttribute(int outputType, String msg) {
         if (outputType == LogUserAction.OUTPUT_WEIGHT) {
-            return log.logAttributeWeight(attrData, msg);
+            return log.logAttributeWeight(chartData.getAttrData(), msg);
         }
         else if (outputType == LogUserAction.OUTPUT_STATE) {
-            return log.logAttributeState(attrData, msg);
+            return log.logAttributeState(chartData.getAttrData(), msg);
         }
 
         return false;
@@ -1128,13 +1138,13 @@ public class ValueChart extends JPanel {
     public boolean logState() {
         int temp = log.getVerbosity();
         log.setVerbosity(LogUserAction.LOG_ALL);
-        boolean res = log.logAttributeState(attrData, "");
+        boolean res = log.logAttributeState(chartData.getAttrData(), "");
         log.setVerbosity(temp);
         return res;
     }
     
     public boolean logConstruction() {
-        return log.logConstruction(attrData);
+        return log.logConstruction(chartData.getAttrData());
     }
     
     public boolean logUtility(AttributeData data) {
@@ -1142,7 +1152,7 @@ public class ValueChart extends JPanel {
     }
     
     public boolean logPump(String pumpAttr, boolean isInc) {
-        return log.logPump(attrData, pumpAttr, isInc);
+        return log.logPump(chartData.getAttrData(), pumpAttr, isInc);
     }
     
     public boolean logDrag(AttributeData attr1, AttributeData attr2) {
@@ -1151,7 +1161,7 @@ public class ValueChart extends JPanel {
     
     public String outputAttributes(ColorList colors) {
         String data = "";
-        for (AttributeData a : attrData) {
+        for (AttributeData a : chartData.getAttrData()) {
             data = data + a.getObjectiveOutput(colors, 0);
         }
         return data;
@@ -1193,5 +1203,54 @@ public class ValueChart extends JPanel {
         displayPanel.setMinimumSize(displayPanel.getPreferredSize());
         pnlDisp.setPreferredSize(mainPane.getSize());
         pnlDisp.setMaximumSize(mainPane.getSize());
+    }
+    
+
+    
+    public void restoreState() {     
+        chartData.restoreState();
+        updateChartState();
+    }
+    
+    public void updateChartState() {
+        readFromAttribute();
+        setSize(getPreferredWidth(),
+                displayType == SIDE_DISPLAY ? displayHeight * 2 - 50
+                        : displayHeight);
+        setVisible(true);
+        if (mainPane != null) {
+            mainPane.updateSizesAndHeights();
+            mainPane.revalidate();
+            if (displayPanel != null) {
+                alignDisplayPanel();
+                displayPanel.revalidate();
+            }
+        }
+        newConst();
+        repaint();
+    }
+    
+    public Vector<AttributeData> getAttrData() {
+        return chartData.getAttrData();
+    }
+    
+    public Vector<ChartEntry> getEntryList() {
+        return chartData.getEntryList();
+    }
+    
+    public AttributeData getAttribute(String name) {
+        return chartData.findAttribute(name);
+    }
+    
+    public AttributeDomain getDomain(String name) {
+        AttributeData data = getAttribute(name);
+        if (data != null && !data.isAbstract()) {
+            return data.getPrimitive().getDomain();
+        }
+        return null;
+    }
+
+    public void keepCurrentState() {
+        chartData.keepCurrentState(this);
     }
 }

@@ -168,8 +168,8 @@ public class JObjective extends JLabel{
 		domain = ad;
 		// set the range
 		if (domain.getType() == AttributeDomainType.CONTINUOUS) {
-            minC = ((ContinuousAttributeDomain)domain).getMin();
-            maxC = ((ContinuousAttributeDomain)domain).getMax();
+            minC = domain.getContinuous().getMin();
+            maxC = domain.getContinuous().getMax();
 		}
 	}
 	
@@ -258,12 +258,12 @@ public class JObjective extends JLabel{
         ValueChart chart = null;
         if (dvf != null && dvf.con != null) chart = dvf.con.chart;
         if (getDomainType() == AttributeDomainType.DISCRETE) {
-        	DiscreteAttributeDomain dd = (DiscreteAttributeDomain)getDomain();
+        	DiscreteAttributeDomain dd = getDomain().getDiscrete();
         	DiscreteUtilityGraph dug = new DiscreteUtilityGraph(chart, false, dd, dd.getElements(), dd.getWeights(), getName(), dvf, acell);
             pnl.add(dug);        	
         }
         else {
-        	ContinuousAttributeDomain cd = (ContinuousAttributeDomain)getDomain();
+        	ContinuousAttributeDomain cd = getDomain().getContinuous();
             ContinuousUtilityGraph cug = new ContinuousUtilityGraph(chart, false, cd, cd.getKnots(), cd.getWeights(), getUnit(), getName(), dvf, acell);
             pnl.add(cug);            
         }

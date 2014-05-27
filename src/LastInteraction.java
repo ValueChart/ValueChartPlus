@@ -6,14 +6,13 @@ public class LastInteraction {
     int type;
     int delY;
     int dragY;
-    BaseTableContainer base;
     boolean pump;
     boolean east;
     String elt;
     double weight;
     double knot;
     JPanel pnlUtil;
-    AttributeDomain domain;
+    String name;
     ValueChart chart;
 
     LastInteraction(ValueChart ch) {
@@ -21,26 +20,26 @@ public class LastInteraction {
         chart = ch;
     }
 
-    void setUndoUtil(JPanel p, String e, double k, double wt, AttributeDomain ad) {
+    void setUndoUtil(JPanel p, String e, double k, double wt, String attrName) {
         type = UTIL;
         pnlUtil = p;
         elt = e;
         knot = k;
         weight = wt;
-        domain = ad;
+        name = attrName;
     }
 
-    void setUndoSlide(BaseTableContainer b, int dy, int ry, boolean e) {
+    void setUndoSlide(String baseName, int dy, int ry, boolean e) {
         type = SLIDE;
-        base = b;
+        name = baseName;
         dragY = ry;
         delY = dy;
         east = e;
     }
 
-    void setUndoPump(BaseTableContainer b, boolean p) {
+    void setUndoPump(String baseName, boolean p) {
         type = PUMP;
-        base = b;
+        name = baseName;
         pump = p;
     }
 
@@ -49,17 +48,17 @@ public class LastInteraction {
         last.dragY = dragY;
         last.delY = -delY;
         last.pump = pump ? false : true;
-        last.base = base;
         last.pnlUtil = pnlUtil;
         last.knot = knot;
         last.elt = elt;
-        last.domain = domain;
-        if (domain != null) {
+        last.name = name;
+        AttributeDomain domain = chart.getDomain(name);
+        if (domain != null && type == UTIL) {
             if (domain.getType() == AttributeDomainType.DISCRETE) {
-                DiscreteAttributeDomain d = ((DiscreteAttributeDomain) domain);
+                DiscreteAttributeDomain d = domain.getDiscrete();
                 last.weight = d.getEntryWeight(elt);
             } else {
-                ContinuousAttributeDomain c = ((ContinuousAttributeDomain) domain);
+                ContinuousAttributeDomain c = domain.getContinuous();
                 last.weight = c.getValue(knot);
             }
         }
@@ -69,6 +68,8 @@ public class LastInteraction {
     void execute() {
         switch (type) {
         case SLIDE: {
+            BaseTableContainer base = chart.getPrimContainer(name);
+            if (base == null) return;
             base.dragY = dragY;
             // if (east)
             base.mouseHandler.setEastRollup(base);
@@ -80,13 +81,16 @@ public class LastInteraction {
             break;
         }
         case PUMP: {
+            BaseTableContainer base = chart.getPrimContainer(name);
+            if (base == null) return;
             base.mouseHandler.pump(base, pump);
             break;
         }
         case UTIL: {
             if (pnlUtil instanceof ContGraph) {
                 ContGraph cg = (ContGraph) pnlUtil;
-                cg.cdomain.changeWeight(knot, weight);
+                ContinuousAttributeDomain cdomain = chart.getDomain(cg.attributeName).getContinuous();
+                cdomain.changeWeight(knot, weight);
                 cg.plotPoints();
             } else if (pnlUtil instanceof DiscGraph) {
                 DiscGraph dg = (DiscGraph) pnlUtil;
@@ -94,11 +98,13 @@ public class LastInteraction {
                 dg.plotPoints();
             } else if (pnlUtil instanceof ContinuousUtilityGraph) {
                 ContinuousUtilityGraph cug = (ContinuousUtilityGraph) pnlUtil;
-                ((ContinuousAttributeDomain) domain).changeWeight(knot, weight);
+                AttributeDomain domain = chart.getDomain(name);
+                domain.getContinuous().changeWeight(knot, weight);
                 cug.acell.cg.plotPoints();
             } else if (pnlUtil instanceof DiscreteUtilityGraph) {
                 DiscreteUtilityGraph dug = (DiscreteUtilityGraph) pnlUtil;
-                ((DiscreteAttributeDomain) domain).changeWeight(elt, weight);
+                AttributeDomain domain = chart.getDomain(name);
+                domain.getDiscrete().changeWeight(elt, weight);
                 dug.acell.dg.plotPoints();
             }
             chart.updateAll();

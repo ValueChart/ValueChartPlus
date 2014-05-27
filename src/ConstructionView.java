@@ -203,9 +203,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                 System.exit(0);
             else {
                 frame.dispose(); // edit view
-                if (pnlAlternatives.alts.size() > 10)
-                    display_type = SIDE_DISPLAY;
-                showChart(true);
+                if (chart != null) {
+                    chart.restoreState();
+                }
             }
         else if ("btnOK".equals(e.getActionCommand())) {
             frame.setVisible(false);
@@ -254,9 +254,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 
             @Override
             public void windowClosing(WindowEvent e) {
-                if (pnlAlternatives.alts.size() > 10)
-                    display_type = SIDE_DISPLAY;
-                showChart(true);
+                if (chart != null) {
+                    chart.restoreState();
+                }
             }
         };
         frame.addWindowListener(exitListener);
@@ -442,8 +442,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         if (constPane == null || pnlObjectives == null || pnlAlternatives == null)
             return;
         
-        // create data file so cancel will restore previous settings
-        createDataFile("test.vc", false);
+        // keep old data so cancel will restore previous settings
+        if (chart != null)
+            chart.keepCurrentState();
         
         constPane.removeAll();
         
@@ -461,8 +462,9 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         if (constPane == null || pnlObjectives == null || pnlAlternatives == null)
             return;
         
-        // create data file so cancel will restore previous settings
-        createDataFile("test.vc", false);
+        // keep old data so cancel will restore previous settings
+        if (chart != null)
+            chart.keepCurrentState();
         
         constPane.removeAll();        
         

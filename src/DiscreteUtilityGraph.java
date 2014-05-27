@@ -192,7 +192,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
                 clicki = i;
                 if (chart != null && fromChart) {
                      LastInteraction interact = new LastInteraction(chart);
-                     interact.setUndoUtil(this, items[i], 0, weights[i], ddomain);
+                     interact.setUndoUtil(this, items[i], 0, weights[i], attributeName);
                      chart.addInteraction(interact);                
                 }
                 

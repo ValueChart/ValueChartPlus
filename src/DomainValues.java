@@ -70,7 +70,7 @@ import javax.swing.table.DefaultTableModel;
 				data = new Vector<String>();
 				BaseTableContainer base = it.next();
 				String s = (base.getName());				
-				AttributeValue val = (AttributeValue)entry.map.get(s);				
+				AttributeValue val = entry.attributeValue(s);				
 				data.add(s);
 				String u = ((AttributeCell)base.table).getUnits();
 				data.add(val.stringValue() + (u==null || u.equals("") ? " " : " " + u));

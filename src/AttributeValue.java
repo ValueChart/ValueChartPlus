@@ -7,35 +7,65 @@ public class AttributeValue
 {
 	String str;
 	double num;
-	AttributeDomain domain;
+	String attributeName;
+	ValueChart chart;
+	boolean isDiscrete;
 
 	//-for discrete attribute, set value and domain
-	public AttributeValue (String s, AttributeDomain d){
+	public AttributeValue (String s, AttributeDomain d, String attrName, ValueChart vc){
 		str = s;
 		if (d.getType() != AttributeDomainType.DISCRETE)
 			throw new IllegalArgumentException ("Symbolic values must be associated with discrete domains");	    
 		try{
-			((DiscreteAttributeDomain)d).getEntryWeight(s);
+			d.getDiscrete().getEntryWeight(s);
 	    }catch (Exception e){
 	    	throw new IllegalArgumentException ("Attribute value " + s + " unknown"); 
 	    }
-	    domain = d;
+	    attributeName = attrName;
+	    chart = vc;
+	    isDiscrete = true;
 	}
 	
 	//-for continuous attribute, set value and domain
-	public AttributeValue (double n, AttributeDomain d){
+	public AttributeValue (double n, AttributeDomain d, String attrName, ValueChart vc){
 		num = n;
 		if (d.getType() != AttributeDomainType.CONTINUOUS)
 			throw new IllegalArgumentException ("Numeric values must be associated with continous domains");
 		try{
-			((ContinuousAttributeDomain)d).weight(n);
+			d.getContinuous().weight(n);
 		}catch (Exception e){
 			throw new IllegalArgumentException ("Attribute value " + n + " out of range"); 
 		}
-		domain = d;
+        attributeName = attrName;
+        chart = vc;
+        isDiscrete = false;
 	}
 
-	public String symbolicValue()
+	public String getAttributeName() {
+        return attributeName;
+    }
+
+    public void setAttributeName(String attributeName) {
+        this.attributeName = attributeName;
+    }
+
+    public ValueChart getChart() {
+        return chart;
+    }
+
+    public void setChart(ValueChart chart) {
+        this.chart = chart;
+    }
+
+    public boolean isDiscrete() {
+        return isDiscrete;
+    }
+
+    public void setDiscrete(boolean isDiscrete) {
+        this.isDiscrete = isDiscrete;
+    }
+
+    public String symbolicValue()
 	 { return str;
 	 }
 
@@ -54,13 +84,12 @@ public class AttributeValue
 	 }
 
 	//returns the weight value of the attribute
-	public double weight()
-	 {
-	   if (domain.getType() == AttributeDomainType.DISCRETE)
-	    { return ((DiscreteAttributeDomain)domain).getEntryWeight (str);
-	    }
-	   else
-	    { return ((ContinuousAttributeDomain)domain).weight (num);
-	    }
-	 }
+    public double weight() {
+        AttributeDomain domain = chart.getDomain(attributeName);
+        if (isDiscrete) {
+            return domain.getDiscrete().getEntryWeight(str);
+        } else {
+            return domain.getContinuous().weight(num);
+        }
+    }
 }

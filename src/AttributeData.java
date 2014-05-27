@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 public interface AttributeData {
 
     public double getWeight();
@@ -19,4 +21,6 @@ public interface AttributeData {
     public String getOutputLogXML(boolean isRoot);
     
     public String getOutputWeightXML(boolean isRoot);
+    
+    public AttributeData getDeepCopy(HashMap<String, AttributeData> attrMap);
 }

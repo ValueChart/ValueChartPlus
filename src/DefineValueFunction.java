@@ -18,10 +18,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 	MouseHandler mouseListener;    
 	JObjective obj_sel;
     JLabel lbl_sel;
-	
-    AttributeDomain domain;
-    String attributeName;
-    
+	    
     JObjective obj;
   
     JPopupMenu popValueFunction;   
@@ -173,7 +170,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		}
 		
 		else if ("Remove Point".equals(ae.getActionCommand())){
-	    	ContinuousAttributeDomain dom = (ContinuousAttributeDomain) obj_sel.getDomain();
+	    	ContinuousAttributeDomain dom = obj_sel.getDomain().getContinuous();
 	    	dom.removeKnot(dom.getKnots()[rem_i]);
 	    	ugraph.repaint();
 
@@ -232,7 +229,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
         	ansd = (Double.valueOf(ans)).doubleValue();
         	try{
         		if (ansd <= obj_sel.maxC && ansd >= obj_sel.minC){	 
-        			ContinuousAttributeDomain dom = (ContinuousAttributeDomain) obj_sel.getDomain();
+        			ContinuousAttributeDomain dom = obj_sel.getDomain().getContinuous();
         			dom.addKnot(ansd, 0.0);
         		}
 	        	else{
@@ -272,7 +269,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
             else if(SwingUtilities.isRightMouseButton(me)){
             	if("ContinuousUtilityGraph".equals(me.getComponent().getClass().getName())){
         			int i;
-    				ContinuousAttributeDomain cad = (ContinuousAttributeDomain)obj_sel.getDomain();
+    				ContinuousAttributeDomain cad = obj_sel.getDomain().getContinuous();
     				double kts[] = cad.getKnots();			
     				for (i=0; i < kts.length; i++){
     				int ptx = (int)((kts[i]-kts[0])/((kts[(kts.length)-1])-kts[0])*200)+50;

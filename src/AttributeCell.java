@@ -26,7 +26,6 @@ public class AttributeCell extends JComponent {
     private ValueChart chart;
     private String units;
     private double threshold;
-    private AttributePrimitiveData data;
     JPopupMenu domainPopup;
     JPopupMenu entryPopup;
     JMenuItem entryPopupMenuItem;
@@ -39,13 +38,13 @@ public class AttributeCell extends JComponent {
     JFrame[] window; //the windows created for the attribute, these are used to show the report. They are class variables because we need to toggle visibility from different methods
     JPanel[] viewerComponentPanel; //the panel for which the fram sits on;
 
-    public AttributeCell(ValueChart chart, AttributePrimitiveData data) {
+    public AttributeCell(ValueChart chart, String attrName) {
         MouseHandler mouseHandler = new MouseHandler();
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
         //addComponentListener(new ResizeHandler());
         this.chart = chart;
-        this.data = data;
+        this.attributeName = attrName;
     }
 
     //temp
@@ -53,8 +52,8 @@ public class AttributeCell extends JComponent {
         return attributeName;
     }
 
-    public void setData(AttributePrimitiveData d) {
-        data = d;
+    public void setName(String name) {
+        attributeName = name;
     }
 
     public double getOverallRatio() { // return overallRatio;
@@ -144,7 +143,7 @@ public class AttributeCell extends JComponent {
         String worst = "";
         DecimalFormat df = obj.decimalFormat;
         if (domain.getType() == AttributeDomainType.DISCRETE) {
-            DiscreteAttributeDomain dd = (DiscreteAttributeDomain) domain;
+            DiscreteAttributeDomain dd = domain.getDiscrete();
             String elt[] = dd.getElements();
             double wt[] = dd.getWeights();
             for (int j = 0; j < wt.length; j++) {
@@ -156,7 +155,7 @@ public class AttributeCell extends JComponent {
                 }
             }
         } else {
-            ContinuousAttributeDomain cd = (ContinuousAttributeDomain) domain;
+            ContinuousAttributeDomain cd = domain.getContinuous();
             double kt[] = cd.getKnots();
             double wt[] = cd.getWeights();
             for (int j = 0; j < wt.length; j++) {
@@ -205,12 +204,11 @@ public class AttributeCell extends JComponent {
     //This is added to display utility graph
     public void getUtility(AttributeDomain domain) {
         if (domain.getType() == AttributeDomainType.DISCRETE) {
-            DiscreteAttributeDomain dd =
-                    (DiscreteAttributeDomain) domain;
+            DiscreteAttributeDomain dd = domain.getDiscrete();
             new DiscreteUtilityGraph(chart, true, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
 
         } else {
-            ContinuousAttributeDomain cd = (ContinuousAttributeDomain) domain;
+            ContinuousAttributeDomain cd = domain.getContinuous();
             new ContinuousUtilityGraph(chart, true, cd, cd.getKnots(), cd.getWeights(), getUnits(), attributeName, null, this);
         }
     }
@@ -218,34 +216,33 @@ public class AttributeCell extends JComponent {
     //This will make function call to get utility graph
     public void makeUtility(AttributeDomain domain) {
         if (domain.getType() == AttributeDomainType.DISCRETE) {
-            DiscreteAttributeDomain dd =
-                    (DiscreteAttributeDomain) domain;
+            DiscreteAttributeDomain dd = domain.getDiscrete();
             new DiscreteUtilityGraph(chart, true, dd, dd.getElements(), dd.getWeights(), attributeName, null, this);
 
         } else {
-            ContinuousAttributeDomain cd = (ContinuousAttributeDomain) domain;
+            ContinuousAttributeDomain cd = domain.getContinuous();
             new ContinuousUtilityGraph(chart, true, cd, cd.getKnots(), cd.getWeights(), getUnits(), attributeName, null, this);
         }
     }
 
     public ContGraph makeContGraph(AttributeDomain domain) {
-        ContinuousAttributeDomain cd = (ContinuousAttributeDomain) domain;
+        ContinuousAttributeDomain cd = domain.getContinuous();
         cg = new ContGraph(chart, cd, cd.getKnots(), cd.getWeights(), getUnits(), attributeName, color, this);
         return cg;
     }
 
     public DiscGraph makeDiscGraph(AttributeDomain domain) {
-        DiscreteAttributeDomain dd = (DiscreteAttributeDomain) domain;
+        DiscreteAttributeDomain dd = domain.getDiscrete();
         dg = new DiscGraph(chart, dd, dd.getElements(), dd.getWeights(), attributeName, color);
         return dg;
     }
 
     AttributeDomain getDomain() {
-        return data.getDomain();
+        return getData().getDomain();
     }
 
     public AttributePrimitiveData getData() {
-        return data;
+        return chart.getAttribute(attributeName).getPrimitive();
     }
 
     public int getColWidth() {
@@ -257,58 +254,6 @@ public class AttributeCell extends JComponent {
     }
 //REPORT AND IMAGE SUBMENU AND WINDOW MANAGEMENT
 
-    public boolean swingWorkersCreatedBlah(Integer entries) throws FileNotFoundException {
-        //entries is the number of entries/scenarios/alternatives
-
-        //TODO: Could run this with the constructor...
-
-        //check if the controller is null (this would mean that this is the first time the user wanted to oen report details
-        if (controller == null) {
-            //Create a swingworker for each entry (alternative) that can be use to display the associated reports for this criteria
-            controller = new SwingController[entries];
-            window = new JFrame[entries];
-            viewerComponentPanel = new JPanel[entries];
-
-            //Now create an instance for each controller
-            for (int i = 0; i < entries; i++) {
-                //Get the entry information
-                ChartEntry tempentry = entryList.get(i);
-
-                //get the report location if associated with the entries
-                File reportFile = (File) tempentry.map.get("report");
-
-                if (reportFile != null) {
-                    controller[i] = new SwingController();
-
-                    //From: http://greenxgene.blogspot.ca/2012/10/how-to-open-pdf-file-from-your-java.html
-
-                    //build a controller
-                    //SwingController controller = new SwingController(); //this is now a class variable
-                    //Above is now done at class level
-
-                    // Build a SwingViewFactory configured with the controller
-                    SwingViewBuilder factory = new SwingViewBuilder(controller[i]);
-                    viewerComponentPanel[i] = factory.buildViewerPanel();
-
-                    // add copy keyboard command
-                    ComponentKeyBinding.install(controller[i], viewerComponentPanel[i]);
-
-                    // add interactive mouse link annotation support via callback
-                    controller[i].getDocumentViewController().setAnnotationCallback(
-                            new org.icepdf.ri.common.MyAnnotationCallback(
-                            controller[i].getDocumentViewController()));
-
-                    //Use the factory to build a JPanel that is pre-configured
-                    //with a complete, active Viewer UI.
-                    // Open a PDF document to view
-                    controller[i].openDocument(reportFile.toString());
-
-                }
-            }
-        }
-        //If it the swingworkes weren't already created, they are now!
-        return true;
-    }
 
     //zoom the the location in the report
     public void zoomToReport(JFrame window, SwingController controller, OutlineItem item, int bookmarkIndex, Boolean showAll) {
@@ -404,7 +349,7 @@ public class AttributeCell extends JComponent {
 
         for (Iterator<ChartEntry> it = entryList.iterator(); it.hasNext();) {
             ChartEntry entry = it.next();
-            AttributeValue value = (AttributeValue) entry.map.get(attributeName);
+            AttributeValue value = entry.attributeValue(attributeName);
             int h = 0;
             int hpos = height;
             if (value != null) {
@@ -434,7 +379,7 @@ public class AttributeCell extends JComponent {
                     if (wthresh < height - 10) {
                         g.setColor(Color.darkGray);
                     } else {
-                        boolean black = useBlackForeground(data.getColor());
+                        boolean black = useBlackForeground(getData().getColor());
                         // completely coloured background
                         if (hpos < height - 10){
                             g.setColor((black ? Color.BLACK : Color.WHITE));
@@ -534,7 +479,7 @@ public class AttributeCell extends JComponent {
                 boolean redisplay = false;
                 for (Iterator<ChartEntry> it = entryList.iterator(); it.hasNext();) {
                     ChartEntry entry = it.next();
-                    AttributeValue value = (AttributeValue) entry.map.get(attributeName);
+                    AttributeValue value = entry.attributeValue(attributeName);
                     double h = (value != null ? value.weight() : 0);
                     if (threshold <= 0) {
                         if (threshold >= h && !entry.isMasked() && threshold > 0.02) {//added to fix bug0 
@@ -602,7 +547,7 @@ public class AttributeCell extends JComponent {
                 final int index = e.getX() / colWidth;
                 if (index >= 0 && index < entryList.size()) {
                     ChartEntry entry =  entryList.get(index);
-                    AttributeValue value = (AttributeValue) entry.map.get(attributeName);
+                    AttributeValue value = entry.attributeValue(attributeName);
 
                     //***added to retreive the report location from the hash map (data structure)
                     //final File reportFileLocation = (File) entry.map.get("report"); //"report" can be found in ValueChart.java in the method readEntry(...);
@@ -624,7 +569,7 @@ public class AttributeCell extends JComponent {
                     attributeMeta.add(detailMenuItem);
 
                     //Now check if this attribute exists in the report, if not then don't show the menu items to zoom to details
-                    final int bookmarkIndex = criteriaBookmarkExistsInReport((OutlineItem) entry.map.get("OutlineItem"), entry.name.toString(), attributeName);
+                    final int bookmarkIndex = criteriaBookmarkExistsInReport(entry.getOutlineItem(), entry.name.toString(), attributeName);
 
                     //This menu item opens one pdf report specific for this entry for the given attribute
                     if (bookmarkIndex > 0) {
@@ -635,9 +580,9 @@ public class AttributeCell extends JComponent {
                             public void actionPerformed(ActionEvent b) {
                                 System.out.print("Report Clicked");
                                 ChartEntry tempentry =  entryList.get(index); //get the current entry
-                                if (tempentry.map.get("Report Frame") != null) { //check if the entry has an associated report
+                                if (tempentry.getReportFrame() != null) { //check if the entry has an associated report
                                     //The JFram and SwingController inputs were created in ValueChart.java when the initial data was loaded
-                                    zoomToReport((JFrame) tempentry.map.get("Report Frame"), (SwingController) tempentry.map.get("Report Controller"), (OutlineItem) tempentry.map.get("OutlineItem"), bookmarkIndex, true); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
+                                    zoomToReport(tempentry.getReportFrame(), tempentry.getReportController(), tempentry.getOutlineItem(), bookmarkIndex, true); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
                                 } else {
                                     System.out.println("There is no associated report for scenario/entry #" + (index + 1));
                                 }
@@ -654,11 +599,11 @@ public class AttributeCell extends JComponent {
                                 //loop through each entry
                                 for (int i = 0; i < entryList.size(); i++) {
                                     ChartEntry tempentry =  entryList.get(i); //get the entry
-                                    if (tempentry.map.get("Report Frame") != null) { //check if there is an associated report
+                                    if (tempentry.getReportFrame() != null) { //check if there is an associated report
                                         //The JFrame and SwingController inputs were created in ValueChart.java when the initial data was loaded
-                                        int tempbookmarkIndex = criteriaBookmarkExistsInReport((OutlineItem) tempentry.map.get("OutlineItem"), tempentry.name.toString(), attributeName);
+                                        int tempbookmarkIndex = criteriaBookmarkExistsInReport(tempentry.getOutlineItem(), tempentry.name.toString(), attributeName);
                                         if (tempbookmarkIndex >= 0) {
-                                        zoomToReport((JFrame) tempentry.map.get("Report Frame"), (SwingController) tempentry.map.get("Report Controller"), (OutlineItem) tempentry.map.get("OutlineItem"), tempbookmarkIndex, false); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
+                                        zoomToReport(tempentry.getReportFrame(), tempentry.getReportController(), tempentry.getOutlineItem(), tempbookmarkIndex, false); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
                                         }
                                     } else {
                                         System.out.println("There is no associated report for scenario/entry #" + (index + 1));
@@ -677,11 +622,11 @@ public class AttributeCell extends JComponent {
                                 //loop through each entry
                                 for (int i = 0; i < entryList.size(); i++) {
                                     ChartEntry tempentry =  entryList.get(i); //get the entry
-                                    if (tempentry.map.get("Report Frame") != null) { //check if there is an associated report
+                                    if (tempentry.getReportFrame() != null) { //check if there is an associated report
                                         //The JFram and SwingController inputs were created in ValueChart.java when the initial data was loaded
-                                        int tempbookmarkIndex = criteriaBookmarkExistsInReport((OutlineItem) tempentry.map.get("OutlineItem"), tempentry.name.toString(), attributeName);
+                                        int tempbookmarkIndex = criteriaBookmarkExistsInReport(tempentry.getOutlineItem(), tempentry.name.toString(), attributeName);
                                         if (tempbookmarkIndex >= 0) {
-                                            zoomToReport((JFrame) tempentry.map.get("Report Frame"), (SwingController) tempentry.map.get("Report Controller"), (OutlineItem) tempentry.map.get("OutlineItem"), tempbookmarkIndex, true); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
+                                            zoomToReport(tempentry.getReportFrame(), tempentry.getReportController(), tempentry.getOutlineItem(), tempbookmarkIndex, true); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
                                         }
                                     } else {
                                         System.out.println("There is no associated report for scenario/entry #" + (index + 1));

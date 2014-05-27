@@ -121,7 +121,7 @@ public class DiscGraph extends JPanel implements MouseListener, MouseMotionListe
                 moving = p[i];
                 clicki = i;
                 LastInteraction interact = new LastInteraction(chart);
-                interact.setUndoUtil(this, items[i], 0, weights[i], ddomain);
+                interact.setUndoUtil(this, items[i], 0, weights[i], attributeName);
                 chart.addInteraction(interact);
                 movePoint(xaxis, me.getY());
                 return;

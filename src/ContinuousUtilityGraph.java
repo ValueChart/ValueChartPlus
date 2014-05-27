@@ -169,7 +169,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
                 	clicki = i;
                 	if (chart != null && fromChart) {
                         LastInteraction interact = new LastInteraction(chart);
-                        interact.setUndoUtil(this, null, items[i], weights[i], cdomain);
+                        interact.setUndoUtil(this, null, items[i], weights[i], attributeName);
                         chart.addInteraction(interact);
                 	}
                 	movePoint(xaxis, me.getY());  

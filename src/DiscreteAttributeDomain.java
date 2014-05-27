@@ -68,5 +68,24 @@ public class DiscreteAttributeDomain extends AttributeDomain
 		else
 		    setEntryWeight(elem, wt);
 	}
+
+    @Override
+    public AttributeDomain getDeepCopy() {
+        DiscreteAttributeDomain newData = new DiscreteAttributeDomain();
+        for (Map.Entry<String, Double> entry : entryMap.entrySet()) {
+            newData.addElement(entry.getKey(), entry.getValue());
+        }
+        return newData;
+    }
+
+    @Override
+    public ContinuousAttributeDomain getContinuous() {
+        return null;
+    }
+
+    @Override
+    public DiscreteAttributeDomain getDiscrete() {
+        return this;
+    }
 	
 }

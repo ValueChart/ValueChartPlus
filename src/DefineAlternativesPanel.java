@@ -74,7 +74,16 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		columns = new Vector<String>();		
 				
 		//set up table model and component
-		tabModel = new DefaultTableModel();
+		tabModel = new DefaultTableModel() /*{
+            private static final long serialVersionUID = 1L;
+
+            @Override 
+            public boolean isCellEditable(int row, int column) {
+                // alternative name column
+		        if (column == 0) return false;
+		        return true;
+		    }
+		}*/;
 		tabModel.setDataVector(rows,columns);		
 		table = new JTable(tabModel);        
 		table.getModel().addTableModelListener(this);		
@@ -482,17 +491,19 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                                JOptionPane.YES_NO_CANCEL_OPTION);
 		                        //c)add the new discrete value 
 		                        if (n == JOptionPane.YES_OPTION) {
-		                        	DiscreteAttributeDomain dom = (DiscreteAttributeDomain)obj.getDomain();
+		                        	DiscreteAttributeDomain dom = obj.getDomain().getDiscrete();
 		                        	dom.addElement(entered, 0.5); 		                        	
 		                            String name = temp.get("name").toString();
-		                            for (Iterator<ChartEntry> it = con.chart.entryList.iterator(); it.hasNext();) {
-		                                ChartEntry entry = it.next();
-		                                if (entry.name.equals(name)) {
-		                                    AttributeValue value = (AttributeValue) entry.map.get(objName);
-		                                    if (value != null) {
-		                                        value.str = entered;
-		                                    }
-		                                }
+		                            if (con.chart != null) {
+    		                            for (Iterator<ChartEntry> it = con.chart.getEntryList().iterator(); it.hasNext();) {
+    		                                ChartEntry entry = it.next();
+    		                                if (entry.name.equals(name)) {
+    		                                    AttributeValue value = entry.attributeValue(objName);
+    		                                    if (value != null) {
+    		                                        value.str = entered;
+    		                                    }
+    		                                }
+    		                            }
 		                            }
 		                        	updateTable(); //d. update for new combobox item
 		                        }
@@ -505,7 +516,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        			}
 		        		}	        		
 		        		//3. continuous items
-		        		else {
+		        		else if (obj!=null && obj.getDomainType()==AttributeDomainType.DISCRETE){
                             AttributeValue value = null;
 
 		        			//a) check if within range
@@ -515,12 +526,14 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		        obj.replaceInObjValueMap(lastVal, enteredVal);
 		        		        
                                 String name = temp.get("name").toString();
-                                for (Iterator<ChartEntry> it = con.chart.entryList.iterator(); it.hasNext();) {
-                                    ChartEntry entry = it.next();
-                                    if (entry.name.equals(name)) {
-                                        value = (AttributeValue) entry.map.get(objName);
-                                        if (value != null) {
-                                            value.num = enteredVal;
+                                if (con.chart != null) {
+                                    for (Iterator<ChartEntry> it = con.chart.getEntryList().iterator(); it.hasNext();) {
+                                        ChartEntry entry = it.next();
+                                        if (entry.name.equals(name)) {
+                                            value = entry.attributeValue(objName);
+                                            if (value != null) {
+                                                value.num = enteredVal;
+                                            }
                                         }
                                     }
                                 }
@@ -535,7 +548,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                            double newMin = (obj.minC < enteredVal ? obj.minC : enteredVal);
 		                            double newMax = (obj.maxC > enteredVal ? obj.maxC : enteredVal);
 		                            
-		                            boolean updated = ((ContinuousAttributeDomain)obj.getDomain()).updateRange(newMin, newMax);
+		                            boolean updated = obj.getDomain().getContinuous().updateRange(newMin, newMax);
 		                            obj.minC = newMin;
                                     obj.maxC = newMax;
                                     
@@ -580,7 +593,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                             newMin = curr;
                                     }
                                     
-                                    boolean updated = ((ContinuousAttributeDomain)obj.getDomain()).updateRange(newMin, newMax);
+                                    boolean updated = obj.getDomain().getContinuous().updateRange(newMin, newMax);
                                     obj.minC = newMin;
                                     obj.maxC = newMax;
                                     

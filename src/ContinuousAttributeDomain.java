@@ -178,5 +178,24 @@ public class ContinuousAttributeDomain extends AttributeDomain
             contGraph.plotPoints();
         return true;
     }
+
+    @Override
+    public AttributeDomain getDeepCopy() {
+        ContinuousAttributeDomain newData = new ContinuousAttributeDomain();
+        for (Map.Entry<Double, Double> entry : knotMap.entrySet()) {
+            newData.addKnot(entry.getKey(), entry.getValue());
+        }
+        return newData;
+    }
+
+    @Override
+    public ContinuousAttributeDomain getContinuous() {
+        return this;
+    }
+
+    @Override
+    public DiscreteAttributeDomain getDiscrete() {
+        return null;
+    }
 	
 }

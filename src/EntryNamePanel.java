@@ -85,7 +85,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             g.drawString(labelList.get(i).toString(), (i * colWidth) + (30 + ((int) (colWidth - 30) / 2)), ANG_HT); //center the entry name
             g.setColor(Color.GRAY);
             g.drawLine((i * colWidth), ANG_HT, (i * colWidth) + ANG_WD, 0);
-            if (chart.entryList.get(i).getIsMarked()) {
+            if (chart.getEntryList().get(i).getIsMarked()) {
                 g.setColor(Color.blue);
                 //code a polygon or something
                 g.drawString(labelList.get(i).toString(), (i * colWidth) + 21, ANG_HT - 1);
@@ -204,9 +204,9 @@ public class EntryNamePanel extends JPanel implements ActionListener {
         //listener for popup menu
         if ("Mark".equals(ae.getActionCommand()) || "Unmark".equals(ae.getActionCommand())) {
             if ("Mark".equals(ae.getActionCommand())) {
-                chart.entryList.get(rightClicked).setIsMarked(true);
+                chart.getEntryList().get(rightClicked).setIsMarked(true);
             } else {
-                chart.entryList.get(rightClicked).setIsMarked(false);
+                chart.getEntryList().get(rightClicked).setIsMarked(false);
             }
             updateBoth();
             /*			if (chart.mainEntryNames.isAncestorOf(selected_entry))
@@ -226,14 +226,14 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             System.out.println("Report Clicked");
             
             //Get the current entry
-            ChartEntry tempentry = chart.entryList.get(rightClicked); //get the current entry
+            ChartEntry tempentry = chart.getEntryList().get(rightClicked); //get the current entry
             
-            if (tempentry.map.get("Report Frame") != null) { //check if the entry has an associated report
+            if (tempentry.getReportFrame() != null) { //check if the entry has an associated report
                 //The JFrame and SwingController inputs were created in ValueChart.java when the initial data was loaded
                 //Since the window is initially hidden, or when the user closes the window is become hidden (not closed), we need to check this first
                 //But only show the window if the request has been such
-                JFrame window = (JFrame) tempentry.map.get("Report Frame"); //get the window associated with the chart
-                SwingController controller = (SwingController) tempentry.map.get("Report Controller"); //get the controller associated with the window
+                JFrame window = tempentry.getReportFrame(); //get the window associated with the chart
+                SwingController controller = tempentry.getReportController(); //get the controller associated with the window
                 
                 zoomToReport(window, controller, tempentry.name.toString()); //if there is a bookmark with the name of this entry, go to it, otherwise it will take you to the first page of the report
             } else {
@@ -257,7 +257,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
 
     void toggleDetails(boolean show) {
         //offset fom extra label added for ruler
-        chart.entryList.get(rightClicked).setShowFlag(show);
+        chart.getEntryList().get(rightClicked).setShowFlag(show);
         chart.updateAll();
     }
 
@@ -279,13 +279,13 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             //System.out.println("IDX___________ " + idx);
             chart.updateAll();
             if (SwingUtilities.isRightMouseButton(me)) {
-                if (chart.entryList.get(idx).getIsMarked()) {
+                if (chart.getEntryList().get(idx).getIsMarked()) {
                     ((JMenuItem) popEntry.getComponent(0)).setText("Unmark");
                 } else {
                     ((JMenuItem) popEntry.getComponent(0)).setText("Mark");
                 }
                 if (idx != -1) {
-                    if (chart.entryList.get(idx).getShowFlag()) {
+                    if (chart.getEntryList().get(idx).getShowFlag()) {
                         ((JMenuItem) popEntry.getComponent(3)).setText("Hide Details");
                     } else {
                         ((JMenuItem) popEntry.getComponent(3)).setText("Show Details");
