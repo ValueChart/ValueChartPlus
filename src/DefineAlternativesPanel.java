@@ -270,8 +270,13 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        		if (obj.getDomainType()==AttributeDomainType.DISCRETE){
 	        			data.addElement("");
 	        		}
-	        		else
-	        			data.addElement(Double.valueOf(obj.minC).toString());
+	        		else {
+	        		    if (obj.minC > obj.maxC) {
+	        		        data.addElement("");
+	        		    } else {
+	        		        data.addElement(Double.valueOf(obj.minC).toString());
+	        		    }
+	        		}
 	        }
 	        rows.add(data);
 	        tabModel.fireTableRowsInserted(rows.size(), rows.size());   
@@ -289,8 +294,13 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        		if (obj.getDomainType()==AttributeDomainType.DISCRETE){
 	        			datamap.put(obj.getName(), "");
 	        		}
-	        		else
-	        			datamap.put(obj.getName(), Double.valueOf(obj.minC));
+	        		else {
+	        		    if (obj.minC > obj.maxC) {
+	        		        datamap.put(obj.getName(), "");
+                        } else {
+                            datamap.put(obj.getName(), Double.valueOf(obj.minC));
+                        }
+	        		}
         		}
 	        	
 	        }

@@ -1,17 +1,13 @@
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.FileNotFoundException;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.text.DecimalFormat;
 import java.util.*;
 import javax.swing.JPanel;
 import org.icepdf.core.pobjects.OutlineItem;
-import org.icepdf.ri.common.ComponentKeyBinding;
 import org.icepdf.ri.common.SwingController;
-import org.icepdf.ri.common.SwingViewBuilder;
 import org.icepdf.ri.common.views.DocumentViewControllerImpl;
 
 
@@ -442,13 +438,6 @@ public class AttributeCell extends JComponent {
      }
      }    
      */
-
-    private class ResizeHandler extends ComponentAdapter {
-
-        public void componentResized(ComponentEvent e) {
-            getHeight();
-        }
-    }
 
     private class MouseHandler extends MouseInputAdapter {
 
