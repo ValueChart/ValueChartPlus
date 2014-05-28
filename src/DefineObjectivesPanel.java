@@ -375,7 +375,11 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		}
 		
 		else {
-			str = str + obj.toString() + " " + obj.getWeight() + " { ";			
+		    String wt = obj.getWeight();
+		    if (wt.equals("*")) { // weight wasn't set when criteria made, default to 0
+		        wt = "0.0";
+		    }
+			str = str + obj.toString() + " " + wt + " { ";			
 			//double vals[] = new double[obj.num_points];
 			//Vector vals = obj.domain.getWeights();
 			double vals[] = obj.getDomain().getWeights();

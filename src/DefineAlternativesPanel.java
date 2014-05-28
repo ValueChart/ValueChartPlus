@@ -387,6 +387,10 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     			if (it2.next().equals(""))
     			    return false;
     	}    		
+    	Vector<JObjective> all_objs = con.getObjPanel().getPrimitiveObjectives();
+    	for (JObjective obj : all_objs) {
+    	    if (obj.getObjValueMapCount() < 2) return false;
+    	}
     	return true;
     }
     

@@ -302,6 +302,10 @@ public class JObjective extends JLabel{
         }
     }
     
+    public int getObjValueMapCount() {
+        return objValuesMap.size();
+    }
+    
     public void clearObjValueMap() {
         objValuesMap.clear();
     }
