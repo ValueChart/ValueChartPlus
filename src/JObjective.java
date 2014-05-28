@@ -302,6 +302,16 @@ public class JObjective extends JLabel{
         }
     }
     
+    public void decreaseInObjValueMap(Object val) {
+        if (objValuesMap.containsKey(val)) {
+            if (objValuesMap.get(val) == 1) {
+                objValuesMap.remove(val);
+            } else {
+                objValuesMap.put(val, objValuesMap.get(val)-1);
+            }
+        }
+    }
+    
     public void clearObjValueMap() {
         objValuesMap.clear();
     }

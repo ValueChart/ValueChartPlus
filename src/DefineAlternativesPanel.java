@@ -534,8 +534,13 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        			//a) check if within range
 		        		    try {
 		        		        double enteredVal = Double.valueOf(entered).doubleValue();
-		        		        double lastVal = Double.valueOf(last_value).doubleValue();
-		        		        obj.replaceInObjValueMap(lastVal, enteredVal);
+		        		        double lastVal = 0;
+		        		        if (!last_value.isEmpty()) {
+		        		            lastVal = Double.valueOf(last_value).doubleValue();
+		        		            obj.replaceInObjValueMap(lastVal, enteredVal);
+		        		        } else {
+		        		            obj.addToObjValueMap(enteredVal);
+		        		        }
 		        		        
                                 String name = temp.get("name").toString();
                                 if (con.chart != null) {
@@ -575,10 +580,14 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        	        		temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
 		        	        		alts.set(table.getSelectedRow(), temp); 
 		        	        		table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
-	                                obj.replaceInObjValueMap(enteredVal, lastVal);
-                                    if (value != null) {
-                                        value.num = lastVal;
-                                    }
+		        	        		if (!last_value.isEmpty()) {
+    	                                obj.replaceInObjValueMap(enteredVal, lastVal);
+                                        if (value != null) {
+                                            value.num = lastVal;
+                                        }
+		        	        		} else {
+		        	        		    obj.decreaseInObjValueMap(enteredVal);
+		        	        		}
                                     entered = last_value;
 		                        }                        	
 			        		}   
@@ -634,6 +643,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                 temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
                                 alts.set(table.getSelectedRow(), temp); 
                                 table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
+                                entered = last_value;
 		        		    }
 		        		}
 	        		}
