@@ -1207,9 +1207,10 @@ public class ValueChart extends JPanel {
     
 
     
-    public void restoreState() {     
+    public void restoreState(boolean refreshDisp) {     
         chartData.restoreState();
-        updateChartState();
+        if (refreshDisp)
+            updateChartState();
     }
     
     public void updateChartState() {

@@ -204,7 +204,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             else {
                 frame.dispose(); // edit view
                 if (chart != null) {
-                    chart.restoreState();
+                    chart.restoreState(true);
                 }
             }
         else if ("btnOK".equals(e.getActionCommand())) {
@@ -255,7 +255,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             @Override
             public void windowClosing(WindowEvent e) {
                 if (chart != null) {
-                    chart.restoreState();
+                    chart.restoreState(true);
                 }
             }
         };

@@ -278,6 +278,8 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 			}
 			else
 				chart.show_graph = false;
+			chart.keepCurrentState();
+			chart.restoreState(false);
 			chart.resetDisplay(chart.displayType, chart.colWidth, true, chart.show_graph);
 		}
 		
