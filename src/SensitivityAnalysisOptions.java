@@ -83,6 +83,8 @@ class SensitivityAnalysisOptions extends JPanel implements ActionListener{
         pnlSA.add(optInc);
         pnlSA.add(optDec);
         
+        setSelection();
+        
         // TODO: rename Sensitivity Anaysis options?
         pnlSA.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(1), "Sensitivity Analysis", 0, 0, font));
         add(pnlSA);
@@ -93,7 +95,19 @@ class SensitivityAnalysisOptions extends JPanel implements ActionListener{
         	add(chart.pnlDom); 
         }   
         add(pnlSA);     
-    	}    	
+    }    	
+	
+    private void setSelection() {
+        if (!chart.pump_increase)
+            optDec.setSelected(true);
+        else
+            optInc.setSelected(true);
+        
+        if (chart.pump)
+            selectMode.setSelectedIndex(1);
+        else if (chart.sort)
+            selectMode.setSelectedIndex(2);
+    }
 	
 	public void actionPerformed(ActionEvent ae) {
 		// if action sourced from drop-down select box
