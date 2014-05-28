@@ -100,12 +100,14 @@ public class LastInteraction {
                 ContinuousUtilityGraph cug = (ContinuousUtilityGraph) pnlUtil;
                 AttributeDomain domain = chart.getDomain(name);
                 domain.getContinuous().changeWeight(knot, weight);
-                cug.acell.cg.plotPoints();
+                if (cug.acell != null && cug.acell.dg != null)
+                    cug.acell.cg.plotPoints();
             } else if (pnlUtil instanceof DiscreteUtilityGraph) {
                 DiscreteUtilityGraph dug = (DiscreteUtilityGraph) pnlUtil;
                 AttributeDomain domain = chart.getDomain(name);
                 domain.getDiscrete().changeWeight(elt, weight);
-                dug.acell.dg.plotPoints();
+                if (dug.acell != null && dug.acell.dg != null)
+                    dug.acell.dg.plotPoints();
             }
             chart.updateAll();
         }

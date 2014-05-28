@@ -149,5 +149,9 @@ public class ChartData {
         return attrMap.get(name);
     }
     
+    public ChartEntry findEntry(String name) {
+        return entryMap.get(name);
+    }
+    
     
 }

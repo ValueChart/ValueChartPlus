@@ -1242,6 +1242,10 @@ public class ValueChart extends JPanel {
         return chartData.findAttribute(name);
     }
     
+    public ChartEntry getEntry(String name) {
+        return chartData.findEntry(name);
+    }
+    
     public AttributeDomain getDomain(String name) {
         AttributeData data = getAttribute(name);
         if (data != null && !data.isAbstract()) {

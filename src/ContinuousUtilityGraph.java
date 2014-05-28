@@ -218,7 +218,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         cdomain.removeKnot(items[clicki]);
         cdomain.addKnot(items[clicki],((float) (205 - y) / 200));
         
-        if (acell != null)
+        if (acell != null && acell.cg != null)
             acell.cg.plotPoints();
         
         if (chart!=null){        	

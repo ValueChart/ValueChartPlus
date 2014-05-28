@@ -476,7 +476,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        			}
 		        		}	
 		        		
-		        		
+		        		// ---------------------------------------------------------------
 		        		//2. discrete items
 		        		//a) check if in list
 		        		if (obj!=null && obj.getDomainType()==AttributeDomainType.DISCRETE){
@@ -495,15 +495,13 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                        	dom.addElement(entered, 0.5); 		                        	
 		                            String name = temp.get("name").toString();
 		                            if (con.chart != null) {
-    		                            for (Iterator<ChartEntry> it = con.chart.getEntryList().iterator(); it.hasNext();) {
-    		                                ChartEntry entry = it.next();
-    		                                if (entry.name.equals(name)) {
-    		                                    AttributeValue value = entry.attributeValue(objName);
-    		                                    if (value != null) {
-    		                                        value.str = entered;
-    		                                    }
-    		                                }
-    		                            }
+		                                ChartEntry entry = con.chart.getEntry(name);
+		                                if (entry != null) {
+		                                    AttributeValue value = entry.attributeValue(objName);
+                                            if (value != null) {
+                                                value.str = entered;
+                                            }
+		                                }
 		                            }
 		                        	updateTable(); //d. update for new combobox item
 		                        }
@@ -514,9 +512,23 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                            obj.replaceInObjValueMap(entered, last_value);
 		                        }
 		        			}
+		        			// already in list
+		        			else {                                  
+                                String name = temp.get("name").toString();
+                                if (con.chart != null) {
+                                    ChartEntry entry = con.chart.getEntry(name);
+                                    if (entry != null) {
+                                        AttributeValue value = entry.attributeValue(objName);
+                                        if (value != null) {
+                                            value.str = entered;
+                                        }
+                                    }
+                                }
+		        			}
 		        		}	        		
-		        		//3. continuous items
-		        		else if (obj!=null && obj.getDomainType()==AttributeDomainType.DISCRETE){
+		        		// ---------------------------------------------------------------
+                        //3. continuous items
+		        		else if (obj!=null && obj.getDomainType()==AttributeDomainType.CONTINUOUS){
                             AttributeValue value = null;
 
 		        			//a) check if within range
@@ -527,13 +539,11 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		        
                                 String name = temp.get("name").toString();
                                 if (con.chart != null) {
-                                    for (Iterator<ChartEntry> it = con.chart.getEntryList().iterator(); it.hasNext();) {
-                                        ChartEntry entry = it.next();
-                                        if (entry.name.equals(name)) {
-                                            value = entry.attributeValue(objName);
-                                            if (value != null) {
-                                                value.num = enteredVal;
-                                            }
+                                    ChartEntry entry = con.chart.getEntry(name);
+                                    if (entry != null) {
+                                        value = entry.attributeValue(objName);
+                                        if (value != null) {
+                                            value.num = enteredVal;
                                         }
                                     }
                                 }
@@ -632,8 +642,11 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        		
 	        		last_value = entered;
 	        		
-	        		if (con != null)
-	                    con.validateTabs(); 
+	        		if (con != null) {
+	                    con.validateTabs();
+	                    if (con.chart != null)
+	                        con.chart.updateAll();
+	        		}	        		    
 	        		break;}
 	        		catch (ArrayIndexOutOfBoundsException ex){}  
 	        		catch (NullPointerException ne){}         		
