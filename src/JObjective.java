@@ -33,9 +33,8 @@ public class JObjective extends JLabel{
 	
 	Color color = Color.WHITE;
 
-	// TODO these should depend on the map
-	double minC = 0;		
-	double maxC = 100;
+	double minC = Double.MAX_VALUE;		
+	double maxC = Double.MIN_VALUE;
 	// number of alternatives that hold distinct objective values
 	// key: objective value, value: count
 	private HashMap<Object, Integer> objValuesMap; 
@@ -174,12 +173,9 @@ public class JObjective extends JLabel{
 	}
 	
 	//default flat
+	// TODO needs update depending on what it's used for
 	void setContinuous(){
-		num_points = 6;
 		Vector<Double> values = new Vector<Double>();
-		for (int i=0; i<num_points; i++){
-			values.add(Double.valueOf(0.5));
-		}	
 		setCDomain(values);
 	}
 	
@@ -197,22 +193,14 @@ public class JObjective extends JLabel{
 		setCDomain(values);
 	}
 
+	// TODO needs update depending on what it's used for
 	void setContinuous(double peak){
-		num_points = 5;
 		Vector<Double> values = new Vector<Double>();
-
-		values.add(Double.valueOf(0));
-		values.add(Double.valueOf(1));
-		values.add(Double.valueOf(0));
 		
 		//seting domain as would in setCDomain
     	domain = null;		
     	Vector<Object> knots = new Vector<Object>();
-		domain_type = AttributeDomainType.CONTINUOUS;		
-
-		knots.add(Double.valueOf(minC));
-		knots.add(Double.valueOf(peak));
-		knots.add(Double.valueOf(maxC));		
+		domain_type = AttributeDomainType.CONTINUOUS;			
 
 		domain = AttributeDomain.getInfo(knots, values, domain_type);	
 	}
@@ -221,11 +209,13 @@ public class JObjective extends JLabel{
     	domain = null;		
 		Vector<Double> values = v;
 		Vector<Object> knots = new Vector<Object>();
-		domain_type = AttributeDomainType.CONTINUOUS;		
-		for (int i=0; i<num_points; i++){
-			Double knt = new Double(minC+((maxC-minC)/(num_points-1)*(i)));
-			knots.add(knt);
-		}	
+		domain_type = AttributeDomainType.CONTINUOUS;	
+		if (minC < maxC) {
+    		for (int i=0; i<num_points; i++){
+    			Double knt = new Double(minC+((maxC-minC)/(num_points-1)*(i)));
+    			knots.add(knt);
+    		}	
+		}
 		domain = AttributeDomain.getInfo(knots, values, domain_type);		
 	}
 	
@@ -322,6 +312,10 @@ public class JObjective extends JLabel{
     
     public Set<Object> getKeySet() {
         return objValuesMap.keySet();
+    }
+
+    public void resetWeights() {
+        getDomain().resetWeights();
     }
 }
 

@@ -87,5 +87,12 @@ public class DiscreteAttributeDomain extends AttributeDomain
     public DiscreteAttributeDomain getDiscrete() {
         return this;
     }
+
+    @Override
+    public void resetWeights() {
+        for (Map.Entry<String, Double> entry : entryMap.entrySet()) {
+            entry.setValue(0.5);
+        }
+    }
 	
 }

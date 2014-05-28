@@ -15,7 +15,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
     }
 
 	// sorted in increasing x value
-	TreeMap<Double, Double> knotMap;
+	private TreeMap<Double, Double> knotMap;
 
         //the constructor carries a Vector list of elements
 	public ContinuousAttributeDomain()
@@ -81,7 +81,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
         //Returns the minimum element on the x-axis
     public double getMin() {
         if (knotMap.size() < 2) {
-            throw new IllegalStateException("incomplete knot list");
+            return Double.MAX_VALUE;
         }
         return knotMap.firstKey();
     }
@@ -89,7 +89,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
         //Returns the maximum element on the x-axis
     public double getMax() {
         if (knotMap.size() < 2) {
-            throw new IllegalStateException("incomplete knot list");
+            return Double.MIN_VALUE;
         }
         return knotMap.lastKey();
     }
@@ -135,7 +135,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
                 min = currVal;
             }
         }
-	    if (min == 0 && max == 1) return;
+	    if ( (min == 0 && max == 1) || min == max ) return;
 	    
 	    double range = max - min;
 	    double shift = min;
@@ -149,6 +149,14 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	public boolean updateRange(double min, double max) {
 	    if ( (min == getMin() && max == getMax()) ||
 	         max <= min) return true;
+	    
+	    // no knots yet
+	    if (knotMap.isEmpty()) {
+            knotMap.put(min, 0.5);
+            knotMap.put(min + (max-min)/2, 0.5);
+            knotMap.put(max, 0.5);
+            return false;
+        }
 	    
         // new range larger than current range
 	    if (max < knotMap.firstKey()) return false;
@@ -196,6 +204,13 @@ public class ContinuousAttributeDomain extends AttributeDomain
     @Override
     public DiscreteAttributeDomain getDiscrete() {
         return null;
+    }
+
+    @Override
+    public void resetWeights() {
+        for (Map.Entry<Double, Double> entry : knotMap.entrySet()) {
+            entry.setValue(0.5);
+        }
     }
 	
 }

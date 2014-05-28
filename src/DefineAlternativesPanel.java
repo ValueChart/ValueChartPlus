@@ -573,7 +573,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                                    "Reminder",
 		                                    JOptionPane.INFORMATION_MESSAGE);
 
-		                                obj.setContinuous();	//reset to default value function
+		                                obj.resetWeights();	//reset to default value function
 		                            }
 		                        }
 		                        else{ //reset for cancel or no
@@ -622,7 +622,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                             "Reminder",
                                             JOptionPane.INFORMATION_MESSAGE);
 
-                                        obj.setContinuous();    //reset to default value function
+                                        obj.resetWeights();    //reset to default value function
                                     }
 
                                 }

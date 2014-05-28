@@ -175,4 +175,6 @@ public abstract class AttributeDomain
     public abstract ContinuousAttributeDomain getContinuous();
     
     public abstract DiscreteAttributeDomain getDiscrete();
+
+    public abstract void resetWeights();
 }
