@@ -178,7 +178,7 @@ public class LogUserAction {
             fw.write("timestamp=\"" + df.format(Calendar.getInstance().getTime()) + "\">\n");
             
             if (!msg.isEmpty()) {
-                fw.write("<Message>\n");
+                fw.write("<Message>");
                 fw.write(msg);
                 fw.write("</Message>\n");
             }

@@ -40,6 +40,7 @@ public class ValueChart extends JPanel {
     TablePane mainPane;
     JPanel mainPaneWithNames;
     EntryNamePanel mainEntryNames;
+    CommentPanel commentPanel;
     DisplayPanel displayPanel;
     EntryNamePanel displayEntryNames;
     JPanel displayWithNames;
@@ -1009,8 +1010,14 @@ public class ValueChart extends JPanel {
         mainPaneWithNames.setLayout(new BoxLayout(mainPaneWithNames, BoxLayout.Y_AXIS));
 
         mainEntryNames = new EntryNamePanel(chartData.getEntryList(), colWidth, mainPane.getDepth(), true, this);
+        commentPanel = new CommentPanel(this);
         JPanel pnlBottom = new JPanel();
         pnlBottom.setLayout(new BoxLayout(pnlBottom, BoxLayout.X_AXIS));
+        Dimension dim = pnlBottom.getMaximumSize();
+        pnlBottom.setPreferredSize(new Dimension(dim.width, EntryNamePanel.ANG_HT + 3));
+        commentPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        mainEntryNames.setAlignmentY(Component.TOP_ALIGNMENT);
+        pnlBottom.add(commentPanel);
         pnlBottom.add(Box.createHorizontalGlue());
         pnlBottom.add(mainEntryNames);
 

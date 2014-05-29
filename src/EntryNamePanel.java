@@ -26,7 +26,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             AffineTransform.getRotateInstance(-Math.PI / 6.0);
     public static Font VLABELFONT = LABELFONT.deriveFont(ANGLEFONT);
     private static final int ANG_WD = 90;
-    private static final int ANG_HT = 50;
+    static final int ANG_HT = 50;
     Vector<String> labelList;
     int panelHeight = 0;
     int colWidth = 0;
