@@ -68,6 +68,8 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         menu.add(menuItem);
         menuItem = new MenuEntry("Open");
         menu.add(menuItem);
+        menuItem = new MenuEntry("Change User");
+        menu.add(menuItem);
         menu.addSeparator();
         menuItem = new MenuEntry("Save"); 
         //Added to email the individual VC
@@ -234,7 +236,11 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 			ValueChartsPlus.chart = chart;
 			ValueChartsPlus.showStartView();
 		}
-		
+        
+		if ("Change User".equals(ae.getActionCommand())){
+            changeUser();
+        }
+        
 		if ("Save".equals(ae.getActionCommand())){
 			saveFile();
 		}	
@@ -471,13 +477,19 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		      }
 		}
 	}
+	
+	void changeUser(){
+        String username = (String)JOptionPane.showInputDialog(this, "Username: ", "Change user", 
+                JOptionPane.PLAIN_MESSAGE, null, null, chart.getUsername());
+        chart.setUsername(username);
+    }
 
 	void saveFile(){
 		File file;
 		int ans = JOptionPane.YES_OPTION;
 		chart.setConnectingFields();
 	    String filename = (String)JOptionPane.showInputDialog(this, "ValueChart name: ", "Save ValueChart", 
-	    		JOptionPane.PLAIN_MESSAGE, null, null, ".vc");
+	    		JOptionPane.PLAIN_MESSAGE, null, null, chart.getUsername() + ".vc");
 	    if ((filename != null) && (filename.length() > 0)) {
 	    	file = new File(filename);
 	    	if (file.exists()){

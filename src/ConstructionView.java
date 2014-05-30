@@ -47,6 +47,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     ColorList colors; // vc primitive objective colors
     Vector<JObjective> obj_list; // can represent all possible objectives (columns of table)
     Vector<HashMap<String,Object>> alts; // data (rows of table)
+    private String tempUser;
 
     int display_type = DEFAULT_DISPLAY;
     boolean abs = true;
@@ -59,7 +60,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     // Root Objective placement/dimensions: Will determine overall tree view
     static final int OBJ_X = 50, OBJ_Y = 15, OBJ_WIDTH = 500, OBJ_HEIGHT = 30;
 
-    public ConstructionView(int i) {
+    public ConstructionView(int i, String user) {
+        tempUser = user.replaceAll("[^a-zA-Z0-9]+", "");
         chart = null; // at first there will be no chart attached
         type = i;
         obj_list = new Vector<JObjective>();
@@ -212,22 +214,21 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             createDataFile("test.vc", false);
             if (pnlAlternatives.alts.size() > 10)
                 display_type = SIDE_DISPLAY;
-            showChart(true);
+            showChart();
             chart.logConstruction();
         }
     }
 
-    public void showChart(boolean fromCon) {
-        if (fromCon)
-            if (chart != null)
-                chart.closeChart();
+    public void showChart() {
+        if (chart != null)
+            chart.closeChart();
         LogUserAction log = null;
         boolean dispUtil = false;
         if (chart != null) {
             log = chart.getLog();
             dispUtil = chart.displayUtilityWeights;
         }
-        chart = new ValueChart(this, filename, log, ValueChart.DEFAULT_DISPLAY,
+        chart = new ValueChart(this, filename, log, tempUser, ValueChart.DEFAULT_DISPLAY,
                 ValueChart.DEFAULT_COL_WIDTH, true, true, dispUtil); // TODO
         chart.newConst();
     }

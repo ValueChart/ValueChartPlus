@@ -26,6 +26,7 @@ public class ValueChartsPlus extends JPanel
     
     protected JLabel lblFileList;
     protected JTextField txtName; 
+    protected JTextField txtUser;
     protected static JFrame frame;
     
     JList<String> lstFiles;    
@@ -35,6 +36,7 @@ public class ValueChartsPlus extends JPanel
     JButton btnCancel;    
     JPanel pnlButtons;
     JLabel lblName;
+    JLabel lblUser;
     JCheckBox chkAbs;
     
     ConstructionView con;
@@ -91,12 +93,20 @@ public class ValueChartsPlus extends JPanel
         scrList.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
         //Set up file name text field    
-        lblName = new JLabel("ValueChart name:");       
+        lblName = new JLabel("ValueChart name:");      
         txtName = new JTextField(20);   
         txtName.addPropertyChangeListener(this);
         JPanel pnlFileName = new JPanel(new FlowLayout());
         pnlFileName.add(lblName);
         pnlFileName.add(txtName);       
+        
+        lblUser = new JLabel("Username:");       
+        lblUser.setPreferredSize(lblName.getPreferredSize());
+        txtUser = new JTextField(20);   
+        JPanel pnlUserName = new JPanel(new FlowLayout());
+        pnlUserName.add(lblUser);
+        pnlUserName.add(txtUser);  
+        
 
         chkAbs = new JCheckBox("abs");
         chkAbs.setSelected(true);
@@ -125,6 +135,8 @@ public class ValueChartsPlus extends JPanel
         add(Box.createRigidArea(new Dimension(0,5)));
         add(pnlFileName);     
         add(Box.createRigidArea(new Dimension(0,5)));
+        add(pnlUserName);     
+        add(Box.createRigidArea(new Dimension(0,5)));
         add(pnlButtons);
 
         setBorder(BorderFactory.createEmptyBorder(10,10,0,10));
@@ -145,26 +157,30 @@ public class ValueChartsPlus extends JPanel
         	}
         	if (optData.isSelected()){
         		datafilename = lstFiles.getSelectedValue().toString();        	
-        		con = new ConstructionView(ConstructionView.FROM_DATAFILE);
+        		con = new ConstructionView(ConstructionView.FROM_DATAFILE, txtUser.getText());
         		//con.readFile(lstFiles.getSelectedValue().toString());        	
             }
         	else if (optVC.isSelected()){ 
-        		con = new ConstructionView(ConstructionView.FROM_VC);
+        		con = new ConstructionView(ConstructionView.FROM_VC, txtUser.getText());
         		con.filename = lstFiles.getSelectedValue().toString();
         		con.setInit(false);
         		filename = lstFiles.getSelectedValue().toString();
         		if (countEntries(filename) > 10)
         			con.setDisplayType(ConstructionView.SIDE_DISPLAY);
-        		con.showChart(true);
+        		con.showChart();
         		con.filename = "test.vc";	//temp holder for a new filename
         	}
             else if (optNew.isSelected()){
-            	con = new ConstructionView(ConstructionView.NEW_FILE);
+            	con = new ConstructionView(ConstructionView.NEW_FILE, txtUser.getText());
             	//create new file with specified name
             }        	
     	}
-        else if ("btnCancel".equals(e.getActionCommand())) 
-        	System.exit(0);
+        else if ("btnCancel".equals(e.getActionCommand())) {
+            if (chart == null)
+                System.exit(0);
+            else
+                frame.dispose();
+        }
         
     	//what happens when an option is selected
         else if ("optNew".equals(e.getActionCommand())){
@@ -288,7 +304,17 @@ public class ValueChartsPlus extends JPanel
     public static void showStartView() {
         //Create and set up the window.
         frame = new JFrame("ValueCharts Plus");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        WindowListener exitListener = new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (chart == null) {
+                    System.exit(0);
+                }
+            }
+        };
+        frame.addWindowListener(exitListener);
         newContentPane = new ValueChartsPlus();
         frame.setContentPane(newContentPane);      
         frame.pack();

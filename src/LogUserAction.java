@@ -19,13 +19,20 @@ public class LogUserAction {
     private String filename;
     private DateFormat df;
     private int verbosity;
+    private String username = "";
+    private String problem;
     
     private String oldAttrData = "";
     
-    public LogUserAction(String vcName) {
-        df = new SimpleDateFormat("ddMMMyyyy_HHmmss");
+    public LogUserAction(String vcName, String user) {
+        df = new SimpleDateFormat("ddMMMyyyy-HHmmss");
+        problem = vcName;
+        username = user;
         
-        filename = "vc_" + vcName + "_" + df.format(Calendar.getInstance().getTime()) + ".xml";
+        if (username == null || username.isEmpty())
+            filename = "vc_" + problem + "_" + df.format(Calendar.getInstance().getTime()) + ".xml";
+        else
+            filename = "vc_" + problem + "_" + username + "_" + df.format(Calendar.getInstance().getTime()) + ".xml";
         
         df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         setVerbosity(LOG_ALL);
@@ -49,6 +56,36 @@ public class LogUserAction {
 
     public void setOldAttrData(String oldAttrData) {
         this.oldAttrData = oldAttrData;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+    
+    public void setUsername(String user) {
+        this.username = user;
+        
+        String str = "";
+        if (username == null || username.isEmpty())
+            str = "vc_" + problem + "_";
+        else
+            str = "vc_" + problem + "_" + username + "_";
+        
+        filename = filename.replaceFirst(".*_", "");
+        filename = str + filename;
+    }
+    
+    public void setProblem(String prob) {
+        this.problem = prob;
+        
+        String str = "";
+        if (username != null)
+            str = "vc_" + problem + "_" + username + "_";
+        else
+            str = "vc_" + problem + "_";
+        
+        filename = filename.replaceFirst(".*_", "");
+        filename = str + filename;
     }
 
     public static String getDataOutput(Vector<AttributeData> attrData, int outputType) {
@@ -77,7 +114,7 @@ public class LogUserAction {
 
         return data;
     }
-    
+
     public boolean logConstruction(Vector<AttributeData> newAttr) {
         if (verbosity < LOG_MSG) return true;
         try {

@@ -82,11 +82,8 @@ public class ValueChart extends JPanel {
 
 //CONSTRUCTOR
     
-    /*public ValueChart(ValueChart vc) {
-        super();
-    }*/
     
-    public ValueChart(ConstructionView c, String file, LogUserAction l, int type, int colwd, boolean b, boolean g, boolean dispUtil) {
+    public ValueChart(ConstructionView c, String file, LogUserAction l, String user, int type, int colwd, boolean b, boolean g, boolean dispUtil) {
         super();
         show_graph = g;
         con = c;
@@ -95,10 +92,10 @@ public class ValueChart extends JPanel {
         setDisplayType(type);
         displayUtilityWeights = dispUtil;
         
-        constructFromFile(l, colwd);
+        constructFromFile(l, user, colwd);
     }
 
-    public ValueChart(ConstructionView c, String file, LogUserAction l,
+    public ValueChart(ConstructionView c, String file, LogUserAction l, String user, 
             ChartData data, int type, int colwd,
             boolean b, boolean g, boolean dispUtil) {
         super();
@@ -109,15 +106,15 @@ public class ValueChart extends JPanel {
         displayUtilityWeights = dispUtil;
 
         if (data == null)
-            constructFromFile(l, colwd);
+            constructFromFile(l, user, colwd);
         else {
             filename = file;
-            constructFromAttribute(data, l, colwd);
+            constructFromAttribute(data, l, user, colwd);
         }
     }
     
     
-    private void constructFromFile(LogUserAction l, int colwd) {
+    private void constructFromFile(LogUserAction l, String user, int colwd) {
         chartData = new ChartData(this);
         
         menuOptions = new OptionsMenu(this);
@@ -147,11 +144,11 @@ public class ValueChart extends JPanel {
             e.printStackTrace();
         }
 
-        showVC();
+        showVC(user);
         if (l != null) {
             log = l;
         } else {
-            log = new LogUserAction(getChartTitle());
+            log = new LogUserAction(getChartTitle(), user);
             log.setVerbosity(LogUserAction.LOG_ALL);
         }
         if (isNew) {
@@ -165,7 +162,7 @@ public class ValueChart extends JPanel {
     }
     
     
-    private void constructFromAttribute(ChartData data, LogUserAction l, int colwd) {
+    private void constructFromAttribute(ChartData data, LogUserAction l, String user, int colwd) {
         chartData = data;
 
         menuOptions = new OptionsMenu(this);
@@ -192,11 +189,11 @@ public class ValueChart extends JPanel {
                         : displayHeight);
         setVisible(true);
 
-        showVC();
+        showVC(user);
         if (l != null) {
             log = l;
         } else {
-            log = new LogUserAction(getChartTitle());
+            log = new LogUserAction(getChartTitle(), user);
             log.setVerbosity(LogUserAction.LOG_ALL);
         }
         if (isNew) {
@@ -415,7 +412,7 @@ public class ValueChart extends JPanel {
     }
 
     public void newConst() {
-        con = new ConstructionView(ConstructionView.FROM_VC);
+        con = new ConstructionView(ConstructionView.FROM_VC, getUsername());
         setConst();
     }
 
@@ -817,7 +814,7 @@ public class ValueChart extends JPanel {
     }
 
     public void resetDisplay(int type, int colwd, boolean close, boolean graph) {
-        ValueChart ch = new ValueChart(con, filename, log, chartData, type, colwd, true, graph, displayUtilityWeights);
+        ValueChart ch = new ValueChart(con, filename, log, getUsername(), chartData, type, colwd, true, graph, displayUtilityWeights);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -836,7 +833,7 @@ public class ValueChart extends JPanel {
     }
 
     public void compareDisplay(int type, int colwd) {
-        ValueChart ch = new ValueChart(con, filename, log, type, colwd, false, show_graph, displayUtilityWeights); // TODO
+        ValueChart ch = new ValueChart(con, filename, log, getUsername(), type, colwd, false, show_graph, displayUtilityWeights); // TODO
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
@@ -864,8 +861,12 @@ public class ValueChart extends JPanel {
         chartFrame.dispose();
     }
 
-    void showVC() {
-        chartFrame = new JFrame("ValueChart for " + chartTitle);
+    void showVC(String user) {
+        String title = "ValueChart for " + chartTitle;
+        if (user != null && !user.isEmpty()) {
+            title += " (user: " + user + ")";
+        }
+        chartFrame = new JFrame(title);
         chartFrame.getContentPane().setLayout(new BoxLayout(chartFrame.getContentPane(), BoxLayout.Y_AXIS));
         if (displayType == SIDE_DISPLAY) {
             pnlOpt = new SensitivityAnalysisOptions(this);
@@ -1264,5 +1265,21 @@ public class ValueChart extends JPanel {
 
     public void keepCurrentState() {
         chartData.keepCurrentState(this);
+    }
+    
+    public void setUsername(String user) {
+        user = user.replaceAll("[^a-zA-Z0-9]+", "");
+        log.setUsername(user);
+        String title = "ValueChart for " + chartTitle;
+        if (user != null && !user.isEmpty()) {
+            title += " (user: " + user + ")";
+        }
+        if (chartFrame != null) {
+            chartFrame.setTitle(title);
+        }
+    }
+    
+    public String getUsername() {
+        return log.getUsername();
     }
 }

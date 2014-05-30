@@ -22,7 +22,7 @@ public class CommentPanel extends JPanel {
     }
     
     public void buildDisplay() {
-        inputButton = new JButton("Add Comment");
+        inputButton = new JButton("Comment");
         inputButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event){
                 logComment(sanitizeXmlChars(userInputField.getText()));
