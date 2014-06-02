@@ -230,6 +230,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         }
         chart = new ValueChart(this, filename, log, tempUser, ValueChart.DEFAULT_DISPLAY,
                 ValueChart.DEFAULT_COL_WIDTH, true, true, dispUtil); // TODO
+        ValueChartsPlus.chart = chart;
         chart.newConst();
     }
 
