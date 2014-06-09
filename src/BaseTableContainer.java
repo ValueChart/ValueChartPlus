@@ -127,8 +127,10 @@ public class BaseTableContainer extends Box implements ActionListener {
         if (width != -1) {
             if (chart.getChartTitle().equals(name) || chart.getChartTitle().equals(name.replace('_', ' '))) {
                 dimhead.width = 0; //hides the root/main/left/core/chart/title/primary container. 
+            } else if (table instanceof AttributeCell){
+                dimhead.width = chart.headerWidth;
             } else {
-            dimhead.width = chart.headerWidth;
+                dimhead.width = chart.headerWidth/2;
             }
         }
         preferredHeaderWidth = dimhead.width;
@@ -345,8 +347,8 @@ public class BaseTableContainer extends Box implements ActionListener {
         //long pct = Math.round(s * 100);
         Double pct_d = s * 100.0;
         
-        DecimalFormat twoDForm = new DecimalFormat("#.##");
-        Double pct = Double.valueOf(twoDForm.format(pct_d));
+        DecimalFormat oneDForm = new DecimalFormat("#.#");
+        Double pct = Double.valueOf(oneDForm.format(pct_d));
         
 //        String pct = String.format("%.2f", Double.valueOf(pct_d).toString());
 //        System.out.println(name+" "+heightRatio+" "+heightScale);
@@ -377,11 +379,11 @@ public class BaseTableContainer extends Box implements ActionListener {
                     }
                 }
             }
-            range = "<br><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[" + (best.isEmpty() ? "" : "BEST: " + best) 
-                    + (worst.isEmpty() ? "" : " WORST: " + worst) + "]</small>";
+            range = "<br><small>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[" + (worst.isEmpty() ? "" : "WORST: " + worst) 
+                    + (best.isEmpty() ? "" : " BEST: " + best) + "]</small>";
         }
         
-        if (getHeight() < 30) {
+        if (getHeight() < 40) {
             header.setText("   " + name.replace('_', ' ') + " (" + pct + "%)");
         } else {
             header.setText("<html><left>" + "&nbsp;&nbsp;&nbsp;" + name.replace('_', ' ') + " (" + pct + "%)" + range + "</left></html>");
@@ -417,7 +419,7 @@ public class BaseTableContainer extends Box implements ActionListener {
         if (table instanceof AttributeCell) {
             int d = ((TablePane) getParent()).getDepth();
             if (d != 1) {
-                Dimension dim = new Dimension(((d - 1) + 1) * chart.headerWidth, header.getSize().height);
+                Dimension dim = new Dimension((d + 1) * chart.headerWidth/2, header.getSize().height);
                 header.setPreferredSize(dim);
                 header.setMaximumSize(dim);
             }

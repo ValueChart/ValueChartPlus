@@ -31,7 +31,6 @@ class SensitivityAnalysisOptions extends JPanel implements ActionListener{
 		Font font = new Font("Arial", Font.PLAIN, 11);
 		
 		// set up drop-down selection box
-		// TODO JRE 6 or 7? getting rawtype warning
 		selectMode = new JComboBox<String>(selectOpt);
 		selectMode.setSelectedIndex(0);
 		selectMode.setActionCommand("select");

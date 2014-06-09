@@ -30,7 +30,7 @@ public class ValueChart extends JPanel {
             SEPARATE_DISPLAY = 3;
     static public final Color gridColor = new Color(150, 150, 150); // between lightgray and gray
     
-    int headerWidth = 250;
+    int headerWidth = 300;
     int graphWidth = 100;
     int displayType = DEFAULT_DISPLAY;
     int displayHeight = DEFAULT_DISPLAY_HEIGHT;
@@ -1062,6 +1062,7 @@ public class ValueChart extends JPanel {
         displayPanel.setRootPane(mainPane);
         displayPanel.setEntries(chartData.getEntryList());
 
+        int headerDepth = (mainPane.getDepth()) * headerWidth/2;
 
         pnlDisp = new JPanel();
         pnlDisp.setLayout(new BoxLayout(pnlDisp, BoxLayout.X_AXIS));
@@ -1073,8 +1074,8 @@ public class ValueChart extends JPanel {
             pnlOpt.setAlignmentX(Component.LEFT_ALIGNMENT);
             pnlDisp.add(pnlOpt);
             //Note: subtracted 1 from mainPane depth, this might cause a problem if there is only one level.
-            pnlOpt.setPreferredSize(new Dimension((mainPane.getDepth() - 1) * headerWidth - colWidth + (show_graph ? graphWidth : 0), displayHeight));
-            pnlOpt.setMaximumSize(new Dimension((mainPane.getDepth() - 1) * headerWidth - colWidth, displayHeight));
+            pnlOpt.setPreferredSize(new Dimension(headerDepth - colWidth + (show_graph ? graphWidth : 0), displayHeight));
+            pnlOpt.setMaximumSize(new Dimension(headerDepth - colWidth, displayHeight));
         }
         pnlDisp.add(Box.createHorizontalGlue());
         pnlDisp.add(displayPanel);
@@ -1104,10 +1105,10 @@ public class ValueChart extends JPanel {
 
         graphWidth = (show_graph ? graphWidth : 0);
 
-        mainPaneWithNames.setMaximumSize(new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, 10000));
-        mainPaneWithNames.setMinimumSize(new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, 0));
+        mainPaneWithNames.setMaximumSize(new Dimension(mainWidth + headerDepth + graphWidth, 10000));
+        mainPaneWithNames.setMinimumSize(new Dimension(mainWidth + headerDepth + graphWidth, 0));
         mainPaneWithNames.setPreferredSize(
-                new Dimension(mainWidth + ((mainPane.getDepth() -1) * headerWidth) + graphWidth, displayType == SIDE_DISPLAY ? displayHeight * 2 - 50 : displayHeight));
+                new Dimension(mainWidth + headerDepth + graphWidth, displayType == SIDE_DISPLAY ? displayHeight * 2 - 50 : displayHeight));
 
         int w = ((displayType == SIDE_DISPLAY) ? mainWidth + 40 : dispWidth) + colWidth;//no real reason why it's 40
 
@@ -1116,9 +1117,9 @@ public class ValueChart extends JPanel {
             displayWithNames.setMinimumSize(new Dimension(w, 0));
             displayWithNames.setPreferredSize(new Dimension(w, displayHeight * 2 - 50));
         } else {
-            displayWithNames.setMaximumSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, 10000));//- and rev x, y
-            displayWithNames.setMinimumSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, 0));//- and rev x, y
-            displayWithNames.setPreferredSize(new Dimension(w + (mainPane.getDepth() -1) * headerWidth + graphWidth, displayHeight-50));//- and rev x, y
+            displayWithNames.setMaximumSize(new Dimension(w + headerDepth + graphWidth, 10000));//- and rev x, y
+            displayWithNames.setMinimumSize(new Dimension(w + headerDepth + graphWidth, 0));//- and rev x, y
+            displayWithNames.setPreferredSize(new Dimension(w + headerDepth + graphWidth, displayHeight-50));//- and rev x, y
             // seems to work with -50 to get rid of unnecessary padding. TODO resize is weird
         }
         mainPane.updateSizesAndHeights();
