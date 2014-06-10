@@ -481,7 +481,8 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 	void changeUser(){
         String username = (String)JOptionPane.showInputDialog(this, "Username: ", "Change user", 
                 JOptionPane.PLAIN_MESSAGE, null, null, chart.getUsername());
-        chart.setUsername(username);
+        if (username != null)
+        	chart.setUsername(username);
     }
 
 	void saveFile(){
