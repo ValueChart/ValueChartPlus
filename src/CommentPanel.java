@@ -1,4 +1,5 @@
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
@@ -22,7 +23,8 @@ public class CommentPanel extends JPanel {
     }
     
     public void buildDisplay() {
-        inputButton = new JButton("Comment");
+        inputButton = new JButton("Log Comment");
+        inputButton.setFont(new Font("Verdana", Font.PLAIN, 10));
         inputButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event){
                 logComment(sanitizeXmlChars(userInputField.getText()));
