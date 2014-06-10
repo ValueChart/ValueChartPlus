@@ -7,8 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -54,6 +57,8 @@ class OptionsMenu extends JMenuBar implements ActionListener{
     MenuEntry menuRedo;
     ValueChart chart;
     Font font; 
+    
+    public static final String pwdFilename = "email.txt";
     
     OptionsMenu(ValueChart ch){
     	chart = ch;    	
@@ -401,8 +406,26 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		      // Sender's email ID needs to be mentioned
 		      final String from = "valuechartsplus@gmail.com";
 		      
-		      //Sender's password
-		      final String pwd = "charts@v";
+		      //Get sender password from text file, if exists
+		      String pwd = "";
+		      try {
+		          Path path = Paths.get(pwdFilename); 
+		          Scanner pwdFile = new Scanner(path);
+		          if (pwdFile != null && pwdFile.hasNext()) {
+		              pwd = pwdFile.next();
+		          } else {
+		              pwd = (String)JOptionPane.showInputDialog(this, "Password for " + from + ": ", "Password required", 
+		                      JOptionPane.PLAIN_MESSAGE, null, null, "");
+		          }
+		          pwdFile.close();
+		          if (pwd == null || pwd.length() <= 0)
+		              return;
+		      } catch (IOException ex) {
+		          pwd = (String)JOptionPane.showInputDialog(this, "Password for " + from + ": ", "Password required", 
+                          JOptionPane.PLAIN_MESSAGE, null, null, "");
+		          if (pwd == null || pwd.length() <= 0)
+                      return;
+		      }
 		      
 		      // Assuming you are sending email from localhost
 		      String host = "smtp.gmail.com";
@@ -424,10 +447,12 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 
 		      // Get the default Session object.
 //		      Session session = Session.getDefaultInstance(props);
+		      
+		      final String pwdSend = pwd;
 		      Session session = Session.getDefaultInstance(props,  
 		    		    new javax.mail.Authenticator() {
 		    		       protected PasswordAuthentication getPasswordAuthentication() {  
-		    		       return new PasswordAuthentication(from,pwd);  
+		    		       return new PasswordAuthentication(from,pwdSend);  
 		    		   }  
 		    		   });
 
