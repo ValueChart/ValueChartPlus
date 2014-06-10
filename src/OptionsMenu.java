@@ -396,14 +396,14 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 			
 //			sendEmail(selectedVC);
 			// Recipient's email ID needs to be mentioned.
-		      String to = "sanzana05@gmail.com";
+		      String to = "valuechartsplus@gmail.com";
 
 		      // Sender's email ID needs to be mentioned
 		      final String from = "valuechartsplus@gmail.com";
 		      
 		      //Sender's password
 		      final String pwd = "charts@v";
-
+		      
 		      // Assuming you are sending email from localhost
 		      String host = "smtp.gmail.com";
 
