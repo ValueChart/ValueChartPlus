@@ -942,6 +942,7 @@ public class BaseTableContainer extends Box implements ActionListener {
             }
             chart.updateMainPane();
             realignAll(chart.mainPane);
+            chart.mainPane.updateSizesAndHeights();
             chart.logPump(base.getName(), up);
         }
         //-double-click for sorting by objective: call to reorder	
