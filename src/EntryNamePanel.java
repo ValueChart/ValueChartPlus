@@ -18,14 +18,8 @@ import org.icepdf.ri.common.views.DocumentViewControllerImpl;
 public class EntryNamePanel extends JPanel implements ActionListener {
 
     private static final long serialVersionUID = 1L;
-//    public static Font LABELFONT = new Font("Verdana", Font.BOLD, 15);
-    public static Font LABELFONT = new Font("Verdana", Font.PLAIN, 12);
-    public static final AffineTransform NINETY =
-            new AffineTransform(0.0, -1.0, 1.0, 0.0, 0.0, 0.0);
-    public static final AffineTransform ANGLEFONT =
-            AffineTransform.getRotateInstance(-Math.PI / 6.0);
-    public static Font VLABELFONT = LABELFONT.deriveFont(ANGLEFONT);
-    private static final int ANG_WD = 90;
+    public static Font LABELFONT = new Font("Verdana", Font.BOLD, 16);
+    private static final int ANG_WD = 50;
     static final int ANG_HT = 50;
     Vector<String> labelList;
     int panelHeight = 0;
@@ -75,25 +69,25 @@ public class EntryNamePanel extends JPanel implements ActionListener {
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(Color.BLACK);
-        g.setFont(VLABELFONT);
+        g.setFont(LABELFONT);
         for (int i = 0; i < labelList.size(); ++i) {
             if (i == mousedOver) {
                 g.setColor(Color.GRAY);
             } else {
                 g.setColor(Color.BLACK);
             }
-            g.drawString(labelList.get(i).toString(), (i * colWidth) + (30 + ((int) (colWidth - 30) / 2)), ANG_HT); //center the entry name
+            g.drawString("(" + (i+1) + ")", ((i+1) * colWidth) + ((int) (colWidth) / 2) - LABELFONT.getSize(), LABELFONT.getSize());
             g.setColor(Color.GRAY);
-            g.drawLine((i * colWidth), ANG_HT, (i * colWidth) + ANG_WD, 0);
+            if (i != 0)
+                g.drawLine(((i+1) * colWidth)-1, LABELFONT.getSize(), ((i+1) * colWidth)-1, 0);
             if (chart.getEntryList().get(i).getIsMarked()) {
                 g.setColor(Color.blue);
                 //code a polygon or something
                 g.drawString(labelList.get(i).toString(), (i * colWidth) + 21, ANG_HT - 1);
             }
         }
-        g.drawLine((labelList.size() * colWidth), ANG_HT, (labelList.size() * colWidth) + ANG_WD, 0);
-        g.drawLine(ANG_WD, 0, (labelList.size() * colWidth) + ANG_WD, 0);
-        g.drawLine(0, ANG_HT, (labelList.size() * colWidth), ANG_HT);
+        g.setColor(Color.BLACK);
+        g.drawString("Alternatives", (labelList.size() * colWidth)/2, ANG_HT-10);
     }
 
     void createPopup() {
@@ -265,16 +259,17 @@ public class EntryNamePanel extends JPanel implements ActionListener {
     public Dimension getPreferredSize() {
         return new Dimension(labelList.size() * colWidth + ANG_WD, ANG_HT + 3);
     }
+    
     int rightClicked = -1;
+    int idx = -1;
 
     class MouseHandler extends MouseInputAdapter {
-
-        int idx = 0;
-
         public void mousePressed(MouseEvent me) {
             //(chart.entryList.get(idx)).setShowFlag(true);	
             if (idx != -1) {
                 chart.showDomainVals(idx);
+            } else {
+                chart.showAlternativeLegend();
             }
             //System.out.println("IDX___________ " + idx);
             chart.updateAll();
@@ -299,17 +294,9 @@ public class EntryNamePanel extends JPanel implements ActionListener {
 
         public void mouseMoved(MouseEvent me) {
             int inc = ANG_WD / 4;
-            int hity = 0;
             int y = getHeight() / 4;
-            for (int i = 0; i < 4; i++) {
-                if (me.getY() > (i * y) && me.getY() < (i + 1) * y) {
-                    hity = (3 - i) * inc;
-                    break;
-                }
-            }
             for (int i = 0; i < labelList.size(); i++) {
-                if (me.getX() > ((i * colWidth) + hity) && me.getX()
-                        < ((i * colWidth) + hity + colWidth)) {
+                if (me.getX() > ((i+1)*colWidth) && me.getX() < ((i+1)*colWidth) + colWidth) {
                     idx = i;
                     
                     EntryNamePanel.this.setToolTipText("<html><blockquote><left><font size=\"4\">" + labelList.get(i).toString().replace('_', ' ') + "</left></blockquote></html>");
@@ -324,12 +311,14 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             if (me.getY() < 3 || me.getY() > getHeight() - 3) {
                 mousedOver = -1;
             }
+            chart.selectAlternativeLegend(mousedOver);
 
             repaint();
         }
 
         public void mouseExited(MouseEvent me) {
             mousedOver = -1;
+            idx = -1;
             repaint();
         }
     }

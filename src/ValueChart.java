@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
 
 import java.util.*;
 import java.io.*;
@@ -61,7 +62,7 @@ public class ValueChart extends JPanel {
     boolean show_graph = true;
     int sa_dir = BaseTableContainer.UP;
     SensitivityAnalysisOptions pnlOpt;
-    public DomainValues pnlDom;
+    public DetailsViewPanel pnlDom;
     OptionsMenu menuOptions;
     boolean isNew = true;
     private Stack<LastInteraction> undo_int;
@@ -70,6 +71,7 @@ public class ValueChart extends JPanel {
     LogUserAction log;
     boolean displayUtilityWeights = false;
     private ChartData chartData;
+    AlternativeMouseHandler mh = new AlternativeMouseHandler();
 
     
     //***Added so that there is one frame that allows display of pdf reports from value chart. This window is not used for each of the attribute/entry reports.
@@ -94,6 +96,8 @@ public class ValueChart extends JPanel {
         displayUtilityWeights = dispUtil;
         
         constructFromFile(l, user, colwd);
+        addMouseListener(mh);
+        showAlternativeLegend();
     }
 
     public ValueChart(ConstructionView c, String file, LogUserAction l, String user, 
@@ -112,6 +116,8 @@ public class ValueChart extends JPanel {
             filename = file;
             constructFromAttribute(data, l, user, colwd);
         }
+        addMouseListener(mh);
+        showAlternativeLegend();
     }
     
     
@@ -935,6 +941,15 @@ public class ValueChart extends JPanel {
         pnlDom.showData(c);
     }
 
+    public void showAlternativeLegend() {
+        if (pnlDom != null)
+            pnlDom.showAlternativeLegend();
+    }
+    
+    public void selectAlternativeLegend(int idx) {
+        if (pnlDom != null)
+            pnlDom.highLightAlternative(idx);
+    }
     
     void addInteraction(LastInteraction last) {
         undo_int.push(last);
@@ -1066,7 +1081,7 @@ public class ValueChart extends JPanel {
 
         pnlDisp = new JPanel();
         pnlDisp.setLayout(new BoxLayout(pnlDisp, BoxLayout.X_AXIS));
-        pnlDom = new DomainValues(this);
+        pnlDom = new DetailsViewPanel(this);
         if (displayType == SIDE_DISPLAY) {
             pnlDisp.add(Box.createHorizontalGlue());
         } else {
@@ -1300,5 +1315,20 @@ public class ValueChart extends JPanel {
     
     public String getUsername() {
         return log.getUsername();
+    }
+    
+    
+    class AlternativeMouseHandler extends MouseInputAdapter {
+        public void mousePressed(MouseEvent me) {
+            if (mainEntryNames.idx == -1) {
+                showAlternativeLegend();
+            }
+        }
+
+        public void mouseMoved(MouseEvent me) {
+        }
+
+        public void mouseExited(MouseEvent me) {
+        }
     }
 }
