@@ -199,7 +199,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		    if ((new_name != null) && (new_name.length() > 0)) {  
 		        JObjective lblNew = new JObjective(new_name);	        
 				DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(lblNew);			        
-				addToTree(new_node, lblSel, true);
+				addToTree(new_node, lblSel, true, true);
 				lblNew.setTransferHandler(new ObjectiveTransferHandler());
 				lblNew.addMouseListener(mhandler);		
 		    }	    
@@ -223,16 +223,16 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(ch);
 		findNode(par);
 		JObjective parentobj = (JObjective)found_node.getUserObject();
-		addToTree(childNode, parentobj, true);
+		addToTree(childNode, parentobj, true, false);
 		ch.setTransferHandler(new ObjectiveTransferHandler());
 		ch.addMouseListener(mhandler);	
 	}
 	
-	void addToTree(DefaultMutableTreeNode new_node, JObjective obj2, boolean addToModel){
+	void addToTree(DefaultMutableTreeNode new_node, JObjective obj2, boolean addToModel, boolean atEnd){
 		//add JObjective to tree		
 		counter++;
 		if (addToModel)
-			tree_model.insertNodeInto(new_node, found_node, found_node.getChildCount());
+			tree_model.insertNodeInto(new_node, found_node, (atEnd ? found_node.getChildCount() : 0) );
 		JObjective obj1 = (JObjective)new_node.getUserObject();
 		//display new JObjective
 		int x1 = obj2.getX(),		//should be dropped on obj
@@ -251,7 +251,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
             pnlCon.validateTabs();      
         //this cascades the children for DnD: repaints the labels but does change model 
 		for (int i=0; i<new_node.getChildCount(); i++){
-			addToTree((DefaultMutableTreeNode)new_node.getChildAt(i), obj1, false);
+			addToTree((DefaultMutableTreeNode)new_node.getChildAt(i), obj1, false, atEnd);
 		}		
 	}
 			
@@ -588,7 +588,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 							else
 								node1 = found_node;
 							findNode(obj2.getName());
-							addToTree(node1, (JObjective)found_node.getUserObject(), true);						
+							addToTree(node1, (JObjective)found_node.getUserObject(), true, true);						
 						}
 					}
 				}
