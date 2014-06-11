@@ -312,7 +312,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
                         < ((i * colWidth) + hity + colWidth)) {
                     idx = i;
                     
-                    EntryNamePanel.this.setToolTipText("<html><blockquote><left><font size=\"6\">" + labelList.get(i).toString().replace('_', ' ') + "</left></blockquote></html>");
+                    EntryNamePanel.this.setToolTipText("<html><blockquote><left><font size=\"4\">" + labelList.get(i).toString().replace('_', ' ') + "</left></blockquote></html>");
                     
                     break;
                 }

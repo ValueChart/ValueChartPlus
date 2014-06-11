@@ -35,6 +35,9 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     JPanel pnl;
     boolean modified = false;
     boolean fromChart = false; // graph opened by clicking on chart interface
+    
+    int width = 400;
+    int height = 320;
 
     public ContinuousUtilityGraph(ValueChart ch, boolean fromCh, ContinuousAttributeDomain dd, double[] it, double[] we, String un, String att, DefineValueFunction d, AttributeCell ac) {
        	
@@ -73,7 +76,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     void plotPoints(){
         //Creating all the points of utility
         for(int i = 0; i < items.length; i++){
-        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+50, ((int) (200 - (weights[i] * 200) + 5)));
+        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+50, ((int) ((height-60) - (weights[i] * (height-60)) + 5)));
             //p[i] = new MoveablePoint(((Incre * i) + 50), ((int) (200 - (weights[i] * 200) + 5)));
         }
         
@@ -86,7 +89,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     
     void setGraph(){
         pnl = new JPanel();
-        this.setPreferredSize(new Dimension(275,260));        
+        this.setPreferredSize(new Dimension(width,height));        
         pnl.add(this, BorderLayout.CENTER);
     }
     
@@ -96,7 +99,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
 
     public void mouseClicked(MouseEvent me) { 
         modified = true;
-        if((me.getX()< 40) && (me.getX() > 0) && (me.getY() > 240)){
+        if((me.getX()< 40) && (me.getX() > 0) && (me.getY() > height-20)){
             for(int i = 0; i < undo.length; i++){
             cdomain.removeKnot(items[i]);
             cdomain.addKnot(items[i], undo[i]);
@@ -104,7 +107,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
        
          //Updating the weight
         for(int i = 0; i < items.length; i++){
-        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+50, ((int) (200 - (weights[i] * 200) + 5)));
+        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+50, ((int) (height-60 - (weights[i] * (height-60)) + 5)));
         }
             
         //Rejoining the lines
@@ -118,7 +121,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         }
         
         
-        if((me.getX()< 275) && (me.getX() > 210) && (me.getY() > 240)){
+        if((me.getX()< width) && (me.getX() > width-65) && (me.getY() > height-20)){
             
         for(int i = 0; i < undo.length; i++){
             cdomain.removeKnot(items[i]);
@@ -127,7 +130,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
        
          //Updating the weight
         for(int i = 0; i < items.length; i++){
-        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+50, ((int) (200 - (weights[i] * 200) + 5)));
+        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+50, ((int) (height-60 - (weights[i] * (height-60)) + 5)));
         }
             
         //Rejoining the lines
@@ -191,12 +194,12 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     }
     
     public void mouseDragged(MouseEvent me) {
-        if(me.getY() < 205 && me.getY() > 5){
+        if(me.getY() < height-55 && me.getY() > 5){
             movePoint(xaxis, me.getY());
         }
         else{
-            if(me.getY() > 205){
-                movePoint(xaxis, 205);
+            if(me.getY() > height-55){
+                movePoint(xaxis, height-55);
             }
             else if(me.getY() < 5){
                 movePoint(xaxis,5);
@@ -216,7 +219,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         repaint();
         
         cdomain.removeKnot(items[clicki]);
-        cdomain.addKnot(items[clicki],((float) (205 - y) / 200));
+        cdomain.addKnot(items[clicki],((float) (height-55 - y) / (height-60)));
         
         if (acell != null && acell.cg != null)
             acell.cg.plotPoints();
@@ -250,7 +253,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         
         for(int i = 0; i < items.length; i++){
             if (chart != null && chart.displayUtilityWeights) {
-                Float test = new Float((205 - p[i].y) / 2);
+                Float test = new Float((height-55 - p[i].y) / 2);
                 temp = test.toString();
                 g.drawString(temp, (p[i].x + 5),p[i].y);
             }
@@ -274,8 +277,8 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
             g.draw(s[i]);
         }
         //Draw the Line axis
-        g.drawLine(50, 5, 50, 205); //y-axis
-        g.drawLine(50, 205, 260, 205); //x-axis
+        g.drawLine(50, 5, 50, height-55); //y-axis
+        g.drawLine(50, height-55, width-15, height-55); //x-axis
         //Draw the static labels
         g.setFont(new Font(null, Font.BOLD, 12));
 //        String utility_upper_bound = new String("1");
@@ -285,13 +288,13 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         String utility_upper_bound = new String("Best");
         g.drawString(utility_upper_bound, 10, 15);
         String utility_lower_bound = new String("Worst");
-        g.drawString(utility_lower_bound, 10, 205);
+        g.drawString(utility_lower_bound, 10, height-55);
         
         //Drawing the labels from variables passed
          g.setFont(new Font(null, Font.BOLD, 12));
          int len = (attributeName + " (" + unit + ")").length();
          g.setFont(new Font(null, Font.BOLD, 13));
-        g.drawString((attributeName + " (" + unit + ")"), 150 - 3 * len ,240);
+        g.drawString((attributeName + " (" + unit + ")"), width/2 - 3 * len ,height-20);
         //Labelling different utilities
         for(int i = 0; i < items.length; i++){
            if((weights[i] == 0.0) || (weights[i] == 1.0)){
@@ -303,9 +306,9 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
            
            if (acell != null) {
                DecimalFormat df = acell.obj.decimalFormat;
-               g.drawString((df.format(items[i])),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+40 ,220);
+               g.drawString((df.format(items[i])),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-40);
            } else {
-               g.drawString(Double.valueOf(items[i]).toString(),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*200))+40 ,220);
+               g.drawString(Double.valueOf(items[i]).toString(),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-40);
            }
                
         }	
@@ -313,8 +316,8 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         //Drawing the Undo and Redo button
         g.setColor(Color.RED);
         g.setFont(new Font(null, Font.PLAIN, 12));
-        g.drawString("UNDO", 2, 255);
-        g.drawString("REDO", 235, 255);
+        g.drawString("UNDO", 2, height-5);
+        g.drawString("REDO", width-40, height-5);
         
     }
         
@@ -331,7 +334,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         });
         //ContinuousUtilityGraph moving = new ContinuousUtilityGraph();
         //moving
-        this.setPreferredSize(new Dimension(275,260));
+        this.setPreferredSize(new Dimension(width,height));
 //        this.setPreferredSize(new Dimension(500,500));
         
         frame.getContentPane().add(this, BorderLayout.CENTER);

@@ -40,6 +40,9 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     public static Font VLABELFONT = LABELFONT.deriveFont(ANGLEFONT);
     public static Font VLABELFONT_BOLD = LABELFONT_BOLD.deriveFont(ANGLEFONT);
     
+    int width = 400;
+    int height = 320;
+    
     int getSpacing(int i){
     	int sp = 0;
     	if (items.length > 2)
@@ -91,15 +94,15 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     }
     
     void plotPoints(){
-        Incre = 240 / items.length; // This is the variable that calculate how far each point should be.
+        Incre = (width - 120) / (items.length-1); // This is the variable that calculate how far each point should be.
         //Creating all the points of utility
         for(int i = 0; i < items.length; i++){
-            p[i] = new MoveablePoint(((Incre * i) + getSpacing(i)), ((int) (200 - (weights[i] * 200) + 5)));
+            p[i] = new MoveablePoint(((Incre * i) + getSpacing(i)), ((int) (height - 60 - (weights[i] * (height-60)) + 5)));
         }
         
         //Making the basepoints
         for(int i = 0; i < items.length; i++){
-            base[i] = new MoveablePoint(((Incre * i) + getSpacing(i)), 205);
+            base[i] = new MoveablePoint(((Incre * i) + getSpacing(i)), height - 55);
         }
         
         //Joining all the points into lines
@@ -110,8 +113,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     
     void setGraph(){
         pnl = new JPanel();
-        this.setPreferredSize(new Dimension(275,260));
-//        this.setPreferredSize(new Dimension(500,500));
+        this.setPreferredSize(new Dimension(width,height));
         pnl.add(this, BorderLayout.CENTER);
     }
 
@@ -121,9 +123,9 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     
     public void mouseClicked(MouseEvent me) {
         modified = true;
-        if((me.getX()< 40) && (me.getX() > 0) && (me.getY() > 240)){
+        if((me.getX()< 40) && (me.getX() > 0) && (me.getY() > height-20)){
             undone = true;
-            int Incre = 240 / items.length; // This is the variable that calculate how far each point should be.
+            int Incre = (width-35) / items.length; // This is the variable that calculate how far each point should be.
             for(int i = 0; i < items.length; i++){
                 redo.removeElement(items[i]);
                 redo.addElement(items[i],ddomain.getEntryWeight(items[i]));
@@ -136,7 +138,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
             
             //Updating the weight
             for(int i = 0; i < items.length; i++){
-                p[i] = new MoveablePoint(((Incre * i) + getSpacing(i)), ((int) (200 - (undo.getEntryWeight(items[i]) * 200) + 5)));
+                p[i] = new MoveablePoint(((Incre * i) + getSpacing(i)), ((int) (height-60 - (undo.getEntryWeight(items[i]) * (height-60)) + 5)));
             }
             
             for(int i = 0; i < items.length; i++){
@@ -148,8 +150,8 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
             	chart.updateAll();
         }
         
-        if((me.getX()< 250) && (me.getX() > 210) && (me.getY() > 240) && (undone == true)){
-            int Incre = 240 / items.length; // This is the variable that calculate how far each point should be.
+        if((me.getX()< width-25) && (me.getX() > width-65) && (me.getY() > height-20) && (undone == true)){
+            int Incre = (width-35) / items.length; // This is the variable that calculate how far each point should be.
             undone = false;
             for(int i = 0; i < items.length; i++){
                 ddomain.removeElement(items[i]);
@@ -157,7 +159,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
             }
             
             for(int i = 0; i < items.length; i++){
-                p[i] = new MoveablePoint(((Incre * i) + getSpacing(i)), ((int) (200 - (redo.getEntryWeight(items[i]) * 200) + 5)));
+                p[i] = new MoveablePoint(((Incre * i) + getSpacing(i)), ((int) (height-60 - (redo.getEntryWeight(items[i]) * (height-60)) + 5)));
             }
             
             //Rejoining the lines
@@ -203,7 +205,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
             }
                 
                 undo.removeElement(items[clicki]);
-                undo.addElement(items[clicki],((float)(205 - me.getY())) / 200);
+                undo.addElement(items[clicki],((float)(height-55 - me.getY())) / (height-60));
                 movePoint(xaxis, me.getY());
                 return;
             }
@@ -221,12 +223,12 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     }
     
     public void mouseDragged(MouseEvent me) {
-        if(me.getY() < 205 && me.getY() > 5){
+        if(me.getY() < height-55 && me.getY() > 5){
             movePoint(xaxis, me.getY());
         }
         else{
-            if(me.getY() > 205){
-                movePoint(xaxis, 205);
+            if(me.getY() > height-55){
+                movePoint(xaxis, height-55);
             }
             else if(me.getY() < 5){
                 movePoint(xaxis,5);
@@ -249,7 +251,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
 	    //ddomain.removeElement(items[clicki]);
 	    //ddomain.addElement(items[clicki],((float) (205 - y) / 200));
         
-	    ddomain.changeWeight(items[clicki],((float) (205 - y) / 200));
+	    ddomain.changeWeight(items[clicki],((float) (height-55 - y) / (height-60)));
 	    if (acell != null && acell.dg != null)
 	        acell.dg.plotPoints();
 	    //Update Value Chart
@@ -288,7 +290,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         g.setColor(Color.DARK_GRAY);
         for(int i = 0; i < items.length; i++){
             if (chart != null && chart.displayUtilityWeights) {
-                Float test = new Float((205 - p[i].y) / 2); //converted domain values
+                Float test = new Float((height-55 - p[i].y) / 2); //converted domain values
                 temp = test.toString();
                 g.drawString(temp, (p[i].x + 5),p[i].y);
             }
@@ -310,8 +312,8 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
             g.draw(s[i]);
         }
         //Draw the Line axis
-        g.drawLine(50, 5, 50, 205); //y-axis
-        g.drawLine(50, 205, 260, 205); //x-axis
+        g.drawLine(50, 5, 50, height-55); //y-axis
+        g.drawLine(50, height-55, width-15, height-55); //x-axis
         
         //Draw the static labels
         g.setFont(new Font(null, Font.BOLD, 12));
@@ -322,12 +324,12 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
 //        String utility_lower_bound = new String("0");
         String utility_lower_bound = new String("Worst");
 //        g.drawString(utility_lower_bound, 35, 205);
-        g.drawString(utility_lower_bound, 10, 205);
+        g.drawString(utility_lower_bound, 10, height-55);
         
         //Drawing the labels from variables passed
         g.setFont(new Font(null, Font.BOLD, 13));
-        g.drawString(attributeName, 150 - 3*attributeName.length() ,240);
-        Incre = 240 / items.length; // This is the variable that calculate how far each point should be.
+        g.drawString(attributeName, width/2 - 3*attributeName.length() ,height-20);
+        Incre = (width - 120) / (items.length-1); // This is the variable that calculate how far each point should be.
         //Labelling different utilities
         weights = ddomain.getWeights();
         for(int i = 0; i < items.length; i++){
@@ -344,15 +346,14 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
 //            	items[i] = cut.substring(0,10).concat("\n").concat(cut.substring(10,cut.length()));
 //            }
 //          g.drawString(items[i], (((Incre * i) + getSpacing(i) - 3 * (items[i].length()))) + (30 + ((int) (p[i].x - 30) / 2)), ANG_HT);
-            g.drawString(items[i],(((Incre * i) + getSpacing(i) - 3 * (items[i].length()))),220);
+            g.drawString(items[i],(((Incre * i) + getSpacing(i) - 3 * (items[i].length()))),height-40);
         }
         
         //Drawing the Undo and Redo button
         g.setFont(new Font(null, Font.PLAIN, 12));
         g.setColor(Color.RED);
-        g.drawString("UNDO", 2, 255);
-        g.drawString("REDO", 235, 255);
-        
+        g.drawString("UNDO", 2, height-5);
+        g.drawString("REDO", width-40, height-5);        
     }
     
     
@@ -369,7 +370,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         });
         //ContinuousUtilityGraph moving = new ContinuousUtilityGraph();
         //moving
-        this.setPreferredSize(new Dimension(275,260));
+        this.setPreferredSize(new Dimension(width, height));
         
         frame.getContentPane().add(this, BorderLayout.NORTH);
         frame.pack();

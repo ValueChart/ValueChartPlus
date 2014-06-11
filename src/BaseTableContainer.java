@@ -389,7 +389,7 @@ public class BaseTableContainer extends Box implements ActionListener {
             header.setText("<html><left>" + "&nbsp;&nbsp;&nbsp;" + name.replace('_', ' ') + " (" + pct + "%)" + range + "</left></html>");
         }
         //header.setText(s);
-        header.setToolTipText("<html><blockquote><left><font size=\"6\">" + name.replace('_', ' ') + " (" + pct + "%)" + range + "</left></blockquote></html>");
+        header.setToolTipText("<html><blockquote><left><font size=\"4\">" + name.replace('_', ' ') + " (" + pct + "%)" + range + "</left></blockquote></html>");
         header.setFont(new Font("Verdana", Font.PLAIN, 12));
     }
 
