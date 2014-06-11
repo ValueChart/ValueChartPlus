@@ -486,9 +486,22 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		         messageBodyPart = new MimeBodyPart();
 		         String filename = selectedVC;
 		         DataSource source = new FileDataSource(filename);
-		         messageBodyPart.setDataHandler(new DataHandler(source));
-		         messageBodyPart.setFileName(filename);
-		         multipart.addBodyPart(messageBodyPart);
+                 messageBodyPart.setDataHandler(new DataHandler(source));
+                 messageBodyPart.setFileName(filename);
+                 multipart.addBodyPart(messageBodyPart);
+                 
+                 // attach log file as well
+                 if (chart.getLog() != null) {
+                     filename = chart.getLog().getFilename();
+                     File file = new File(filename);
+                     if (file.exists() && !file.isDirectory()) {
+                         messageBodyPart = new MimeBodyPart();
+                         source = new FileDataSource(filename);
+                         messageBodyPart.setDataHandler(new DataHandler(source));
+                         messageBodyPart.setFileName(filename);
+                         multipart.addBodyPart(messageBodyPart);
+                     }
+                 }
 
 		         // Send the complete message parts
 		         message.setContent(multipart );
