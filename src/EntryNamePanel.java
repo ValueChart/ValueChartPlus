@@ -76,10 +76,10 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             } else {
                 g.setColor(Color.BLACK);
             }
-            g.drawString("(" + (i+1) + ")", ((i+1) * colWidth) + ((int) (colWidth) / 2) - LABELFONT.getSize(), LABELFONT.getSize());
+            g.drawString("(" + (i+1) + ")", (i * colWidth) + ((int) (colWidth) / 2) - LABELFONT.getSize() +1, LABELFONT.getSize());
             g.setColor(Color.GRAY);
             if (i != 0)
-                g.drawLine(((i+1) * colWidth)-1, LABELFONT.getSize(), ((i+1) * colWidth)-1, 0);
+                g.drawLine((i * colWidth), LABELFONT.getSize(), (i * colWidth), 0);
             if (chart.getEntryList().get(i).getIsMarked()) {
                 g.setColor(Color.blue);
                 //code a polygon or something
@@ -87,7 +87,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             }
         }
         g.setColor(Color.BLACK);
-        g.drawString("Alternatives", (labelList.size() * colWidth)/2, ANG_HT-10);
+        g.drawString("Alternatives", (labelList.size() * colWidth)/2 - 60, ANG_HT-10);
     }
 
     void createPopup() {
@@ -257,7 +257,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
 
     /**/
     public Dimension getPreferredSize() {
-        return new Dimension(labelList.size() * colWidth + ANG_WD, ANG_HT + 3);
+        return new Dimension(labelList.size() * colWidth, ANG_HT + 3);
     }
     
     int rightClicked = -1;
@@ -296,7 +296,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             int inc = ANG_WD / 4;
             int y = getHeight() / 4;
             for (int i = 0; i < labelList.size(); i++) {
-                if (me.getX() > ((i+1)*colWidth) && me.getX() < ((i+1)*colWidth) + colWidth) {
+                if (me.getX() > (i*colWidth) && me.getX() < (i*colWidth) + colWidth) {
                     idx = i;
                     
                     EntryNamePanel.this.setToolTipText("<html><blockquote><left><font size=\"4\">" + labelList.get(i).toString().replace('_', ' ') + "</left></blockquote></html>");
