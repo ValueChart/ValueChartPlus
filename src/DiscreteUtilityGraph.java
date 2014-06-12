@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.text.DecimalFormat;
 
 //This class is a variation of the ContinuousUtilityGraph class. the only difference is that
 //the function call is to DiscreteAttributeDomain
@@ -290,8 +291,9 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         g.setColor(Color.DARK_GRAY);
         for(int i = 0; i < items.length; i++){
             if (chart != null && chart.displayUtilityWeights) {
-                Float test = new Float((height-55 - p[i].y) / 2); //converted domain values
-                temp = test.toString();
+                Float test = new Float((float) (height-55 - p[i].y) / (height-60)*100); //converted domain values
+                DecimalFormat df = new DecimalFormat("#.#");
+                temp = df.format(test);
                 g.drawString(temp, (p[i].x + 5),p[i].y);
             }
             s[i] = p[i].getShape();

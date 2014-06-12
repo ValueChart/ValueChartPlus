@@ -88,7 +88,6 @@ public class ValueChartsPlus extends JPanel
         lstFiles.setVisibleRowCount(10);       
     
         scrList = new JScrollPane(lstFiles);
-        lstFiles.setPreferredSize(new Dimension(200,500));
       
         scrList.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 

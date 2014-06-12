@@ -253,8 +253,9 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         
         for(int i = 0; i < items.length; i++){
             if (chart != null && chart.displayUtilityWeights) {
-                Float test = new Float((height-55 - p[i].y) / 2);
-                temp = test.toString();
+                Float test = new Float((float) (height-55 - p[i].y) / (height-60)*100);
+                DecimalFormat df = new DecimalFormat("#.#");
+                temp = df.format(test);
                 g.drawString(temp, (p[i].x + 5),p[i].y);
             }
             s[i] = p[i].getShape();
