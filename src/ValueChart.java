@@ -30,7 +30,8 @@ public class ValueChart extends JPanel {
             SIDE_DISPLAY = 2,
             SEPARATE_DISPLAY = 3;
     static public final Color gridColor = new Color(150, 150, 150); // between lightgray and gray
-    
+    static public final String ICON_FILENAME = "chart_bar.png";
+
     int headerWidth = 300;
     int graphWidth = 100;
     int displayType = DEFAULT_DISPLAY;
@@ -161,6 +162,8 @@ public class ValueChart extends JPanel {
         if (isNew) {
             menuOptions.setSelectedItems();
             chartFrame.setJMenuBar(menuOptions);
+            ImageIcon img = new ImageIcon(ICON_FILENAME);
+            chartFrame.setIconImage(img.getImage());
         }
         setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         if (displayType == SEPARATE_DISPLAY) {
