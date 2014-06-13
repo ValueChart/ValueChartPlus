@@ -295,7 +295,7 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
          g.setFont(new Font(null, Font.BOLD, 12));
          int len = (attributeName + " (" + unit + ")").length();
          g.setFont(new Font(null, Font.BOLD, 13));
-        g.drawString((attributeName + " (" + unit + ")"), width/2 - 3 * len ,height-20);
+        g.drawString((attributeName + " (" + unit + ")"), width/2 - 3 * len ,height-15);
         //Labelling different utilities
         for(int i = 0; i < items.length; i++){
            if((weights[i] == 0.0) || (weights[i] == 1.0)){
@@ -305,11 +305,23 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
                 g.setFont(new Font(null, Font.PLAIN, 12));
             }    
            
+           String text = "";
            if (acell != null) {
                DecimalFormat df = acell.obj.decimalFormat;
-               g.drawString((df.format(items[i])),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-40);
+               text = (df.format(items[i]));
            } else {
-               g.drawString(Double.valueOf(items[i]).toString(),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-40);
+               text = Double.valueOf(items[i]).toString();
+           }
+           
+           if(text.length()>12){
+               String[] cut = text.split("[^A-Za-z0-9]");
+               for (int k = 2; k < cut.length; k++) {
+                   cut[1] += cut[k];
+               }
+               g.drawString(cut[0],((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-45);
+               g.drawString(cut[1],((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-35);
+           } else {
+               g.drawString(text,((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-40);
            }
                
         }	

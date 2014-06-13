@@ -319,36 +319,34 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
         
         //Draw the static labels
         g.setFont(new Font(null, Font.BOLD, 12));
-//        String utility_upper_bound = new String("1");
         String utility_upper_bound = new String("Best");
-//        g.drawString(utility_upper_bound, 35, 15);
         g.drawString(utility_upper_bound, 10, 15);
-//        String utility_lower_bound = new String("0");
         String utility_lower_bound = new String("Worst");
-//        g.drawString(utility_lower_bound, 35, 205);
         g.drawString(utility_lower_bound, 10, height-55);
         
         //Drawing the labels from variables passed
         g.setFont(new Font(null, Font.BOLD, 13));
-        g.drawString(attributeName, width/2 - 3*attributeName.length() ,height-20);
+        g.drawString(attributeName, width/2 - 3*attributeName.length() ,height-15);
         Incre = (width - 120) / (items.length-1); // This is the variable that calculate how far each point should be.
         //Labelling different utilities
         weights = ddomain.getWeights();
         for(int i = 0; i < items.length; i++){
             if((weights[i] == 0.0) || (weights[i] == 1.0)){
                 g.setFont(new Font(null, Font.BOLD, 10));
-//            	g.setFont(VLABELFONT_BOLD);
             }
             else{
                 g.setFont(new Font(null, Font.PLAIN, 10));
-//            	g.setFont(VLABELFONT);
             }
-//            if(items[i].length()>10){
-//            	String cut = items[i];
-//            	items[i] = cut.substring(0,10).concat("\n").concat(cut.substring(10,cut.length()));
-//            }
-//          g.drawString(items[i], (((Incre * i) + getSpacing(i) - 3 * (items[i].length()))) + (30 + ((int) (p[i].x - 30) / 2)), ANG_HT);
-            g.drawString(items[i],(((Incre * i) + getSpacing(i) - 3 * (items[i].length()))),height-40);
+            if(items[i].length()>12){
+            	String[] cut = items[i].split("[^A-Za-z0-9]");
+            	for (int k = 2; k < cut.length; k++) {
+            	    cut[1] += cut[k];
+            	}
+            	g.drawString(cut[0],(((Incre * i) + getSpacing(i) - 3 * (cut[0].length()))),height-45);
+            	g.drawString(cut[1],(((Incre * i) + getSpacing(i) - 3 * (cut[1].length()))),height-35);
+            } else {
+                g.drawString(items[i],(((Incre * i) + getSpacing(i) - 3 * (items[i].length()))),height-40);
+            }
         }
         
         //Drawing the Undo and Redo button
