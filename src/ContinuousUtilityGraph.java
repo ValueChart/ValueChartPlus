@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.text.DecimalFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //Author: Victor Chung
 //This class itself is "almost" self-contained. Unlike other classes in the program, the function call in this
@@ -314,12 +316,22 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
            }
            
            if(text.length()>12){
-               String[] cut = text.split("[^A-Za-z0-9]");
-               for (int k = 2; k < cut.length; k++) {
-                   cut[1] += cut[k];
+               Pattern pattern = Pattern.compile("[^A-Za-z0-9]");
+               Matcher matcher = pattern.matcher(text);
+               int mid = text.length()/2;
+               // find idx closes to middle
+               int idx = -1;
+               while (matcher.find()) {
+                   idx = matcher.start();
+                   if (idx >= mid) break;
+                   matcher.group();
                }
-               g.drawString(cut[0],((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-45);
-               g.drawString(cut[1],((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-35);
+               if (idx < 0) {
+                   g.drawString(text,((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-40);
+               } else {
+                   g.drawString(text.substring(0, idx), ((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-45);
+                   g.drawString(text.substring(idx, text.length()),((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-35);
+               }
            } else {
                g.drawString(text,((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+40 ,height-40);
            }

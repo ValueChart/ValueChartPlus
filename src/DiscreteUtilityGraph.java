@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.text.DecimalFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //This class is a variation of the ContinuousUtilityGraph class. the only difference is that
 //the function call is to DiscreteAttributeDomain
@@ -337,15 +339,26 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
             else{
                 g.setFont(new Font(null, Font.PLAIN, 10));
             }
+            String text = items[i];
             if(items[i].length()>12){
-            	String[] cut = items[i].split("[^A-Za-z0-9]");
-            	for (int k = 2; k < cut.length; k++) {
-            	    cut[1] += cut[k];
-            	}
-            	g.drawString(cut[0],(((Incre * i) + getSpacing(i) - 3 * (cut[0].length()))),height-45);
-            	g.drawString(cut[1],(((Incre * i) + getSpacing(i) - 3 * (cut[1].length()))),height-35);
+                Pattern pattern = Pattern.compile("[^A-Za-z0-9]");
+                Matcher matcher = pattern.matcher(text);
+                int mid = text.length()/2;
+                // find idx closes to middle
+                int idx = -1;
+                while (matcher.find()) {
+                    idx = matcher.start();
+                    if (idx >= mid) break;
+                    matcher.group();
+                }
+                if (idx < 0) {
+                    g.drawString(text,(((Incre * i) + getSpacing(i) - 3 * (text.length()))),height-40);
+                } else {
+                    g.drawString(text.substring(0, idx), (((Incre * i) + getSpacing(i) - 3 * (idx))),height-45);
+                    g.drawString(text.substring(idx, text.length()),(((Incre * i) + getSpacing(i) - 3 * (text.length()-idx))),height-35);
+                }
             } else {
-                g.drawString(items[i],(((Incre * i) + getSpacing(i) - 3 * (items[i].length()))),height-40);
+                g.drawString(text,(((Incre * i) + getSpacing(i) - 3 * (text.length()))),height-40);
             }
         }
         
