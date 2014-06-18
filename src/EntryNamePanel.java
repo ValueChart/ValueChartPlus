@@ -106,7 +106,9 @@ public class EntryNamePanel extends JPanel implements ActionListener {
         menuItem = new JMenuItem("Show Report");
         menuItem.addActionListener(this);
         popEntry.add(menuItem);
-
+        menuItem = new JMenuItem("Description");
+        menuItem.addActionListener(this);
+        popEntry.add(menuItem);
     }
 
     public void relabel(Vector<ChartEntry> entryList) {
@@ -233,6 +235,10 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             } else {
                 System.out.println("There is no associated report for scenario/entry ");
             }
+        } else if ("Description".equals(ae.getActionCommand())) {
+            ChartEntry tempentry = chart.getEntryList().get(rightClicked);
+            if (tempentry.hasDescription())
+                new DescriptionView(tempentry.getDescription());
         }
     }
     /**/
@@ -284,6 +290,11 @@ public class EntryNamePanel extends JPanel implements ActionListener {
                         ((JMenuItem) popEntry.getComponent(3)).setText("Hide Details");
                     } else {
                         ((JMenuItem) popEntry.getComponent(3)).setText("Show Details");
+                    }
+                    if (chart.getEntryList().get(idx).hasDescription()) {
+                        ((JMenuItem) popEntry.getComponent(5)).setEnabled(true);
+                    } else {
+                        ((JMenuItem) popEntry.getComponent(5)).setEnabled(false);
                     }
                 }
                 rightClicked = idx;

@@ -8,6 +8,7 @@ public class AttributePrimitiveData implements AttributeData {
     private Color color;
     private String unitsName;
     private String attributeName;
+    private String description;
 
     @Override
     public double getWeight() {
@@ -57,6 +58,19 @@ public class AttributePrimitiveData implements AttributeData {
         attributeName = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    @Override
+    public boolean hasDescription() {
+        return (description != null && !description.isEmpty());
+    }
+   
     @Override
     public AttributeData findData(String name) {
         if (attributeName.equals(name))
@@ -161,6 +175,7 @@ public class AttributePrimitiveData implements AttributeData {
         newData.setDomain(domain.getDeepCopy());
         newData.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
         newData.setUnitsName(unitsName);
+        newData.setDescription(description);
         
         return newData;
     }

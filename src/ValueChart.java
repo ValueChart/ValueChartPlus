@@ -151,6 +151,8 @@ public class ValueChart extends JPanel {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        XMLParser.readDescriptions(this);
 
         showVC(user);
         if (l != null) {

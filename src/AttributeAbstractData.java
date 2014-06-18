@@ -38,6 +38,12 @@ public class AttributeAbstractData implements AttributeData {
     public void setName(String name) {
         attributeName = name;
     }
+    
+
+    @Override
+    public boolean hasDescription() {
+        return false;
+    }
 
     @Override
     public AttributeData findData(String name) {
@@ -138,5 +144,6 @@ public class AttributeAbstractData implements AttributeData {
         }
         return newData;
     }
+
 
 }

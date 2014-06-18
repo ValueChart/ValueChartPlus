@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
+
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -54,8 +55,10 @@ public class BaseTableContainer extends Box implements ActionListener {
     int preferredHeaderWidth = 0;
     String weight;
     JPopupMenu popAttribute;
+    JMenuItem descriptionMenuItem;
 
     public AttributeData getData() {
+        if (chart == null) return null;
         return chart.getAttribute(name);
     }
     
@@ -65,6 +68,9 @@ public class BaseTableContainer extends Box implements ActionListener {
 
     public BaseTableContainer(JComponent table, String name, ValueChart chart, int width) {
         super(BoxLayout.X_AXIS);
+        this.table = table;
+        this.name = name;
+        this.chart = chart;
         header = new JLabel(".00");
         //Checking if BaseTableContainer is the container holding the attribute bar charts or attribute names
 
@@ -145,6 +151,25 @@ public class BaseTableContainer extends Box implements ActionListener {
         header.setVerticalAlignment(JLabel.CENTER);
 
         popAttribute = new JPopupMenu();
+        popAttribute.addPopupMenuListener( new PopupMenuListener() {
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent arg0) {
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+            }
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+                if (getData() != null)
+                    descriptionMenuItem.setEnabled(getData().hasDescription());
+                else
+                    descriptionMenuItem.setEnabled(false);
+            }
+            
+        });
 
         JMenuItem menuItem = new JMenuItem("Value Function SA...");
         menuItem.addActionListener(this);
@@ -162,11 +187,12 @@ public class BaseTableContainer extends Box implements ActionListener {
         menuItem = new JMenuItem("Edit");
         menuItem.addActionListener(this);
         popAttribute.add(menuItem);
+        descriptionMenuItem = new JMenuItem("Description");
+        descriptionMenuItem.addActionListener(this);
+        descriptionMenuItem.setEnabled(false);
+        popAttribute.add(descriptionMenuItem);
 
         add(popAttribute);
-        this.table = table;
-        this.name = name;
-        this.chart = chart;
     }
 
     public void setExactSize(int w, int h) {
@@ -1054,7 +1080,11 @@ public class BaseTableContainer extends Box implements ActionListener {
         } else if (("Criteria Details in Report").equals(ae.getActionCommand())) {
             //go to the valuechart report
             chart.zoomToReport(this.getName());
+        } else if (("Description").equals(ae.getActionCommand())) {
+            //go to the valuechart report
+            new DescriptionView(getData().getPrimitive().getDescription());
         }
+        
     }
     
     public void updateSize() {

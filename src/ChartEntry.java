@@ -23,6 +23,7 @@ public class ChartEntry
 	private SwingController reportController = null;
 	private OutlineItem outlineItem = null;
 	private File report;
+	private String description;
 
 	public ChartEntry (String name){
 		this.name = name;
@@ -96,6 +97,19 @@ public class ChartEntry
 		this.report = report;
 	}
 
+    public String getDescription() {
+        return description;
+    }
+    
+    public boolean hasDescription() {
+        return (description != null && !description.isEmpty());
+    }
+
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public ChartEntry getDeepCopy(Vector<AttributeData> attrData, ValueChart vc) {
         if (attrData == null) return null;
         
@@ -127,6 +141,7 @@ public class ChartEntry
         newData.reportController = reportController;
         newData.outlineItem = outlineItem;
         newData.report = report;
+        newData.description = description;
         
         return newData;
     }

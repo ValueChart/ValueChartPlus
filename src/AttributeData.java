@@ -9,6 +9,8 @@ public interface AttributeData {
     public String getName();
 
     public void setName(String name);
+    
+    public boolean hasDescription();
 
     public AttributeData findData(String name);
 
