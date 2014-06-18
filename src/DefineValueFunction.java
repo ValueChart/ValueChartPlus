@@ -4,6 +4,8 @@ import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 public class DefineValueFunction extends JPanel implements ActionListener{
 
@@ -18,11 +20,14 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 	MouseHandler mouseListener;    
 	JObjective obj_sel;
     JLabel lbl_sel;
+    JLabel desc_sel;
 	    
     JObjective obj;
   
-    JPopupMenu popValueFunction;   
+    JPopupMenu popValueFunction;
+    JPopupMenu popEntry; 
     JMenuItem menuRemove;
+    JMenuItem descriptionMenuItem;
   
     boolean all_set;
     ConstructionView con;
@@ -62,6 +67,31 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 	    menuItem = new JMenuItem("Build Custom...");
 	    menuItem.addActionListener(this);
 	    //popValueFunction.add(menuItem);	
+	    
+	    popEntry = new JPopupMenu();
+	    popEntry.addPopupMenuListener( new PopupMenuListener() {
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent arg0) {
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+            }
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+                if (getDescriptionAttribute() != null)
+                    descriptionMenuItem.setEnabled(getDescriptionAttribute().hasDescription());
+                else
+                    descriptionMenuItem.setEnabled(false);
+            }
+            
+        });
+        descriptionMenuItem = new JMenuItem("Criterion Description");
+        descriptionMenuItem.addActionListener(this);
+        descriptionMenuItem.setEnabled(false);
+        popEntry.add(descriptionMenuItem);
     		
         // add all information to view
 		setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
@@ -153,6 +183,11 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 	}
  	
     public void actionPerformed(ActionEvent ae) {  	
+        if ("Criterion Description".equals(ae.getActionCommand())){
+            new DescriptionView(getDescriptionAttribute().getDescription());
+            return;
+        }
+        
 		if ("Default Flat".equals(ae.getActionCommand())){
 			obj_sel.setContinuous();
 		}
@@ -267,29 +302,32 @@ public class DefineValueFunction extends JPanel implements ActionListener{
             
             //if the value graph is right-clicked, display the popup menu
             else if(SwingUtilities.isRightMouseButton(me)){
-            	if("ContinuousUtilityGraph".equals(me.getComponent().getClass().getName())){
-        			int i;
-    				ContinuousAttributeDomain cad = obj_sel.getDomain().getContinuous();
-    				double kts[] = cad.getKnots();			
-    				for (i=0; i < kts.length; i++){
-    				int ptx = (int)((kts[i]-kts[0])/((kts[(kts.length)-1])-kts[0])*200)+50;
-    				if (me.getX() > (ptx - 5) && me.getX() < (ptx + 5)){
-    					rem_i = i;
-    					System.out.println("rem_i " + rem_i);
-    					break;
-    				}
-    				else{
-    					System.out.println("not");
-    					rem_i = -1;
-    				}
-    					
-    			}
-            			if (rem_i != -1)
-            				menuRemove.setEnabled(true);
-            			else
-            				menuRemove.setEnabled(false);
-            			popValueFunction.show(me.getComponent(), me.getX()+5, me.getY()+5);
-            	}
+                if ("ContinuousUtilityGraph".equals(me.getComponent().getClass().getName())) {
+                    int i;
+                    ContinuousAttributeDomain cad = obj_sel.getDomain().getContinuous();
+                    double kts[] = cad.getKnots();
+                    for (i = 0; i < kts.length; i++) {
+                        int ptx = (int) ((kts[i] - kts[0]) / ((kts[(kts.length) - 1]) - kts[0]) * 200) + 50;
+                        if (me.getX() > (ptx - 5) && me.getX() < (ptx + 5)) {
+                            rem_i = i;
+                            System.out.println("rem_i " + rem_i);
+                            break;
+                        } else {
+                            System.out.println("not");
+                            rem_i = -1;
+                        }
+
+                    }
+                    if (rem_i != -1)
+                        menuRemove.setEnabled(true);
+                    else
+                        menuRemove.setEnabled(false);
+                    
+                    popValueFunction.show(me.getComponent(), me.getX() + 5, me.getY() + 5);
+                } else if ("JObjective".equals(me.getComponent().getClass().getName())) {
+                    desc_sel = (JLabel)me.getComponent();
+                    popEntry.show(me.getComponent(), me.getX() - 1, me.getY() - 1);
+                }
             }
    		}
 
@@ -305,6 +343,18 @@ public class DefineValueFunction extends JPanel implements ActionListener{
     void setPointClick(boolean b){
     	point_click = b;
     }
+    
+    public AttributePrimitiveData getDescriptionAttribute() {
+        if (desc_sel != null) {
+            String attrName = desc_sel.getText();
+            AttributeData attrData = con.chart.getAttribute(attrName);
+            if (attrData.isAbstract()) return null;
+            
+            return attrData.getPrimitive();
+        }
+        return null;
+    }
+    
     
 }
 
