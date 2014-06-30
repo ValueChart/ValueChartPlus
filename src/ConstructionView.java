@@ -41,6 +41,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     private WeightingBySMARTER pnlSMARTER;
     JObjective lblRoot;
     JPopupMenu popObjective;
+    boolean preferenceOnly = false;
 
     String filename = "test.vc"; // data file name
     String data; // main data string: all data for data file
@@ -182,6 +183,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
            String title = pane.getTitleAt(sel);
             if (title.equals(TAB_VALUES)) {
                 pnlValueFunction.repaintDisplay();
+                btnOK.setText("Next");
+                btnCancel.setText("Back");
             } else if (title.equals(TAB_SMARTER)) {
                 if (btnOK != null)
                     btnOK.setVisible(false);
@@ -194,6 +197,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                 pnlSMARTER.startWeighting(problem);
             } else if (title.equals(TAB_WEIGHTING)) {
                 pnlWeighting.setObjectiveList();
+                btnOK.setText("Finish & Update Chart");
+                btnCancel.setText("Back");
             }
         }
 
@@ -201,21 +206,53 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 
     public void actionPerformed(ActionEvent e) {
         if ("btnCancel".equals(e.getActionCommand()))
-            if (chart == null) // construction
-                System.exit(0);
+            if (!preferenceOnly) {
+                if (chart == null) // construction
+                    System.exit(0);
+                else {
+                    frame.dispose(); // edit view
+                    if (chart != null) {
+                        chart.restoreState(true);
+                    }
+                }
+            }
+            // back button
             else {
-                frame.dispose(); // edit view
-                if (chart != null) {
-                    chart.restoreState(true);
+                // define value functions
+                if (constPane.getSelectedIndex() == 0) {
+                    int idx = pnlValueFunction.getSelectedIndex();
+                    pnlValueFunction.setSelectedIndex(idx-1);
+                    validateTabs();
+                }
+                // weighting
+                else if (constPane.getSelectedIndex() == 2) {
+                    constPane.setSelectedIndex(1);
+                    validateTabs();
                 }
             }
         else if ("btnOK".equals(e.getActionCommand())) {
-            frame.setVisible(false);
-            createDataFile("test.vc", false);
-            if (pnlAlternatives.alts.size() > 10)
-                display_type = SIDE_DISPLAY;
-            showChart();
-            chart.logConstruction();
+            if (!preferenceOnly 
+                    || constPane.getSelectedIndex() == constPane.getTabCount()-1){ // weighting
+                frame.setVisible(false);
+                createDataFile("test.vc", false);
+                if (pnlAlternatives.alts.size() > 10)
+                    display_type = SIDE_DISPLAY;
+                showChart();
+                chart.logConstruction();
+            }
+            // next button
+            else {
+                // define value functions
+                if (constPane.getSelectedIndex() == 0) {
+                    if (pnlValueFunction.isLastSelected()) {
+                        constPane.setSelectedIndex(1);
+                    } else {
+                        int idx = pnlValueFunction.getSelectedIndex();
+                        pnlValueFunction.setSelectedIndex(idx+1);
+                        validateTabs();
+                    }
+                } 
+            }
         }
     }
 
@@ -448,8 +485,11 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         if (chart != null)
             chart.keepCurrentState();
         
-        constPane.removeAll();
+        preferenceOnly = false;
+        btnOK = new JButton("Update Chart");
+        btnCancel = new JButton("Cancel");
         
+        constPane.removeAll();
         constPane.addTab(TAB_OBJECTIVES, pnlObjectives);
         constPane.addTab(TAB_ALTERNATIVES, pnlAlternatives);
         constPane.addTab(TAB_VALUES, pnlValueFunction);
@@ -468,6 +508,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         if (chart != null)
             chart.keepCurrentState();
         
+        preferenceOnly = true;
         constPane.removeAll();        
         
         constPane.addTab(TAB_VALUES, pnlValueFunction);
@@ -476,6 +517,10 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         
         validateTabs();
         constPane.setSelectedIndex(0);
+        btnOK.setText("Next");
+        btnOK.setEnabled(true);
+        btnCancel.setText("Back");
+        btnCancel.setEnabled(false);
     }
     
     public boolean allowPreferenceModel() {
@@ -521,19 +566,35 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             constPane.setEnabledAt(1, false);
             constPane.setEnabledAt(2, false);
             
-            if (checkAlternativeValid()){
+            boolean altValid = checkAlternativeValid(); 
+            boolean utilValid = pnlValueFunction.checkAllUtility(false);
+            boolean weightValid = checkWeightsValid();
+            
+            // enable tabs
+            if (altValid){
                 constPane.setEnabledAt(0, true);
-                if (pnlValueFunction.checkAllUtility(false)) {
+                if (utilValid) {
                    constPane.setEnabledAt(1, true);
                    constPane.setEnabledAt(2, true);
-                   if (checkWeightsValid()) {
-                       btnOK.setEnabled(true);
-                       return;
-                   }
-                }
-                    
+                }                     
             }
             btnOK.setEnabled(false);
+            btnCancel.setEnabled(false);
+            // enable buttons
+            if (altValid) {
+                if (utilValid) {
+                    if (weightValid) {
+                        btnOK.setEnabled(true);
+                        if (constPane.getSelectedIndex() == 0 && pnlValueFunction.getSelectedIndex() == 0) {
+                            btnCancel.setEnabled(false);
+                        } else {
+                            btnCancel.setEnabled(true);
+                        }
+                    }
+                } else {
+                    return;
+                }
+            }
         }
     }
 }

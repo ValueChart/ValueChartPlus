@@ -19,6 +19,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
     JPanel pnlGraph;
 	MouseHandler mouseListener;    
 	JObjective obj_sel;
+	int selectedIdx = 0;
     JLabel lbl_sel;
     JLabel desc_sel;
 	    
@@ -127,6 +128,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		for (int i=0; i<objs.size(); i++)
 			checkUtility(objs.get(i), (JLabel)pnlObjList.getComponent(i));
 			obj_sel = objs.get(0);
+			selectedIdx = 0;
 			lbl_sel = (JLabel)pnlObjList.getComponent(0);
 		
 	    // set Value Function graph for first objective		
@@ -285,15 +287,18 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		public void mousePressed(MouseEvent me){
 			        	//If an Objective label is clicked, show the graph
             if(SwingUtilities.isLeftMouseButton(me)){          
-            	if("JObjective".equals(me.getComponent().getClass().getName())){
+            	if("JObjective".equals(me.getComponent().getClass().getName())
+            	        && !con.preferenceOnly){
                 	lbl_sel.setBackground(Color.LIGHT_GRAY); 	//unmark the last seection
                 	lbl_sel = (JLabel)me.getComponent();
                 	
                 	//set selected objective
             		String str = me.getComponent().toString();     
             		for (int i=0; i<objs.size(); i++){
-            			if (str.equals(objs.get(i).toString()))
+            			if (str.equals(objs.get(i).toString())) {
             				obj_sel = objs.get(i);
+            				selectedIdx = i;
+            			}
             		}            			
             		showGraph();
             		//repaintDisplay();          
@@ -355,6 +360,25 @@ public class DefineValueFunction extends JPanel implements ActionListener{
         return null;
     }
     
+    public boolean isLastSelected() {
+        return selectedIdx == objs.size()-1;
+    }
+    
+    public int getSelectedIndex() {
+        return selectedIdx;
+    }
+    
+    public void setSelectedIndex(int idx) {
+        if (idx < 0 || idx > objs.size()-1)
+            return;
+                    
+        selectedIdx = idx;
+        lbl_sel.setBackground(Color.LIGHT_GRAY);    //unmark the last seection
+        lbl_sel = (JLabel)pnlObjList.getComponent(selectedIdx);
+        obj_sel = objs.get(selectedIdx);
+        
+        showGraph();
+    }
     
 }
 
