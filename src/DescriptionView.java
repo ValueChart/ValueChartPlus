@@ -36,8 +36,9 @@ public class DescriptionView extends JFrame implements HyperlinkListener {
         textPane.setText(htmlText);
         textPane.setBackground(Color.white);
         textPane.setOpaque(true);
-        textPane.setPreferredSize(new Dimension(width-50, height-50));
         textPane.addHyperlinkListener(this);
+        textPane.setPreferredSize(new Dimension(width-50, height));
+        textPane.setCaretPosition(0);
         
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

@@ -1,0 +1,115 @@
+<xml>
+  <Description>
+    <alternative name="Sheraton">
+      <textData>Get a good night's sleep with premium bedding, a down duvet, and blackout drapes/curtains. The 32-inch TV offers pay movies. Request an in-room massage. A coffee/tea maker is provided. You will have a shower/tub combination, as well as complimentary toiletries and a hair dryer. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.</textData>
+    </alternative>
+    <alternative name="BestWestern">
+      <textData>Balcony with city views. Complimentary wireless Internet access. 42-inch LCD TV. Pay movies. Coffee/tea maker. Fridge and microwave. Private bathroom. Shower/tub combination. Complimentary toiletries. Hair dryer. Safe. Desk. Complimentary newspapers. This room is Non-Smoking.</textData>
+    </alternative>
+    <alternative name="Hyatt">
+      <textData>Wide, floor-to-ceiling windows. Desk. 42-inch flat-screen TV with cable, pay movies, and video games (surcharge). Voice mail. Upholstered armchair with ottoman. Bathrobes. Hairdryer. Designer toiletries. Shower/tub combination. Refrigerator. Video account review and check-out. Rollaway beds available.</textData>
+    </alternative>
+    <alternative name="Marriott">
+      <textData>The video-game console and TV with satellite channels are offered for your entertainment. A coffee/tea maker is provided. The private bathroom has designer toiletries. Climate control, air conditioning, and a safe are among the conveniences offered. This room is Non-Smoking.</textData>
+    </alternative>
+    <alternative name="HolidayInn">
+      <textData>The 42-inch flat-screen TV offers cable channels. A coffee/tea maker is provided. The private bathroom has a hair dryer. Air conditioning, a desk, and a wake-up call service are among the conveniences offered. This room is Non-Smoking.</textData>
+    </alternative>
+    <alternative name="Ramada">
+      <textData>1 double bed. Desk. 37-inch LCD high-definition TV. Pay movies. Phone. Voice mail. Clock radio. Coffee/tea maker. Hair dryer. Iron/ironing board. Complimentary weekday newspaper. Bathroom with granite-topped vanity. Blackout drapes/curtains. Air conditioning. Climate control</textData>
+    </alternative>
+    <criterion name="area">
+      <htmlData><![CDATA[
+          <html>
+          <body>
+          <h1>Area</h1>
+          <ul>
+          <li>Sheraton: near nightlife</li>
+          <li>Best Western: near nightlife</li>
+          <li>Hyatt: on the beach</li>
+          <li>Marriott: near airport</li>
+          <li>Holiday Inn: near airport</li>
+          <li>Ramada: on the beach</li>
+          </ul>
+          </body>
+          </html>
+       ]]>
+      </htmlData>
+    </criterion>
+    <criterion name="skytrain-distance">
+      <htmlData><![CDATA[
+          <html>
+          <body>
+          <h1>Distance to Skytrain station</h1>
+          <h3>unit: blocks</h3>
+          <ul>
+          <li>Sheraton: 7</li>
+          <li>Best Western: 2</li>
+          <li>Hyatt: 2</li>
+          <li>Marriott: 9</li>
+          <li>Holiday Inn: 1</li>
+          <li>Ramada: 1</li>
+          </ul>
+          </body>
+          </html>
+       ]]>
+      </htmlData>
+    </criterion>
+    <criterion name="size">
+      <htmlData><![CDATA[
+          <html>
+          <body>
+          <h1>Room size</h1>
+          <h3>unit: square feet</h3>
+          <ul>
+          <li>Sheraton: 350</li>
+          <li>Best Western: 200</li>
+          <li>Hyatt: 275</li>
+          <li>Marriott: 200</li>
+          <li>Holiday Inn: 237.5</li>
+          <li>Ramada: 312.5</li>
+          </ul>
+          </body>
+          </html>
+       ]]>
+      </htmlData>
+    </criterion>
+    <criterion name="internet-access">
+      <htmlData><![CDATA[
+          <html>
+          <body>
+          <h1>Internet access</h1>
+          <ul>
+          <li>Sheraton: high speed (wired)</li>
+          <li>Best Western: high speed (wireless)</li>
+          <li>Hyatt: low speed (wireless)</li>
+          <li>Marriott: low speed (wireless)</li>
+          <li>Holiday Inn: none</li>
+          <li>Ramada: none</li>
+          </ul>
+          </body>
+          </html>
+       ]]>
+      </htmlData>
+    </criterion>
+    <criterion name="rate">
+      <htmlData><![CDATA[
+          <html>
+          <body>
+          <h1>Rate per night</h1>
+          <h3>unit: CAD</h3>
+          <ul>
+          <li>Sheraton: 150</li>
+          <li>Best Western: 100</li>
+          <li>Hyatt: 200</li>
+          <li>Marriott: 160</li>
+          <li>Holiday Inn: 100</li>
+          <li>Ramada: 120</li>
+          </ul>
+          </body>
+          </html>
+       ]]>
+      </htmlData>
+    </criterion>
+  </Description>
+</xml>
