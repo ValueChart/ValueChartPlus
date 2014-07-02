@@ -165,9 +165,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                 
                 if (pnlValueFunction.checkAllUtility(true)) {
                     pnlWeighting.setObjectiveList();
-                    String problem  = "";
-                    if (chart != null) problem = chart.getChartTitle();
-                    pnlSMARTER.startWeighting(problem);
+                    pnlSMARTER.startWeighting();
                 }
                 break;
             }
@@ -192,9 +190,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
                     btnCancel.setVisible(false);
                 
                 pnlWeighting.setObjectiveList();
-                String problem  = "";
-                if (chart != null) problem = chart.getChartTitle();
-                pnlSMARTER.startWeighting(problem);
+                pnlSMARTER.startWeighting();
             } else if (title.equals(TAB_WEIGHTING)) {
                 pnlWeighting.setObjectiveList();
                 btnOK.setText("Finish & Update Chart");

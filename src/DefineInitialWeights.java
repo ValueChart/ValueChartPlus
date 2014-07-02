@@ -179,9 +179,7 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
         if ("SMARTER...".equals(e.getActionCommand())) {
         	WeightingBySMARTER wbs = new WeightingBySMARTER(con, false);
-        	String problem = "";
-        	if (con != null && con.chart != null) problem = con.chart.getChartTitle();
-        	wbs.startWeighting(problem);
+        	wbs.startWeighting();
         	wbs.showFrame();
         }
         if ("Set equal weights".equals(e.getActionCommand())) {

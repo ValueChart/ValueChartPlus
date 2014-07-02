@@ -1,4 +1,6 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -16,18 +18,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 class WeightingBySMARTER extends JPanel implements ActionListener{      
     private static final long serialVersionUID = 1L;
 
     JDialog frame;
     
-    String q1a = "Imagine the worst possible ";
-    String q1b = " (i.e. scoring worst on all criteria) ";
-    String q1c = "and you were given the opportunity to improve one criterion from its WORST value to its BEST. Which would you choose? ";
-    String q2 = "Next, imagine again the worst possible alternative and you are allowed to improve one of the following criterion from its WORST value to its BEST. Which would you choose?";
-    String q3 = " is the last criterion that you would choose to improve.  Click Finish to complete the SMARTER weighting technique.";
+    String q1 = "Imagine the worst case scenario highlighted in red. Which criterion would you prefer to change from the worst to the best based on the values in the table below?";
+    String q2 = "From the remaining criteria, which would you prefer to change next from the worst value to the best value?";
+//    String q3 = " is the last criterion that you would choose to improve.  Click Finish to complete the SMARTER weighting technique.";
     JButton btnSelect; 
     JButton btnCancel;
     
@@ -43,7 +45,6 @@ class WeightingBySMARTER extends JPanel implements ActionListener{
     ConstructionView con;
     private boolean fromConstruction = true;
     private int count = 0;
-    private String problem = "";
 
     WeightingBySMARTER(ConstructionView c, boolean fromCon){
         con = c;
@@ -51,12 +52,11 @@ class WeightingBySMARTER extends JPanel implements ActionListener{
         rowstemp = new Vector<Vector<String>>();
     }
     
-    void startWeighting(String problem){        
+    void startWeighting(){        
         removeAll();
         rowstemp.clear();
-        this.problem = problem;
         count = 1;  //reset counter;
-        txtQ = new JTextArea(q1a + (problem == null || problem.isEmpty() ? "alternative" : problem) + q1b + q1c);   
+        txtQ = new JTextArea(q1);   
         txtQ.setLineWrap(true);
         txtQ.setWrapStyleWord(true);    
         txtQ.setRows(5);
@@ -89,10 +89,11 @@ class WeightingBySMARTER extends JPanel implements ActionListener{
         tabModelWiz.setDataVector(wizRows, wizCols);        
         tableWiz = new JTable(tabModelWiz);        
         tableWiz.setPreferredScrollableViewportSize(new Dimension(350, Math.min(wizRows.size() * 16, 150)));
-        tableWiz.setAutoCreateColumnsFromModel(true);
+        tableWiz.setAutoCreateColumnsFromModel(false);
         tableWiz.setRowSelectionAllowed(true);      
         tableWiz.setRowSelectionInterval(0, 0);
         tableWiz.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tableWiz.getColumnModel().getColumn(1).setCellRenderer(new ColorCellRenderer());
         JScrollPane scrollPane = new JScrollPane(tableWiz);         
 
         btnSelect = new JButton("Select");
@@ -162,17 +163,15 @@ class WeightingBySMARTER extends JPanel implements ActionListener{
                 for (int j=i; j<sel.length; j++)
                     sel[j]--;
                 tableWiz.addNotify();
-                if (tableWiz.getRowCount()==1){
-                    str = tableWiz.getValueAt(0, 0).toString();
-                    txtQ.setText(str.substring(0, 1).toUpperCase() + str.substring(1, str.length()) + q3);
-                    btnSelect.setText("Finish");
-                }               
-                else{ 
+                if (tableWiz.getRowCount() > 1)
                     txtQ.setText(q2);
-                }
-                repaint();              
-                if (tableWiz.getRowCount() == 0) { //none left, disable firing.
-
+                repaint();           
+                
+                if (tableWiz.getRowCount() <= 1) { //none left, disable firing.
+                    if (tableWiz.getRowCount() == 1) {
+                        count++;
+                        addSelection(wizRows.get(0)); 
+                    }
                     con.getWeightPanel().addFromSMARTER(rowstemp);
                     if (frame != null) {
                         frame.dispose();
@@ -192,8 +191,35 @@ class WeightingBySMARTER extends JPanel implements ActionListener{
             if (frame != null) frame.dispose();
             if (fromConstruction) {
                 count = 0;
-                startWeighting(problem);
+                startWeighting();
             }
+        }
+    }
+    
+    public class ColorCellRenderer extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 1L;
+
+        public ColorCellRenderer() {
+            super();
+        }
+        
+        public Component getTableCellRendererComponent(JTable table,
+                Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            
+            Component rendererComp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                    row, column);
+            
+            // selection 
+            if (isSelected) {
+//                setBackground(table.getSelectionBackground());
+//                setForeground(table.getSelectionForeground());
+                rendererComp.setBackground(new Color(103,0,13));
+            } else {
+                rendererComp.setBackground(new Color(222,45,38));
+            }
+            rendererComp.setForeground(Color.white);
+            
+            return this;
         }
     }
 }
