@@ -141,7 +141,9 @@ public class ValueChart extends JPanel {
             try {
                 read(initReader);
             } catch (IOException e) {
-                System.out.println("Error in input: " + e.getMessage());
+                String msg = "Error in input: " + e.getMessage();
+                System.out.println(msg);
+                UserDialog.showError(msg, "File Error", getFrame());
             }
             //setDisplayHeight(Toolkit.getDefaultToolkit().getScreenSize().height);
             setDisplayHeight(displayHeight);
@@ -485,9 +487,11 @@ public class ValueChart extends JPanel {
                     createReportController();
                 } else {
                     //since the report does not exist, throw a system message letting the user know this, and set the report to null
-                    System.out.println("The report for the ValueChart is not valid, the system believes the report is located at: ");
-                    System.out.println("  " + reportFile.toString());
-                    System.out.println("  If this is an error, please verify that you have correctly substituted all spaces and added two slashes between directories.");
+                    String msg = "The report for the ValueChart is not valid, the system believes the report is located at: ";
+                    msg += "  " + reportFile.toString();
+                    msg += "  If this is an error, please verify that you have correctly substituted all spaces and added two slashes between directories.";
+                    System.out.println(msg);
+                    UserDialog.showError(msg, "Report File Error", getFrame());
                     reportFile = null;
                 }
             } else {

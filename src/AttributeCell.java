@@ -573,7 +573,9 @@ public class AttributeCell extends JComponent {
                                     //The JFram and SwingController inputs were created in ValueChart.java when the initial data was loaded
                                     zoomToReport(tempentry.getReportFrame(), tempentry.getReportController(), tempentry.getOutlineItem(), bookmarkIndex, true); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
                                 } else {
-                                    System.out.println("There is no associated report for scenario/entry #" + (index + 1));
+                                    String msg = "There is no associated report for scenario/entry #" + (index + 1);
+                                    System.out.println(msg);
+                                    UserDialog.showError(msg, null, chart.getFrame());
                                 }
                             }
                         });
@@ -595,7 +597,9 @@ public class AttributeCell extends JComponent {
                                         zoomToReport(tempentry.getReportFrame(), tempentry.getReportController(), tempentry.getOutlineItem(), tempbookmarkIndex, false); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
                                         }
                                     } else {
-                                        System.out.println("There is no associated report for scenario/entry #" + (index + 1));
+                                        String msg = "There is no associated report for scenario/entry #" + (index + 1);
+                                        System.out.println(msg);
+                                        UserDialog.showError(msg, null, chart.getFrame());
                                     }
                                 }
                             }
@@ -618,7 +622,9 @@ public class AttributeCell extends JComponent {
                                             zoomToReport(tempentry.getReportFrame(), tempentry.getReportController(), tempentry.getOutlineItem(), tempbookmarkIndex, true); //Go the the bookmark in the PDF (bookmark names should be assocaited with attribute)
                                         }
                                     } else {
-                                        System.out.println("There is no associated report for scenario/entry #" + (index + 1));
+                                        String msg = "There is no associated report for scenario/entry #" + (index + 1);
+                                        System.out.println(msg);
+                                        UserDialog.showError(msg, null, chart.getFrame());
                                     }
                                 }
                             }
