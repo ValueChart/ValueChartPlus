@@ -122,8 +122,8 @@ class DetailsViewPanel extends JPanel {
         table.setFont(altFont);
 
         TableColumnModel cModel = table.getColumnModel();
-        cModel.getColumn(0).setPreferredWidth(20);
-        cModel.getColumn(1).setPreferredWidth(width - 20);
+        cModel.getColumn(0).setPreferredWidth(40);
+        cModel.getColumn(1).setPreferredWidth(width - 40);
 
         rows.clear();
         Vector<ChartEntry> entryList = chart.getEntryList();
@@ -132,7 +132,7 @@ class DetailsViewPanel extends JPanel {
             return;
         for (int i = 0; i < entryList.size(); i++) {
             data = new Vector<String>();
-            data.add("   (" + (i + 1) + ")");
+            data.add("(" + (i + 1) + ")");
             data.add(entryList.get(i).name);
             rows.add(data);
         }

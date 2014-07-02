@@ -80,7 +80,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
 
         //Returns the minimum element on the x-axis
     public double getMin() {
-        if (knotMap.size() < 2) {
+        if (knotMap.size() < 1) {
             return Double.MAX_VALUE;
         }
         return knotMap.firstKey();
@@ -88,7 +88,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
 
         //Returns the maximum element on the x-axis
     public double getMax() {
-        if (knotMap.size() < 2) {
+        if (knotMap.size() < 1) {
             return Double.MIN_VALUE;
         }
         return knotMap.lastKey();
@@ -148,10 +148,10 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	// new range for x-axis
 	public boolean updateRange(double min, double max) {
 	    if ( (min == getMin() && max == getMax()) ||
-	         max <= min) return true;
+	         max < min) return true;
 	    
 	    // no knots yet
-	    if (knotMap.isEmpty()) {
+	    if (knotMap.size() < 3) {
             knotMap.put(min, 0.5);
             knotMap.put(min + (max-min)/2, 0.5);
             knotMap.put(max, 0.5);

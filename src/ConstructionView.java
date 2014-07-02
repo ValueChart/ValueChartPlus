@@ -527,6 +527,13 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         constPane.setSelectedIndex(constPane.getTabCount()-1);
     }
     
+    public void alternativesInvalid() {
+        constPane.setEnabledAt(2, false);
+        constPane.setEnabledAt(3, false);
+        constPane.setEnabledAt(4, false);
+        btnOK.setEnabled(false);
+    }
+    
     public void validateTabs() {
         if (constPane == null || frame == null || !frame.isVisible()) 
             return;

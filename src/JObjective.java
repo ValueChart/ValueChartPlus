@@ -33,8 +33,6 @@ public class JObjective extends JLabel{
 	
 	Color color = Color.WHITE;
 
-	double minC = Double.MAX_VALUE;		
-	double maxC = Double.MIN_VALUE;
 	// number of alternatives that hold distinct objective values
 	// key: objective value, value: count
 	private HashMap<Object, Integer> objValuesMap; 
@@ -165,11 +163,6 @@ public class JObjective extends JLabel{
 	
 	void setDomain(AttributeDomain ad){
 		domain = ad;
-		// set the range
-		if (domain.getType() == AttributeDomainType.CONTINUOUS) {
-            minC = domain.getContinuous().getMin();
-            maxC = domain.getContinuous().getMax();
-		}
 	}
 	
 	//default flat
@@ -206,10 +199,15 @@ public class JObjective extends JLabel{
 	}
 	
 	void setCDomain(Vector<Double> v){
-    	domain = null;		
 		Vector<Double> values = v;
 		Vector<Object> knots = new Vector<Object>();
-		domain_type = AttributeDomainType.CONTINUOUS;	
+		domain_type = AttributeDomainType.CONTINUOUS;
+		double minC = Double.MAX_VALUE;
+		double maxC = Double.MIN_VALUE;
+		if (domain != null) {
+		    minC = domain.getContinuous().getMin();
+		    maxC = domain.getContinuous().getMax();
+		}
 		if (minC < maxC) {
     		for (int i=0; i<num_points; i++){
     			Double knt = new Double(minC+((maxC-minC)/(num_points-1)*(i)));

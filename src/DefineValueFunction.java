@@ -239,13 +239,15 @@ public class DefineValueFunction extends JPanel implements ActionListener{
     private void inputBestValue(){
 		double ansd = 0;
         String ans = null;
+        double minC = obj_sel.getDomain().getContinuous().getMin();
+        double maxC = obj_sel.getDomain().getContinuous().getMax();
     	ans = (String)JOptionPane.showInputDialog(this, "Best Value", "Other", JOptionPane.PLAIN_MESSAGE, 
-                null, null, String.valueOf(obj_sel.minC + (obj_sel.maxC - obj_sel.minC)/2));
+                null, null, String.valueOf(minC + (maxC - minC)/2));
         		//suggest the median value	 
     	try{    		
 	        if ((ans != null) && (ans.length() > 0)) {
 	        	ansd = (Double.valueOf(ans)).doubleValue();
-	        	if (ansd <= obj_sel.maxC && ansd >= obj_sel.minC)	        		
+	        	if (ansd <= maxC && ansd >= minC)	        		
 	        		obj_sel.setContinuous(ansd);
 	        	else{
 	        		JOptionPane.showMessageDialog(this, "Out of range", "Error", JOptionPane.WARNING_MESSAGE);      
@@ -265,7 +267,9 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		if ((ans != null) && (ans.length() > 0)) {
         	ansd = (Double.valueOf(ans)).doubleValue();
         	try{
-        		if (ansd <= obj_sel.maxC && ansd >= obj_sel.minC){	 
+                double minC = obj_sel.getDomain().getContinuous().getMin();
+                double maxC = obj_sel.getDomain().getContinuous().getMax();
+        		if (ansd <= maxC && ansd >= minC){	 
         			ContinuousAttributeDomain dom = obj_sel.getDomain().getContinuous();
         			dom.addKnot(ansd, 0.0);
         		}

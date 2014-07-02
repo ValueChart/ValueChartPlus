@@ -299,7 +299,7 @@ public class ValueChart extends JPanel {
                     if (obj.getUnit().equals("CAD")) {
                         obj.setDecimalFormat("0.00");
                     }
-                    if (obj.maxC > 100) {
+                    if (obj.getDomain().getContinuous().getMax() > 100) {
                         obj.setDecimalFormat("0");
                     } else {
                         obj.setDecimalFormat("0.0");

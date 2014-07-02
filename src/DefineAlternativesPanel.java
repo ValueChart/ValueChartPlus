@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -207,6 +208,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			TableColumn col = table.getColumnModel().getColumn(i+1);
 			JObjective obj = objs.get(i);
 			if (obj.getDomainType() == AttributeDomainType.DISCRETE){
+			    col.setCellRenderer(new DiscreteValidationCellRenderer());
 				JComboBox<String> cboCell;
 				if (obj.getDomain().getElements() != null)
 					cboCell = new JComboBox<String>(obj.getDomain().getElements());
@@ -217,6 +219,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			} 		
 			//set formatted text field if not
 			else {
+	            col.setCellRenderer(new ContinuousValidationCellRenderer());
 				DecimalFormat df = new DecimalFormat("0.0"); 
 				JFormattedTextField txtCell = new JFormattedTextField(df);
 				col.setCellEditor(new DefaultCellEditor(txtCell));
@@ -271,10 +274,12 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        			data.addElement("");
 	        		}
 	        		else {
-	        		    if (obj.minC > obj.maxC) {
+	        		    double minC = obj.getDomain().getContinuous().getMin();
+	        		    double maxC = obj.getDomain().getContinuous().getMax();
+	        		    if (minC > maxC) {
 	        		        data.addElement("");
 	        		    } else {
-	        		        data.addElement(Double.valueOf(obj.minC).toString());
+	        		        data.addElement(Double.valueOf(minC).toString());
 	        		    }
 	        		}
 	        }
@@ -295,10 +300,12 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        			datamap.put(obj.getName(), "");
 	        		}
 	        		else {
-	        		    if (obj.minC > obj.maxC) {
+	        		    double minC = obj.getDomain().getContinuous().getMin();
+                        double maxC = obj.getDomain().getContinuous().getMax();
+	        		    if (minC > maxC) {
 	        		        datamap.put(obj.getName(), "");
                         } else {
-                            datamap.put(obj.getName(), Double.valueOf(obj.minC));
+                            datamap.put(obj.getName(), Double.valueOf(minC));
                         }
 	        		}
         		}
@@ -347,8 +354,6 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 								min = d.doubleValue();	
 			    		}
 			        	if (!obj.init){
-			        		obj.maxC = max;
-			        		obj.minC = min;
 			        		obj.setContinuous();		
 			        		obj.init=true;
 			        	}    				
@@ -356,7 +361,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			        	//determine decimalFormat
 			        	if (obj.getUnit().equals("CAD"))
 			        		obj.setDecimalFormat("0.00");
-			        	else if (obj.maxC > 100)
+			        	else if (obj.getDomain().getContinuous().getMax() > 100)
 			        		obj.setDecimalFormat("0");
 			        	else
 			        		obj.setDecimalFormat("0.0");
@@ -494,62 +499,72 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        		//2. discrete items
 		        		//a) check if in list
 		        		if (obj!=null && obj.getDomainType()==AttributeDomainType.DISCRETE){
-		        		    found = obj.containsKey(entered);
-                            obj.replaceInObjValueMap(last_value, entered);
-
-		        			//b) if new, prompt for confirmation 
-		        			if (!found){	        	
-		                        int n = JOptionPane.showConfirmDialog(
-		                                this, "This is not currently a value on the list.  Would you like to add it?",
-		                                "New discrete value",
-		                                JOptionPane.YES_NO_CANCEL_OPTION);
-		                        //c)add the new discrete value 
-		                        if (n == JOptionPane.YES_OPTION) {
-		                        	DiscreteAttributeDomain dom = obj.getDomain().getDiscrete();
-		                        	dom.addElement(entered, 0.5); 		                        	
-		                            String name = temp.get("name").toString();
-		                            if (con.chart != null) {
-		                                ChartEntry entry = con.chart.getEntry(name);
-		                                if (entry != null) {
-		                                    AttributeValue value = entry.attributeValue(objName);
+		        		    
+		        		    if (!isNumeric(entered)) {
+    		        		    found = obj.containsKey(entered);
+                                obj.replaceInObjValueMap(last_value, entered);
+    
+    		        			//b) if new, prompt for confirmation 
+    		        			if (!found){	        	
+    		                        int n = JOptionPane.showConfirmDialog(
+    		                                this, "This is not currently a value on the list.  Would you like to add it?",
+    		                                "New discrete value",
+    		                                JOptionPane.YES_NO_CANCEL_OPTION);
+    		                        //c)add the new discrete value 
+    		                        if (n == JOptionPane.YES_OPTION) {
+    		                        	DiscreteAttributeDomain dom = obj.getDomain().getDiscrete();
+    		                        	dom.addElement(entered, 0.5); 		                        	
+    		                            String name = temp.get("name").toString();
+    		                            if (con.chart != null) {
+    		                                ChartEntry entry = con.chart.getEntry(name);
+    		                                if (entry != null) {
+    		                                    AttributeValue value = entry.attributeValue(objName);
+                                                if (value != null) {
+                                                    value.str = entered;
+                                                }
+    		                                }
+    		                            }
+    		                        	updateTable(); //d. update for new combobox item
+    		                        }
+    		                        else{ //reset for cancel or no
+    		        	        		temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
+    		        	        		alts.set(table.getSelectedRow(), temp); 
+    		        	        		table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
+    		                            obj.replaceInObjValueMap(entered, last_value);
+    		                        }
+    		        			}
+    		        			// already in list
+    		        			else {                                  
+                                    String name = temp.get("name").toString();
+                                    if (con.chart != null) {
+                                        ChartEntry entry = con.chart.getEntry(name);
+                                        if (entry != null) {
+                                            AttributeValue value = entry.attributeValue(objName);
                                             if (value != null) {
                                                 value.str = entered;
                                             }
-		                                }
-		                            }
-		                        	updateTable(); //d. update for new combobox item
-		                        }
-		                        else{ //reset for cancel or no
-		        	        		temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
-		        	        		alts.set(table.getSelectedRow(), temp); 
-		        	        		table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
-		                            obj.replaceInObjValueMap(entered, last_value);
-		                        }
-		        			}
-		        			// already in list
-		        			else {                                  
-                                String name = temp.get("name").toString();
-                                if (con.chart != null) {
-                                    ChartEntry entry = con.chart.getEntry(name);
-                                    if (entry != null) {
-                                        AttributeValue value = entry.attributeValue(objName);
-                                        if (value != null) {
-                                            value.str = entered;
                                         }
                                     }
-                                }
-		        			}
+    		        			}
+		        		    } else {
+                                temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
+                                alts.set(table.getSelectedRow(), temp); 
+                                table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
+                                entered = last_value;
+		        		    }
 		        		}	        		
 		        		// ---------------------------------------------------------------
                         //3. continuous items
 		        		else if (obj!=null && obj.getDomainType()==AttributeDomainType.CONTINUOUS){
                             AttributeValue value = null;
-
+                            double minC = obj.getDomain().getContinuous().getMin();
+                            double maxC = obj.getDomain().getContinuous().getMax();
+                            
 		        			//a) check if within range
 		        		    try {
 		        		        double enteredVal = Double.valueOf(entered).doubleValue();
 		        		        double lastVal = 0;
-		        		        if (!last_value.isEmpty()) {
+		        		        if (last_value != null && !last_value.isEmpty()) {
 		        		            lastVal = Double.valueOf(last_value).doubleValue();
 		        		            obj.replaceInObjValueMap(lastVal, enteredVal);
 		        		        } else {
@@ -566,7 +581,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                         }
                                     }
                                 }
-			        		if((obj.minC>enteredVal)||(obj.maxC<enteredVal)){
+			        		if((minC>enteredVal)||(maxC<enteredVal)){
 			        			//b)if not, prompt for confirmation
 		                        int n = JOptionPane.showConfirmDialog(
 		                                this, "The value you entered is not within the current range.  Are you sure you would like to enter it?",
@@ -574,12 +589,10 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                                JOptionPane.YES_NO_CANCEL_OPTION);
 		                        //c)update the range information
 		                        if (n == JOptionPane.YES_OPTION){
-		                            double newMin = (obj.minC < enteredVal ? obj.minC : enteredVal);
-		                            double newMax = (obj.maxC > enteredVal ? obj.maxC : enteredVal);
+		                            double newMin = (minC < enteredVal ? minC : enteredVal);
+		                            double newMax = (maxC > enteredVal ? maxC : enteredVal);
 		                            
 		                            boolean updated = obj.getDomain().getContinuous().updateRange(newMin, newMax);
-		                            obj.minC = newMin;
-                                    obj.maxC = newMax;
                                     
 		                            if (!updated) {
 		                                JOptionPane.showMessageDialog(this,		//inform the user that value function is affected
@@ -606,8 +619,8 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		                        }                        	
 			        		}   
 			        		// a) check if range is smaller
-			        		else if (  (obj.minC==lastVal && !obj.containsKey(lastVal)) 
-			        		        || (obj.maxC==lastVal && !obj.containsKey(lastVal)) ) {
+			        		else if (  (minC==lastVal && !obj.containsKey(lastVal)) 
+			        		        || (maxC==lastVal && !obj.containsKey(lastVal)) ) {
 	                               //b)if yes, prompt for confirmation
                                 int n = JOptionPane.showConfirmDialog(
                                         this, "The value you entered requires updating the current range.  Are you sure you would like to enter it?",
@@ -627,8 +640,6 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
                                     }
                                     
                                     boolean updated = obj.getDomain().getContinuous().updateRange(newMin, newMax);
-                                    obj.minC = newMin;
-                                    obj.maxC = newMax;
                                     
                                     if (!updated) {
                                         JOptionPane.showMessageDialog(this,     //inform the user that value function is affected
@@ -653,7 +664,6 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 			        		    
 			        		}
 		        		    } catch (NumberFormatException ex) {
-		        		        JOptionPane.showMessageDialog(this, "Invalid input: numeric value expected");
                                 temp.put((columns.get(table.getSelectedColumn()).toString()), last_value);
                                 alts.set(table.getSelectedRow(), temp); 
                                 table.setValueAt(last_value, table.getSelectedRow(), table.getSelectedColumn());
@@ -676,4 +686,74 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	        		catch (NullPointerException ne){}         		
 	    }
 	}
+	
+    public class ContinuousValidationCellRenderer extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 1L;
+
+        public ContinuousValidationCellRenderer() {
+            super();
+        }
+        
+        public Component getTableCellRendererComponent(JTable table,
+                Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            
+            Component rendererComp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                    row, column);
+            
+            if (value.toString().isEmpty() || !isNumeric(value.toString())) {
+                // selection 
+                if (isSelected) {
+                    rendererComp.setBackground(new Color(103,0,13));
+                } else {
+                    rendererComp.setBackground(new Color(222,45,38));
+                }
+                rendererComp.setForeground(Color.white);
+            } else {
+                if (isSelected) {
+                    rendererComp.setBackground(table.getSelectionBackground());
+                    rendererComp.setForeground(table.getSelectionForeground());
+                } else {
+                    rendererComp.setBackground(table.getBackground());
+                    rendererComp.setForeground(table.getForeground());
+                }
+            }
+            
+            return this;
+        }
+    }
+    
+    public class DiscreteValidationCellRenderer extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 1L;
+
+        public DiscreteValidationCellRenderer() {
+            super();
+        }
+        
+        public Component getTableCellRendererComponent(JTable table,
+                Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            
+            Component rendererComp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                    row, column);
+            
+            if (value.toString().isEmpty() || isNumeric(value.toString())) {
+                // selection 
+                if (isSelected) {
+                    rendererComp.setBackground(new Color(103,0,13));
+                } else {
+                    rendererComp.setBackground(new Color(222,45,38));
+                }
+                rendererComp.setForeground(Color.white);
+            } else {
+                if (isSelected) {
+                    rendererComp.setBackground(table.getSelectionBackground());
+                    rendererComp.setForeground(table.getSelectionForeground());
+                } else {
+                    rendererComp.setBackground(table.getBackground());
+                    rendererComp.setForeground(table.getForeground());
+                }
+            }
+            
+            return this;
+        }
+    }
 }
