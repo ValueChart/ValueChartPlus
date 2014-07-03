@@ -491,7 +491,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             chart.keepCurrentState();
         
         preferenceOnly = false;
-        btnOK = new JButton("Update Chart");
+        btnOK.setText("Update Chart");
+        btnOK.setEnabled(true);
         btnCancel = new JButton("Cancel");
         
         constPane.removeAll();

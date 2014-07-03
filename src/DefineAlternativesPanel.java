@@ -80,7 +80,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		columns = new Vector<String>();		
 				
 		//set up table model and component
-		tabModel = new DefaultTableModel() /*{
+		tabModel = new DefaultTableModel() {
             private static final long serialVersionUID = 1L;
 
             @Override 
@@ -89,7 +89,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		        if (column == 0) return false;
 		        return true;
 		    }
-		}*/;
+		};
 		tabModel.setDataVector(rows,columns);		
 		table = new JTable(tabModel);        
 		table.getModel().addTableModelListener(this);		
@@ -147,7 +147,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	//resets alternative constuction view to reflect any changes in objectives
 	public void updateTable(){
 		//add columns
-		columns = new Vector<String>();
+		columns.clear();
 		columns.addElement("Alternatives");		
 		objs = con.getObjPanel().getPrimitiveObjectives();	//do we really need this temp holder?
 		for(int i=0; i<objs.size(); i++){
@@ -155,7 +155,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 		}  		
 		
 		//add data
-		rows = new Vector<Vector<String>>();
+		rows.clear();
 		for (int j=0; j<alts.size(); j++){
 			Vector<String> data = new Vector<String>();
 			HashMap<String,Object> temp = alts.get(j);
@@ -259,6 +259,39 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	            con.validateTabs(); 
 	   }
 
+    
+    void renameAlternative(int index){
+        String old_name = rows.get(index).get(0);
+        String new_name = (String)JOptionPane.showInputDialog(
+                this,
+                "Alternative name:",
+                "Rename Alternative",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                old_name);
+        // no change, return
+        if (new_name == null || new_name.isEmpty() 
+             || new_name.equals(old_name)) 
+            return;
+        
+        if (hasDuplicate(new_name)) {
+            JOptionPane.showMessageDialog(this, "Alternative name " + new_name + " already exists");
+        } else {
+            HashMap<String,Object> val = alts.get(index);
+            val.put("name", new_name);
+            rows.get(index).set(0, new_name);
+            table.addNotify();
+        }
+    }
+    
+    private boolean hasDuplicate(String str){
+        for (Vector<String> row : rows) {
+            if (row.get(0).equals(str))
+                return true;
+        }
+        return false;
+    }
     
     void addAlternative(){
         String new_name = (String)JOptionPane.showInputDialog(
@@ -420,8 +453,9 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	    		addAlternative();    	
 	    	else if ("Remove".equals(e.getActionCommand()))
 	    		removeAlternative(table.getSelectedRow());
-	    	else if ("Rename".equals(e.getActionCommand()))
-	    		System.out.println("This is to change the alternative name"); 
+	    	else if ("Rename".equals(e.getActionCommand())) {
+	    		renameAlternative(table.getSelectedRow());
+	    	}
 	    		
     }	
     
