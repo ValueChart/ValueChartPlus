@@ -12,6 +12,11 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+/**
+ * Comment box for users to log feedback.
+ * <p><img src="doc-files/CommentPanel.png"/></p>
+ *
+ */
 public class CommentPanel extends JPanel implements FocusListener{
 
     private static final long serialVersionUID = 1L;

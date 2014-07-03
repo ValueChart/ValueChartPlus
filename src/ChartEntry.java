@@ -7,9 +7,16 @@ import org.icepdf.ri.common.SwingController;
 
 import java.io.File;
 
-//This class is the basis of ChartEntry. To my knowledge, this class has little to do with he interface itself. One thing to note though.
-//is that HashMap is the datatype for a Chart Entry. I am not sure if this is a good idea rather than using an object. Since HashMap has certain
-//problems to maintaining consistency and maybe hard to organize for interface presentation
+/**
+ * <p>
+ * Class represents individual alternatives. Has mapping of criteria name to value corresponding to alternative.
+ *  Also links to PDF report controls.
+ * </p>
+ * 
+ * <p>This class is the basis of ChartEntry. To my knowledge, this class has little to do with he interface itself. One thing to note though.
+ * is that HashMap is the datatype for a Chart Entry. I am not sure if this is a good idea rather than using an object. Since HashMap has certain
+ * problems to maintaining consistency and maybe hard to organize for interface presentation</p>
+ */
 public class ChartEntry
 {
 	String name;

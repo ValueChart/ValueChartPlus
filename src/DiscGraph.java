@@ -5,7 +5,12 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 
-
+/**
+ * Small version of discrete utility/value/score function graphs in main interface. Points can be moved.
+ * 
+ * <p><img src="doc-files/DiscGraph.png"/></p>
+ *
+ */
 public class DiscGraph extends JPanel implements MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 	private static final int MIN_HEIGHT = 20;

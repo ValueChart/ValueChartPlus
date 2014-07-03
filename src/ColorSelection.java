@@ -5,7 +5,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.*;
 
-/* ColorChooserDemo.java is a 1.4 application that requires no other files. */
+/** ColorChooserDemo.java is a 1.4 application that requires no other files. */
 public class ColorSelection extends JPanel
                               implements ChangeListener, ActionListener{
 	private static final long serialVersionUID = 1L;

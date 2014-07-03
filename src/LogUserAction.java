@@ -4,7 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Vector;
 
-
+/**
+ * Class that contains a log filename and methods to write user action data
+ * 
+ *
+ */
 public class LogUserAction {
 
     public static final int LOG_NONE = 1;

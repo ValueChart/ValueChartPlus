@@ -11,6 +11,15 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.*;
 
+/**
+ * Interface with two views:  
+ * <ul>
+ * <li><b>Construction Model</b> can modify objective/criteria/attributes, alternatives, value/utility/score functions, SMARTER, and weighting</li>
+ * <li><b>Preference Model</b> linear wizard for modifying value/utility/score function, SMARTER, and weighting</li>
+ * </ul>
+ * 
+ * Creates a new instance of ValueCharts when updating chart, by creating and reading from "test.vc"
+ */
 public class ConstructionView extends JPanel implements ChangeListener, ActionListener{
 
 	private static final long serialVersionUID = 1L;
@@ -520,7 +529,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     }
     
     public boolean allowPreferenceModel() {
-        return (checkObjectiveValid() && checkAlternativeValid());
+        return ((checkObjectiveValid() && checkAlternativeValid()) || chart.reportFile != null);
     }
     
     public void gotoWeighting() {

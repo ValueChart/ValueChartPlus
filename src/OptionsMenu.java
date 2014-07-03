@@ -25,6 +25,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+/**
+ * Top menu bar
+ * 
+ * <p><img src="doc-files/OptionsMenu.png"/></p>
+ */
 class OptionsMenu extends JMenuBar implements ActionListener{
 	private static final long serialVersionUID = 1L;
 

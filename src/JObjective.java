@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 /**
  * Represents a single objective to be rendered as a label
- * TODO: redundant information stored for UI and data handling, should remove UI data where possible
+ * 
  *
  */
 public class JObjective extends JLabel{

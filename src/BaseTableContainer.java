@@ -8,11 +8,13 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 
-//This class is the draggable panel of objectives. The most interesting method to this class is its mouse handler.
-//Pay attention to those few methods, and you can add all kinds of interaction to the interface.
-
-//One of the base containers is the root object, this object is hidden by the width = 0.
-
+/**
+ * This class is the draggable panel of objectives. The most interesting method to this class is its mouse handler.
+ * Pay attention to those few methods, and you can add all kinds of interaction to the interface. 
+ * <p><img src="doc-files/BaseTableContainer.png" /></p>
+ *
+ * One of the base containers is the root object, this object is hidden by the width = 0.
+ */
 public class BaseTableContainer extends Box implements ActionListener {
 
     private static final long serialVersionUID = 1L;

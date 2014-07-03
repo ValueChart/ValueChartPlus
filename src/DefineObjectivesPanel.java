@@ -27,6 +27,11 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+/**
+ * Contained in ConstructionView. Interactive hierarchical construction of objectives.
+ * 
+ *
+ */
 public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	static final int 	OBJ_X = 15, 

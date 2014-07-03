@@ -1,5 +1,10 @@
 
 
+/**
+ * Contains information for a colour associated with a name.
+ * 
+ *
+ */
 public class ColorMap{
     String color;
     int red;

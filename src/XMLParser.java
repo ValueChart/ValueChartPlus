@@ -5,6 +5,11 @@ import java.util.regex.Pattern;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
+/**
+ * Contains helper methods to parse XML file data.
+ * 
+ *
+ */
 public class XMLParser {
     
     public static void readDescriptions(ValueChart chart) {

@@ -7,13 +7,15 @@ import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//Author: Victor Chung
-//This class itself is "almost" self-contained. Unlike other classes in the program, the function call in this
-//class is not as spiral-like.
-//I personally think the Graphics2D paint function is the most interesting ones. Actually, most of the drawing is done in there for the utility graph 
-//Comments are added below 
-
-
+/**
+ * Visual component for modifying continuous domain (utility/value/score function) values.
+ * 
+ * Author: Victor Chung
+ * This class itself is "almost" self-contained. Unlike other classes in the program, the function call in this
+ * class is not as spiral-like.
+ * I personally think the Graphics2D paint function is the most interesting ones. Actually, most of the drawing is done in there for the utility graph 
+ * Comments are added below
+ */
 public class ContinuousUtilityGraph extends JPanel implements MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 	//The basic idea is I have an array list of points, which has x-axis and y-axis.

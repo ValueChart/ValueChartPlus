@@ -1,5 +1,9 @@
 import java.util.HashMap;
 
+/**
+ * Interface for defining criterion/objective/attribute data. 
+ *
+ */
 public interface AttributeData {
 
     public double getWeight();

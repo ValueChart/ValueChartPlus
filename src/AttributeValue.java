@@ -3,6 +3,11 @@
 //through ContinuousAttributeDomain and DiscreteAttributeDomain
 //Those two classes have a more direct implementation of abstract class AttributeDomain
 
+/**
+ * Contains information on a specific value of a domain for a criterion.
+ * Gives the weight (y-axis, [0,1]) given its domain value (x-axis) and criterion name.
+ *
+ */
 public class AttributeValue
 {
 	String str;

@@ -1,7 +1,11 @@
 import java.util.HashMap;
 import java.util.Vector;
 
-
+/**
+ * Contains all the data necessary to generate a ValueChart. Used to pass data across new instances
+ * 
+ *
+ */
 public class ChartData {
     ValueChart chart;
     

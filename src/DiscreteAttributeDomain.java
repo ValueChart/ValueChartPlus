@@ -1,9 +1,12 @@
 import java.util.*;
 
-//Just like ContinuousAttributeDomain, this is the other class which can control most of the interaction
-//you will need to do with the domain.
-//Some more comments are attempted below
-
+/**
+ * Contains a LinkedHashMap that maps x-axis values to y-axis values [0,1] for discrete value/utility/score functions 
+ * 
+ * Just like ContinuousAttributeDomain, this is the other class which can control most of the interaction
+ * you will need to do with the domain.
+ * Some more comments are attempted below
+*/
 public class DiscreteAttributeDomain extends AttributeDomain
 {
 

@@ -13,6 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+/**
+ * Panel containing options for actions such as Pump and Sort
+ * 
+ * <p><img src="doc-files/SensitivityAnalysisOptions.png"/></p>
+ */
 class SensitivityAnalysisOptions extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	JRadioButton optInc;

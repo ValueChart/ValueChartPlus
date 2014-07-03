@@ -1,5 +1,10 @@
 import javax.swing.JPanel;
 
+/**
+ * Represents a single user interaction. Used for Undo/Redo operations
+ * 
+ *
+ */
 public class LastInteraction {
 
     public static final int NO_UNDO = 0, SLIDE = 1, PUMP = 2, UTIL = 3;

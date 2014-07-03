@@ -4,7 +4,12 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.text.DecimalFormat;
 
-
+/**
+ * Small version of continuous utility/value/score function graphs in main interface. Points can be moved.
+ * 
+ * <p><img src="doc-files/ContGraph.png"/></p>
+ *
+ */
 public class ContGraph extends JPanel implements MouseListener, MouseMotionListener{
 	private static final long serialVersionUID = 1L;
 	private static final int 	BOTTOM = 7, 

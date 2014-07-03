@@ -33,6 +33,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+/**
+ * Contained in ConstructionView. Table for defining and setting alternative values
+ * 
+ *
+ */
 public class DefineAlternativesPanel extends JPanel implements ActionListener, TableModelListener{
 
 	private static final long serialVersionUID = 1L;

@@ -13,7 +13,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-
+/**
+ * Pop-up window that displays descriptions (mainly for objectives) as HTML formatted text. Also allows hyperlink to websites
+ * 
+ */
 public class DescriptionView extends JFrame implements HyperlinkListener {
     
 

@@ -1,5 +1,10 @@
 import java.util.Vector;
 
+/**
+ * Simple vector of color name mapping.
+ * 
+ *
+ */
 class ColorList extends Vector<ColorMap>{  
 	private static final long serialVersionUID = 1L;
 

@@ -7,10 +7,11 @@ import acme.misc.ScanfReader;
 
 
 
-//This class contains the details of a domain. If you are working with a domain, chances are, you will call
-//some of the functions in this class to get the weights. 
-
-//NOTE: THIS IS JUST AN ABSTRACT CLASS
+/**
+ * This class contains the details of a domain. If you are working with a domain, chances are, you will call
+ * some of the functions in this class to get the weights.
+ * NOTE: THIS IS JUST AN ABSTRACT CLASS
+ */
 public abstract class AttributeDomain
 {
 

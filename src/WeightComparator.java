@@ -1,7 +1,10 @@
 import java.util.*;
 
-//This class is for comparing weights.
-
+/**
+ * This class is for comparing weights.
+ * 
+ *
+ */
 public class WeightComparator implements Comparator<ChartEntry>
 {
 	   BaseTableContainer baseTab;

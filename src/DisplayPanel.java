@@ -7,11 +7,13 @@ import javax.swing.*;
 import java.util.*;
 import javax.swing.event.MouseInputAdapter;
 
-//This class is the overall ranking panel. The most important function in this
-//class is the paint function. All the rankings are done through paint.
-//If you are rotating the interface 90 degrees, you need to change the paint function
-//of x to y.
-//See below comments
+/**
+ * Visual component containing the stacked bars.
+ * 
+ * This class is the overall ranking panel. The most important function in this
+ * class is the paint function. All the rankings are done through paint.
+ * <p><img src="doc-files/DisplayPanel.png"/></p>
+ */
 public class DisplayPanel extends JComponent {
 
     private static final long serialVersionUID = 1L;

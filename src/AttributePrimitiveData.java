@@ -1,6 +1,10 @@
 import java.awt.Color;
 import java.util.HashMap;
-
+/**
+ * Contains information for a primitive objective/criterion/attribute. Contains all data (weight, domain, color, etc.)
+ * for a specific criterion
+ *
+ */
 public class AttributePrimitiveData implements AttributeData {
 
     private double attributeWeight;

@@ -12,6 +12,11 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
+/**
+ * Dialog that allows creation or opening of a VC file. 
+ * 
+ *
+ */
 public class ValueChartsPlus extends JPanel
                              implements ActionListener, PropertyChangeListener{
 	private static final long serialVersionUID = 1L;

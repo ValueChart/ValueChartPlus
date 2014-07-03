@@ -10,7 +10,11 @@ import org.icepdf.core.pobjects.OutlineItem;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.views.DocumentViewControllerImpl;
 
-
+/**
+ * Visual component that forms the individual colour bars. Each AttributeCell corresponds to a single
+ * alternative and criterion
+ * <p><img src="doc-files/AttributeCell.png"></p>
+ */
 public class AttributeCell extends JComponent {
 
     private static final long serialVersionUID = 1L;

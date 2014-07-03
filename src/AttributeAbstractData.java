@@ -1,6 +1,11 @@
 import java.util.HashMap;
 import java.util.Vector;
 
+/**
+ * Contains information for an abstract objective/criterion/attribute. Composed of children AttributeData, 
+ * each one of which may be abstract or primitive. Derives weight from children.
+ *
+ */
 public class AttributeAbstractData implements AttributeData {
 
     Vector<AttributeData> children;

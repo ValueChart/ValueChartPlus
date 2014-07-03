@@ -1,11 +1,13 @@
 import java.util.*;
 
-
-//This is an important class. In fact, I believe most of the interaction with the continuous domain
-//can be done through this class.
-//If you are successful using this class, in theory, you can ignore AttributeDomain class
-//More comments are added below
-
+/**
+ * Contains a TreeMap (sorted) that maps x-axis numeric values to y-axis values [0,1] for continuous value/utility/score functions 
+ * 
+ * This is an important class. In fact, I believe most of the interaction with the continuous domain
+ * can be done through this class.
+ * If you are successful using this class, in theory, you can ignore AttributeDomain class
+ * More comments are added below
+*/
 public class ContinuousAttributeDomain extends AttributeDomain
 {
     ContGraph contGraph;

@@ -1,7 +1,11 @@
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-
+/**
+ * Allows errors to be displayed to users as dialog rather than just to console display
+ * 
+ *
+ */
 public class UserDialog {
     public static void showMessage(String msg, String title, JFrame frame) {
         JOptionPane.showMessageDialog(frame,

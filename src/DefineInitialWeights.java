@@ -22,6 +22,11 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+/**
+ * Contained in ConstructionView. Has overview of all primitive criteria weights.
+ * 
+ *
+ */
 public class DefineInitialWeights extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 

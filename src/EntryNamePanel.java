@@ -13,8 +13,11 @@ import org.icepdf.ri.common.OutlineItemTreeNode;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.views.DocumentViewControllerImpl;
 
-//This class deals with displaying name of entry's.
-//Like it will display House 1, House 2, House 3 etc..
+/**
+ * Visual component that displays alternative name/index
+ * 
+ * <p><img src="doc-files/EntryNamePanel.png"/></p>
+ */
 public class EntryNamePanel extends JPanel implements ActionListener {
 
     private static final long serialVersionUID = 1L;

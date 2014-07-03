@@ -16,6 +16,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+/**
+ * Table of alternative information. By default, display indexed legend of all alternative names.
+ * If alternative clicked, displays summary details for alternative.
+ * 
+ * <p><img src="doc-files/DetailsViewPanel.png" /></p>
+ */
 class DetailsViewPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     JLabel lblAlt;

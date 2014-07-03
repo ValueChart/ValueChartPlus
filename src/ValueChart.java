@@ -17,6 +17,13 @@ import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingViewBuilder;
 import org.icepdf.ri.common.views.DocumentViewControllerImpl;
 
+/**
+ * Contains many methods and properties that define the running of the entire interface. Also container for all 
+ * relevant data. Contains all components for the full interface.
+ * Main class that does way too much. Would benefit from heavy refactoring.
+ * 
+ *
+ */
 public class ValueChart extends JPanel {
 
     private static final long serialVersionUID = 1L;

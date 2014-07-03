@@ -5,6 +5,11 @@ import javax.swing.*;
 
 import java.util.*;
 
+/**
+ * Used by BaseTableContainer. Visual component that allows objectives to be re-ordered by dragging
+ * 
+ *
+ */
 public class TablePane extends JLayeredPane {
 
     private static final long serialVersionUID = 1L;

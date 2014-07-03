@@ -7,10 +7,13 @@ import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//This class is a variation of the ContinuousUtilityGraph class. the only difference is that
-//the function call is to DiscreteAttributeDomain
-//Also, the paint function has function class that draw bars instead of lines.
-
+/**
+ * Visual component for modifying discrete domain (utility/value/score function) values.
+ * 
+ * This class is a variation of the ContinuousUtilityGraph class. the only difference is that
+ * the function call is to DiscreteAttributeDomain
+ * Also, the paint function has function class that draw bars instead of lines.
+*/
 public class DiscreteUtilityGraph extends JPanel implements MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 	MoveablePoint[] p;

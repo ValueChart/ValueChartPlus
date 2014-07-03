@@ -2,7 +2,11 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-
+/**
+ * Used by ConstructionView. Pop-up that allows modification of objective details.
+ * 
+ *
+ */
 public class ObjectiveDetails extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	JRadioButton optCont;

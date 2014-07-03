@@ -22,6 +22,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+/**
+ * Used in ConstructionView as a tab panel as well as a separate dialog (right click in Weighting tab). 
+ * Steps user through the SMARTER weighting method and updates weights accordingly
+ *
+ */
 class WeightingBySMARTER extends JPanel implements ActionListener{      
     private static final long serialVersionUID = 1L;
 

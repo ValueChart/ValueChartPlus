@@ -7,6 +7,11 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+/**
+ * Contained in ConstructionView. Contains value/score/utility function graphs for modification
+ * 
+ *
+ */
 public class DefineValueFunction extends JPanel implements ActionListener{
 
 	private static final long serialVersionUID = 1L;
