@@ -19,6 +19,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
@@ -27,7 +29,7 @@ import javax.swing.table.JTableHeader;
  * 
  *
  */
-public class DefineInitialWeights extends JPanel implements ActionListener{
+public class DefineInitialWeights extends JPanel implements ActionListener, TableModelListener{
 	private static final long serialVersionUID = 1L;
 
 	static final int ROW_HEIGHT = 20;
@@ -38,7 +40,7 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 	Vector<Vector<String>> rows;
 	Vector<String> columns;
 	JTable table;	
-	TableHandler tabModel;  
+	DefaultTableModel tabModel;  
 	JScrollPane scrollPane;
 	JPanel pnlTable;
 	
@@ -49,6 +51,10 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 	boolean completedSMARTER = false;
 		
 	JPopupMenu popWeighting;
+	
+	private String last_value;
+	private int last_row = -1;
+	private int last_col = -1;
 	
 	DefineInitialWeights(ConstructionView c){
 		con = c;
@@ -97,7 +103,17 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 	
 		updateWeights();
 		//set up table model and component
-		tabModel = new TableHandler();
+		tabModel = new DefaultTableModel(){
+	        private static final long serialVersionUID = 1L;
+
+	        public boolean isCellEditable(int row, int column){
+	            if (column == getColumnCount()-1)
+	                return true;
+	            
+	            return false;
+	        }
+	    };
+	    tabModel.addTableModelListener(this);
 		tabModel.setDataVector(rows,columns);		
 		table = new JTable(tabModel); 
 		table.setRowHeight(ROW_HEIGHT);
@@ -208,9 +224,26 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
 	}
 
 	class MouseHandler extends MouseInputAdapter{
-		public void mousePressed(MouseEvent me){
-            if(SwingUtilities.isRightMouseButton(me))
-            	popWeighting.show(me.getComponent(), me.getX(), me.getY());            	
+        public void mousePressed(MouseEvent me) {
+            if (SwingUtilities.isRightMouseButton(me)) {
+                popWeighting.show(me.getComponent(), me.getX(), me.getY());
+            } else if (SwingUtilities.isLeftMouseButton(me)) {
+                try {
+                    JTable tab = (JTable) (me.getSource());
+                    if (tab.isEditing()) {
+                        if (tab.getValueAt(tab.getSelectedRow(), tab.getSelectedColumn()) != null) {
+                            last_row = tab.getSelectedRow();
+                            last_col = tab.getSelectedColumn();
+                            last_value = (tab.getValueAt(last_row, last_col)).toString();
+                        }
+                    }
+                } catch (java.lang.ClassCastException cce) {
+                } catch (java.lang.NumberFormatException nfe) {
+                } catch (java.lang.NullPointerException npe) {
+                    last_row = last_col = -1;
+                    last_value = null;
+                }
+            }
 		}
 	}
 	
@@ -272,14 +305,28 @@ public class DefineInitialWeights extends JPanel implements ActionListener{
         }
         con.btnOK.setEnabled(true);
     }
-    
-	
-	class TableHandler extends DefaultTableModel{
-		private static final long serialVersionUID = 1L;
 
-		public boolean isCellEditable(int row, int column){
-			return false;
-		}
-	}
-	
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        if (e.getType() != TableModelEvent.UPDATE || table == null)
+            return;
+        
+        int row = table.getSelectedRow();
+        int col = table.getSelectedColumn();
+        if (row != last_row || col != last_col)
+            return;
+        
+        String entered = table.getValueAt(row, col).toString();
+        try {
+            double enteredVal = Double.parseDouble(entered);
+            JObjective obj = objs.get(row);
+            
+            obj.setWeight(entered);
+            if (con != null)
+                con.validateTabs();
+        } catch (NumberFormatException ex) {
+            table.setValueAt(last_value, row, col);
+        }
+
+    }	
 }
