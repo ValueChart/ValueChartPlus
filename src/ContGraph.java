@@ -62,6 +62,10 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
         
     }     
     
+    public void setColor(Color c) {
+        color = c;
+    }
+    
     void plotPoints(){
     	weights = cdomain.getWeights();
     	items = cdomain.getKnots();

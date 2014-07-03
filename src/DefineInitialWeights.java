@@ -313,12 +313,12 @@ public class DefineInitialWeights extends JPanel implements ActionListener, Tabl
         
         int row = table.getSelectedRow();
         int col = table.getSelectedColumn();
-        if (row != last_row || col != last_col)
+        if (row != last_row || col != last_col || row < 0 || col < 0)
             return;
         
         String entered = table.getValueAt(row, col).toString();
         try {
-            double enteredVal = Double.parseDouble(entered);
+            Double.parseDouble(entered);
             JObjective obj = objs.get(row);
             
             obj.setWeight(entered);

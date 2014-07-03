@@ -75,8 +75,14 @@ public class AttributeCell extends JComponent {
 
     public void setColor(Color c) {
         color = c;
-        float[] rgb = c.getRGBColorComponents(null);
-        new Color(rgb[0] / 3, rgb[1] / 3, rgb[2] / 3);
+        if (cg != null)
+            cg.setColor(c);
+        if (dg != null)
+            dg.setColor(c);
+        if (obj != null)
+            obj.setColor(c);
+        //float[] rgb = c.getRGBColorComponents(null);
+        //new Color(rgb[0] / 3, rgb[1] / 3, rgb[2] / 3);
     }
 
     public String getUnits() {

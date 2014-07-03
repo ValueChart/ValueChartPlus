@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -75,11 +76,23 @@ public class ColorSelection extends JPanel
     }
 
 	public void actionPerformed(ActionEvent arg0) {
-		if (lblObj instanceof JObjective)
+		if (lblObj instanceof JObjective) {
 			((JObjective)lblObj).setColor(cc.getColor());
+		}
 		else{ 
 			((AttributeCell)lblObj).setColor(cc.getColor());
-			lblBase.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(cc.getColor()), BorderFactory.createBevelBorder(BevelBorder.RAISED)));
+	        AttributePrimitiveData attrData = chart.getAttribute(lblObj.getName()).getPrimitive();
+	        attrData.setColor(cc.getColor());
+	        if (chart.con != null && chart.con.getObjPanel() != null) {
+	            Vector<JObjective> prims = chart.con.getObjPanel().prim_obj;
+	            for (JObjective obj : prims) {
+	                if (obj.getName().equals(attrData.getName())) {
+	                    obj.setColor(cc.getColor());
+	                    break;
+	                }
+	            }
+	        }
+			lblBase.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(cc.getColor()), BorderFactory.createEmptyBorder()));
 			chart.updateAll();
 		}
 		frame.dispose();

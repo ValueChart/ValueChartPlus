@@ -73,6 +73,10 @@ public class DiscGraph extends JPanel implements MouseListener, MouseMotionListe
         plotPoints();
     }
     
+    public void setColor(Color c) {
+        color = c;
+    }
+    
     int getSpacing(int i){
     	int sp = 0;
     	if (items.length > 2)
