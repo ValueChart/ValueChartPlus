@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 
 
 /**
@@ -18,8 +20,12 @@ public class ColorMap{
         blue = b;
     }
     
-    String getColor(){
+    String getColorString(){
         return color;
+    }
+    
+    Color getColor() {
+        return new Color(red, green, blue);
     }
     
     String getCodeInt(){

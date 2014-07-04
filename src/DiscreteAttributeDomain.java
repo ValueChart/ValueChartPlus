@@ -98,4 +98,7 @@ public class DiscreteAttributeDomain extends AttributeDomain
         }
     }
 	
+    public LinkedHashMap<String, Double> getEntryMap() {
+        return entryMap;
+    }
 }

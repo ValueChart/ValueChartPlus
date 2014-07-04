@@ -24,7 +24,7 @@ class ColorList extends Vector<ColorMap>{
 	
 	String getColorEntry(int index){
 		ColorMap col = (ColorMap)this.get(index);
-		return new String(col.getColor() + " " + col.getCodeDec());
+		return new String(col.getColorString() + " " + col.getCodeDec());
 	}
 	
 	String getColorCode(int index){
@@ -34,7 +34,7 @@ class ColorList extends Vector<ColorMap>{
 	
 	String getColorName(int index){
 		ColorMap col = (ColorMap)this.get(index);
-		return col.getColor();
+		return col.getColorString();
 	}
 	
 

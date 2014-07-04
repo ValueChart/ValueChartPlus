@@ -214,5 +214,9 @@ public class ContinuousAttributeDomain extends AttributeDomain
             entry.setValue(0.5);
         }
     }
+    
+    public TreeMap<Double, Double> getKnotMap() {
+        return knotMap;
+    }
 	
 }
