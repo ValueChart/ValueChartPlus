@@ -23,9 +23,11 @@ public class ValueChartsPlus extends JPanel
 	static String strNew = "Create a new ValueChart";
     static String strData = "Open a data file";
     static String strVC = "Open an existing ValueChart";
+    static String strXML = "Open an XML file";
     JRadioButton optNew;
     JRadioButton optData;
     JRadioButton optVC;
+    JRadioButton optXML;
     ButtonGroup grpOptions;    
     JPanel pnlOptions;
     
@@ -53,6 +55,7 @@ public class ValueChartsPlus extends JPanel
     
     Vector<String> vc_files;
     Vector<String> csv_files;
+    Vector<String> xml_files;
     
     String filename;
     static ValueChart chart;
@@ -68,21 +71,26 @@ public class ValueChartsPlus extends JPanel
         optData.setActionCommand("optData");
         optVC = new JRadioButton(strVC);
         optVC.setActionCommand("optVC");
-    
+        optXML = new JRadioButton(strXML);
+        optXML.setActionCommand("optXML");
+        
         grpOptions = new ButtonGroup();
         grpOptions.add(optNew);
         grpOptions.add(optData);
         grpOptions.add(optVC);        
-
+        grpOptions.add(optXML);
+        
         optNew.addActionListener(this);
         optData.addActionListener(this);
         optVC.addActionListener(this);
-
+        optXML.addActionListener(this);
+        
         pnlOptions = new JPanel(new GridLayout(0, 1));
         pnlOptions.setBorder(BorderFactory.createEtchedBorder(1));        
         pnlOptions.add(optNew);
         pnlOptions.add(optData);
         pnlOptions.add(optVC);
+        pnlOptions.add(optXML);
         
         //Set up the File List
         listModel = new DefaultListModel<String>(); 
@@ -174,6 +182,16 @@ public class ValueChartsPlus extends JPanel
         		con.showChart();
         		con.filename = "test.vc";	//temp holder for a new filename
         	}
+        	else if (optXML.isSelected()){ 
+                con = new ConstructionView(ConstructionView.FROM_XML, txtUser.getText());
+                con.filename = lstFiles.getSelectedValue().toString();
+                con.setInit(false);
+                filename = lstFiles.getSelectedValue().toString();
+                if (countEntries(filename) > 10)
+                    con.setDisplayType(ConstructionView.SIDE_DISPLAY);
+                con.showChart();
+                con.filename = "test.xml";   //temp holder for a new filename
+            }
             else if (optNew.isSelected()){
             	con = new ConstructionView(ConstructionView.NEW_FILE, txtUser.getText());
             	//create new file with specified name
@@ -209,6 +227,13 @@ public class ValueChartsPlus extends JPanel
             scrList.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             lblName.setForeground(Color.GRAY);
         }
+        else if ("optXML".equals(e.getActionCommand())){
+            prepLists();
+            setList(xml_files);
+            txtName.setEnabled(false);          
+            scrList.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            lblName.setForeground(Color.GRAY);
+        }
         else if ("Remove".equals(e.getActionCommand())){
         	if (lstFiles.getSelectedIndex() != -1){
 	        	String delstring = lstFiles.getSelectedValue().toString();
@@ -237,6 +262,7 @@ public class ValueChartsPlus extends JPanel
     void prepLists(){
     	vc_files = new Vector<String>();
     	csv_files = new Vector<String>();
+    	xml_files = new Vector<String>();
         //String[] filenames;
         File f = new File(".");
         String files[] = f.list();
@@ -245,6 +271,8 @@ public class ValueChartsPlus extends JPanel
         		vc_files.add(files[i]);
     		else if (files[i].endsWith(".csv"))
     			csv_files.add(files[i]);
+    		else if (files[i].endsWith(".xml"))
+                xml_files.add(files[i]);
         }    	
     }
     

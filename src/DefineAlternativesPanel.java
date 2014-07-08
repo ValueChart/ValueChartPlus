@@ -411,23 +411,23 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
     public String getAlternativeOutput(){
     	String str = "";
     		
-    		for (int i=0; i<alts.size(); i++){
-    			str = str + "\nentry ";    			
-    			HashMap<String,Object> hm = alts.get(i);
-    			str = str + "\"" + hm.get("name") + "\"" + "\n";
-    			for (int j=1; j<columns.size(); j++){
-    				str = str + "\t" + columns.get(j).toString() + " ";
-    				for (int k=0; k<objs.size(); k++){
-    					JObjective obj = objs.get(k);
-    					if ((obj.getName()).equals(columns.get(j).toString()))
-    						if (obj.getDomainType() == AttributeDomainType.DISCRETE)
-    							str = str + "\"" + hm.get(columns.get(j).toString()) + "\"" + "\n";
-    						else 
-    							str = str + hm.get(columns.get(j).toString()) + "\n";
-    				}
-    			}
-    			str = str + "end\n";
-    		}
+		for (int i=0; i<alts.size(); i++){
+			str = str + "\nentry ";    			
+			HashMap<String,Object> hm = alts.get(i);
+			str = str + "\"" + hm.get("name") + "\"" + "\n";
+			for (int j=1; j<columns.size(); j++){
+				str = str + "\t" + columns.get(j).toString() + " ";
+				for (int k=0; k<objs.size(); k++){
+					JObjective obj = objs.get(k);
+					if ((obj.getName()).equals(columns.get(j).toString()))
+						if (obj.getDomainType() == AttributeDomainType.DISCRETE)
+							str = str + "\"" + hm.get(columns.get(j).toString()) + "\"" + "\n";
+						else 
+							str = str + hm.get(columns.get(j).toString()) + "\n";
+				}
+			}
+			str = str + "end\n";
+		}
     		
 		return str;
     
@@ -480,7 +480,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	            	}
 	            	else{
 	            		menuRemove.setEnabled(true);
-	            		menuRemove.setEnabled(true);
+	            		menuRename.setEnabled(true);
 	            	}
             	}
          	}

@@ -114,13 +114,13 @@ public class XMLParser {
             // get the report file
             if (doc.getElementsByTagName(XML_REPORT).getLength() > 0) {
                 String report = ((Element)doc.getElementsByTagName(XML_REPORT).item(0)).getAttribute("file");
-                vc.reportFile = new File(report.substring(7).replace("$", " ").replace("\\", "\\\\"));
+                vc.reportFile = new File(report.replace("$", " ").replace("\\", "\\\\"));
                 if (vc.reportFile.exists()) {
                     vc.createReportController();
                 } else {
                     //since the report does not exist, throw a system message letting the user know this, and set the report to null
                     String msg = "The report for the ValueChart is not valid, the system believes the report is located at: ";
-                    msg += "  " + report;
+                    msg += "  " + vc.reportFile.toString();
                     msg += "  If this is an error, please verify that you have correctly substituted all spaces and added two slashes between directories.";
                     System.out.println(msg);
                     UserDialog.showError(msg, "Report File Error", vc.getFrame());
@@ -190,8 +190,24 @@ public class XMLParser {
             attr.setWeight(Double.parseDouble(attrElem.getAttribute("weight")));
             attr.setColor(colorMap.get(attr.getName()));
             if (attrElem.getElementsByTagName(XML_DESCRIPTION).getLength() > 0) {
-                attr.setDescription(StringEscapeUtils.unescapeJava(
-                    attrElem.getElementsByTagName(XML_DESCRIPTION).item(0).getTextContent()));
+                String htmlText = StringEscapeUtils.unescapeJava(
+                        attrElem.getElementsByTagName(XML_DESCRIPTION).item(0).getTextContent());
+                
+                Pattern pat = Pattern.compile("<html>");
+                Matcher mat = pat.matcher(htmlText);
+                int start = -1;
+                if(mat.find())
+                    start = mat.start();
+                
+                pat = Pattern.compile("</html>");
+                mat = pat.matcher(htmlText);
+                int end = -1;
+                if(mat.find())
+                    end = mat.start();
+                
+                htmlText = htmlText.substring(start, end + 7);
+                
+                attr.setDescription(htmlText);
             }
             
             Element domainElem = (Element) attrElem.getElementsByTagName(XML_DOMAIN).item(0);

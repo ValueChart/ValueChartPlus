@@ -74,16 +74,16 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 
     	MenuTitle menu;
         menu = new MenuTitle("File");   
-        menuItem = new MenuEntry("New");
-        menu.add(menuItem);
         menuItem = new MenuEntry("Open");
         menu.add(menuItem);
         menuItem = new MenuEntry("Change User");
         menu.add(menuItem);
         menu.addSeparator();
         menuItem = new MenuEntry("Save"); 
-        //Added to email the individual VC
         menu.add(menuItem);
+        menuItem = new MenuEntry("Save XML"); 
+        menu.add(menuItem);
+        //Added to email the individual VC
         menuItem = new MenuEntry("Send"); 
         menu.add(menuItem);
         menuItem = new MenuEntry("Snapshot"); 
@@ -254,6 +254,9 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 		if ("Save".equals(ae.getActionCommand())){
 			saveFile();
 		}	
+		if ("Save XML".equals(ae.getActionCommand())){
+            saveFileXML();
+        }   
 		
 		if ("Send".equals(ae.getActionCommand())){
 			sendFile();
@@ -549,6 +552,27 @@ class OptionsMenu extends JMenuBar implements ActionListener{
 	    		saveFile();
 	    }
 	}
+	
+    void saveFileXML() {
+        File file;
+        int ans = JOptionPane.YES_OPTION;
+        chart.setConnectingFields();
+        String filename = (String) JOptionPane.showInputDialog(this,
+                "ValueChart name: ", "Save ValueChart",
+                JOptionPane.PLAIN_MESSAGE, null, null, chart.getUsername() + ".xml");
+        if ((filename != null) && (filename.length() > 0)) {
+            file = new File(filename);
+            if (file.exists()) {
+                ans = JOptionPane.showConfirmDialog(this,
+                        "Replace existing file??", "File overwrite",
+                        JOptionPane.YES_NO_OPTION);
+            }
+            if (ans == JOptionPane.YES_OPTION) {
+                chart.con.createDataFileXML(filename, true);
+            } else
+                saveFileXML();
+        }
+    }
 	
 	void changeHeaders(TablePane pane){
 		Iterator<BaseTableContainer> it;    	

@@ -25,7 +25,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 	private static final long serialVersionUID = 1L;
 	static final int 	NEW_FILE = 1,
 						FROM_DATAFILE = 2,
-						FROM_VC = 3;
+						FROM_VC = 3,
+						FROM_XML = 4;
 	static final int	DEFAULT_DISPLAY = 1,
 						SIDE_DISPLAY = 2,
 						SEPARATE_DISPLAY = 3;
@@ -35,7 +36,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
 	                    TAB_SMARTER = "SMARTER",
 	                    TAB_WEIGHTING = "Weighting";
 
-	int type = 1;
+	int type = NEW_FILE;
 	ValueChart chart;
 
     JDialog frame;
@@ -52,7 +53,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     JPopupMenu popObjective;
     boolean preferenceOnly = false;
 
-    String filename = "test.vc"; // data file name
+    boolean isXMLfile = false;; // data file name
+    String filename = "test.vc";
     String data; // main data string: all data for data file
     ColorList colors; // vc primitive objective colors
     Vector<JObjective> obj_list; // can represent all possible objectives (columns of table)
@@ -74,6 +76,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         tempUser = user.replaceAll("[^a-zA-Z0-9]+", "");
         chart = null; // at first there will be no chart attached
         type = i;
+        if (type == FROM_XML)
+            setFileName("test.xml", true);
         obj_list = new Vector<JObjective>();
         alts = new Vector<HashMap<String,Object>>();
 
@@ -239,7 +243,11 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             if (!preferenceOnly 
                     || constPane.getSelectedIndex() == constPane.getTabCount()-1){ // weighting
                 frame.setVisible(false);
-                createDataFile("test.vc", false);
+                if (isXMLfile)
+                    createDataFileXML(filename, false);
+                else
+                    createDataFile(filename, false);
+                
                 if (pnlAlternatives.alts.size() > 10)
                     display_type = SIDE_DISPLAY;
                 showChart();
@@ -309,7 +317,7 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         frame.pack();
         // ValueChart.createMenu();
         // frame.setJMenuBar(ValueChart.menubar);
-        if (type == FROM_VC)
+        if (type == FROM_VC || type == FROM_XML)
             frame.setVisible(false);
         else 
             frame.setVisible(true);
@@ -368,8 +376,14 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             System.out.println("Exception: " + ex);
         }
     }
+    
+    public void createDataFileXML(String fname, boolean save) {
+        XMLWriter.saveDataFile(fname, this, save);
+    }
 
-    public void setFileName(String f) {
+
+    public void setFileName(String f, boolean isXML) {
+        isXMLfile = isXML;
         filename = f;
     }
 

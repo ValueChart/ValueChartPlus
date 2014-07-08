@@ -103,7 +103,12 @@ public class ValueChart extends JPanel {
         setDisplayType(type);
         displayUtilityWeights = dispUtil;
         
-        constructFromFile(l, user, colwd);
+        if (con != null && con.isXMLfile) {
+            ChartData data = XMLParser.parseSaveFile(this, file);
+            constructFromAttribute(data, l, user, colwd);
+        } else {
+            constructFromFile(l, user, colwd);
+        }
         addMouseListener(mh);
         showAlternativeLegend();
     }
@@ -433,7 +438,9 @@ public class ValueChart extends JPanel {
     }
 
     public void newConst() {
-        con = new ConstructionView(ConstructionView.FROM_VC, getUsername());
+        con = new ConstructionView( (con.type == ConstructionView.FROM_XML ? 
+                                     ConstructionView.FROM_XML : ConstructionView.FROM_VC), 
+                                     getUsername());
         setConst();
     }
 
