@@ -438,8 +438,8 @@ public class ValueChart extends JPanel {
     }
 
     public void newConst() {
-        con = new ConstructionView( (con.type == ConstructionView.FROM_XML ? 
-                                     ConstructionView.FROM_XML : ConstructionView.FROM_VC), 
+        con = new ConstructionView( (con.type == ConstructionView.FROM_VC ? 
+                                     ConstructionView.FROM_VC : ConstructionView.FROM_XML), 
                                      getUsername());
         setConst();
     }

@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,10 +36,12 @@ public class XMLParser {
             String descFile = chart.filename.substring(0,chart.filename.length()-3) + ".xml";
             File xmlFile = new File(descFile);
             if (xmlFile.exists() && !xmlFile.isDirectory()) {
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                Document doc = dBuilder.parse(xmlFile);
-
+//                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//                Document doc = dBuilder.parse(xmlFile);
+                
+                Document doc = PositionalXMLReader.readXML(descFile);
+                
                 doc.getDocumentElement().normalize();
                 
                 NodeList nList = doc.getElementsByTagName("criterion");
@@ -93,6 +96,7 @@ public class XMLParser {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            UserDialog.showError("Error in line " + e.getMessage(), "File Error", chart.getFrame());
         }
     }
     
@@ -105,9 +109,10 @@ public class XMLParser {
         ChartData chartData = new ChartData(vc);
         
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
+//            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//            Document doc = dBuilder.parse(xmlFile);
+            Document doc = PositionalXMLReader.readXML(filename);
     
             doc.getDocumentElement().normalize();
             
@@ -157,122 +162,145 @@ public class XMLParser {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            UserDialog.showError("Error in line " + ex.getMessage(), "File Error", vc.getFrame());
         }
         
         return chartData;
 
     }
 
-    private static void parseColor(Element node, HashMap<String, Color> colorMap) {
-        Color c = new Color(Integer.parseInt(node.getAttribute("r")), 
-                            Integer.parseInt(node.getAttribute("g")), 
-                            Integer.parseInt(node.getAttribute("b")));
-        colorMap.put(node.getAttribute("name"), c);
+    private static void parseColor(Element node, HashMap<String, Color> colorMap) throws IOException {
+        try {
+            Color c = new Color(Integer.parseInt(node.getAttribute("r")), 
+                                Integer.parseInt(node.getAttribute("g")), 
+                                Integer.parseInt(node.getAttribute("b")));
+            colorMap.put(node.getAttribute("name"), c);
+        } catch (Exception e) {
+            throw new IOException(node.getUserData(PositionalXMLReader.LINE_NUMBER).toString());
+        }
     }
 
     
-    private static void parseCriteria(Element attrElem, ChartData chartData, AttributeData parentAttr, HashMap<String, Color> colorMap) {
-        if (attrElem.getAttribute("type").equals("abstract")) {
-            AttributeAbstractData attr = new AttributeAbstractData();
-            attr.setName(attrElem.getAttribute("name"));
-            NodeList nList = attrElem.getChildNodes();
-            for (int i = 0; i < nList.getLength(); i++) {
-                Node node = nList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    parseCriteria((Element)node, chartData, attr, colorMap);
+    private static void parseCriteria(Element attrElem, ChartData chartData, AttributeData parentAttr, HashMap<String, Color> colorMap) 
+                throws IOException {
+        try {
+            if (attrElem.getAttribute("type").equals("abstract")) {
+                AttributeAbstractData attr = new AttributeAbstractData();
+                attr.setName(attrElem.getAttribute("name"));
+                NodeList nList = attrElem.getChildNodes();
+                for (int i = 0; i < nList.getLength(); i++) {
+                    Node node = nList.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        parseCriteria((Element)node, chartData, attr, colorMap);
+                    }
                 }
+                chartData.addAttributeData(parentAttr, attr);
+            } 
+            else {
+                AttributePrimitiveData attr = new AttributePrimitiveData();
+                attr.setName(attrElem.getAttribute("name"));
+                attr.setWeight(Double.parseDouble(attrElem.getAttribute("weight")));
+                attr.setColor(colorMap.get(attr.getName()));
+                if (attrElem.getElementsByTagName(XML_DESCRIPTION).getLength() > 0) {
+                    String htmlText = StringEscapeUtils.unescapeJava(
+                            attrElem.getElementsByTagName(XML_DESCRIPTION).item(0).getTextContent());
+                    
+                    Pattern pat = Pattern.compile("<html>");
+                    Matcher mat = pat.matcher(htmlText);
+                    int start = -1;
+                    if(mat.find())
+                        start = mat.start();
+                    
+                    pat = Pattern.compile("</html>");
+                    mat = pat.matcher(htmlText);
+                    int end = -1;
+                    if(mat.find())
+                        end = mat.start();
+                    
+                    htmlText = htmlText.substring(start, end + 7);
+                    
+                    attr.setDescription(htmlText);
+                }
+                
+                Element domainElem = (Element) attrElem.getElementsByTagName(XML_DOMAIN).item(0);
+                if (domainElem.getAttribute("type").equals("continuous"))
+                    attr.setUnitsName(domainElem.getAttribute("unit"));
+                attr.setDomain(parseDomain(domainElem));
+                chartData.addAttributeData(parentAttr, attr);
             }
-            chartData.addAttributeData(parentAttr, attr);
-        } 
-        else {
-            AttributePrimitiveData attr = new AttributePrimitiveData();
-            attr.setName(attrElem.getAttribute("name"));
-            attr.setWeight(Double.parseDouble(attrElem.getAttribute("weight")));
-            attr.setColor(colorMap.get(attr.getName()));
-            if (attrElem.getElementsByTagName(XML_DESCRIPTION).getLength() > 0) {
-                String htmlText = StringEscapeUtils.unescapeJava(
-                        attrElem.getElementsByTagName(XML_DESCRIPTION).item(0).getTextContent());
-                
-                Pattern pat = Pattern.compile("<html>");
-                Matcher mat = pat.matcher(htmlText);
-                int start = -1;
-                if(mat.find())
-                    start = mat.start();
-                
-                pat = Pattern.compile("</html>");
-                mat = pat.matcher(htmlText);
-                int end = -1;
-                if(mat.find())
-                    end = mat.start();
-                
-                htmlText = htmlText.substring(start, end + 7);
-                
-                attr.setDescription(htmlText);
-            }
-            
-            Element domainElem = (Element) attrElem.getElementsByTagName(XML_DOMAIN).item(0);
-            if (domainElem.getAttribute("type").equals("continuous"))
-                attr.setUnitsName(domainElem.getAttribute("unit"));
-            attr.setDomain(parseDomain(domainElem));
-            chartData.addAttributeData(parentAttr, attr);
+        } catch (IOException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new IOException(attrElem.getUserData(PositionalXMLReader.LINE_NUMBER).toString());
         }
     }
     
-    private static AttributeDomain parseDomain(Element domainElem) {
+    private static AttributeDomain parseDomain(Element domainElem) throws IOException {
         if (domainElem == null) return null;
-        
-        if (domainElem.getAttribute("type").equals("continuous")) {
-            ContinuousAttributeDomain domain = new ContinuousAttributeDomain();
-            NodeList nList = domainElem.getElementsByTagName(XML_CONT_VAL);
-            for (int i = 0; i < nList.getLength(); i++) {
-                Node node = nList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element e = (Element) node;
-                    domain.addKnot(Double.parseDouble(e.getAttribute("x")), 
-                                   Double.parseDouble(e.getAttribute("y")));
+        try {
+            if (domainElem.getAttribute("type").equals("continuous")) {
+                ContinuousAttributeDomain domain = new ContinuousAttributeDomain();
+                NodeList nList = domainElem.getElementsByTagName(XML_CONT_VAL);
+                for (int i = 0; i < nList.getLength(); i++) {
+                    Node node = nList.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element e = (Element) node;
+                        domain.addKnot(Double.parseDouble(e.getAttribute("x")), 
+                                       Double.parseDouble(e.getAttribute("y")));
+                    }
                 }
-            }
-            return domain;
-        } else {
-            DiscreteAttributeDomain domain = new DiscreteAttributeDomain();
-            NodeList nList = domainElem.getElementsByTagName(XML_DISC_VAL);
-            for (int i = 0; i < nList.getLength(); i++) {
-                Node node = nList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element e = (Element) node;
-                    domain.addElement(e.getAttribute("x"), 
-                                   Double.parseDouble(e.getAttribute("y")));
+                return domain;
+            } else {
+                DiscreteAttributeDomain domain = new DiscreteAttributeDomain();
+                NodeList nList = domainElem.getElementsByTagName(XML_DISC_VAL);
+                for (int i = 0; i < nList.getLength(); i++) {
+                    Node node = nList.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element e = (Element) node;
+                        domain.addElement(e.getAttribute("x"), 
+                                       Double.parseDouble(e.getAttribute("y")));
+                    }
                 }
+                return domain;
             }
-            return domain;
+        } catch (Exception ex) {
+            throw new IOException(domainElem.getUserData(PositionalXMLReader.LINE_NUMBER).toString());
         }
     }
     
-    private static void parseAlternative(Element altNode, ChartData chartData, ValueChart vc) {
+    private static void parseAlternative(Element altNode, ChartData chartData, ValueChart vc) throws IOException {
         if (altNode == null || chartData == null) return;
         
         ChartEntry entry = new ChartEntry(altNode.getAttribute("name"));
-        NodeList nList = altNode.getElementsByTagName(XML_ALT_VAL);
-        for (int i = 0; i < nList.getLength(); i++) {
-            Node node = nList.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element e = (Element) node;
-                String critName = e.getAttribute("criterion"); 
-                AttributeDomain domain = chartData.findAttribute(critName).getPrimitive().getDomain();
-                if (domain.getType() == AttributeDomainType.CONTINUOUS) {
-                    AttributeValue attrVal = new AttributeValue(Double.parseDouble(e.getAttribute("value")),
-                                                                domain, critName, vc);
-                    entry.map.put(critName, attrVal);
-                } else {
-                    AttributeValue attrVal = new AttributeValue(e.getAttribute("value"),
-                                                                domain, critName, vc);
-                    entry.map.put(critName, attrVal);
+        try {
+            NodeList nList = altNode.getElementsByTagName(XML_ALT_VAL);
+            for (int i = 0; i < nList.getLength(); i++) {
+                Node node = nList.item(i);
+                try {
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element e = (Element) node;
+                        String critName = e.getAttribute("criterion"); 
+                        AttributeDomain domain = chartData.findAttribute(critName).getPrimitive().getDomain();
+                        if (domain.getType() == AttributeDomainType.CONTINUOUS) {
+                            AttributeValue attrVal = new AttributeValue(Double.parseDouble(e.getAttribute("value")),
+                                                                        domain, critName, vc);
+                            entry.map.put(critName, attrVal);
+                        } else {
+                            AttributeValue attrVal = new AttributeValue(e.getAttribute("value"),
+                                                                        domain, critName, vc);
+                            entry.map.put(critName, attrVal);
+                        }
+                    }
+                } catch (Exception ex) {
+                    throw new IOException(node.getUserData(PositionalXMLReader.LINE_NUMBER).toString());
                 }
             }
-        }
-        if (altNode.getElementsByTagName(XML_DESCRIPTION).getLength() > 0) {
-            entry.setDescription(StringEscapeUtils.unescapeJava(
-                    altNode.getElementsByTagName(XML_DESCRIPTION).item(0).getTextContent()));
+            if (altNode.getElementsByTagName(XML_DESCRIPTION).getLength() > 0) {
+                entry.setDescription(StringEscapeUtils.unescapeJava(
+                        altNode.getElementsByTagName(XML_DESCRIPTION).item(0).getTextContent()));
+            }
+        } catch (Exception ex) {
+            throw new IOException(altNode.getUserData(PositionalXMLReader.LINE_NUMBER).toString());
         }
         
         entry.setReport(vc.reportFile);

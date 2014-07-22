@@ -484,7 +484,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 	            	}
             	}
          	}
-            else if (SwingUtilities.isLeftMouseButton(me)){
+            else if (SwingUtilities.isLeftMouseButton(me) && (me.getSource() instanceof JTable)){
             	try{
 	            	JTable tab = (JTable)(me.getSource());
 	            	if (tab.isEditing()){

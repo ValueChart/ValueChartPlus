@@ -53,8 +53,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
     JPopupMenu popObjective;
     boolean preferenceOnly = false;
 
-    boolean isXMLfile = false;; // data file name
-    String filename = "test.vc";
+    boolean isXMLfile = true; // data file name
+    String filename = "test.xml";
     String data; // main data string: all data for data file
     ColorList colors; // vc primitive objective colors
     Vector<JObjective> obj_list; // can represent all possible objectives (columns of table)
@@ -76,8 +76,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
         tempUser = user.replaceAll("[^a-zA-Z0-9]+", "");
         chart = null; // at first there will be no chart attached
         type = i;
-        if (type == FROM_XML)
-            setFileName("test.xml", true);
+        if (type == FROM_VC)
+            setFileName("test.vc", false);
         obj_list = new Vector<JObjective>();
         alts = new Vector<HashMap<String,Object>>();
 

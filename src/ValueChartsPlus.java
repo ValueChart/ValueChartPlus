@@ -22,8 +22,8 @@ public class ValueChartsPlus extends JPanel
 	private static final long serialVersionUID = 1L;
 	static String strNew = "Create a new ValueChart";
     static String strData = "Open a data file";
-    static String strVC = "Open an existing ValueChart";
-    static String strXML = "Open an XML file";
+    static String strVC = "Open an existing ValueChart (obsolete)";
+    static String strXML = "Open an XML ValueChart file";
     JRadioButton optNew;
     JRadioButton optData;
     JRadioButton optVC;
@@ -31,7 +31,6 @@ public class ValueChartsPlus extends JPanel
     ButtonGroup grpOptions;    
     JPanel pnlOptions;
     
-    protected JLabel lblFileList;
     protected JTextField txtName; 
     protected JTextField txtUser;
     protected static JFrame frame;
@@ -69,16 +68,16 @@ public class ValueChartsPlus extends JPanel
 
         optData = new JRadioButton(strData);
         optData.setActionCommand("optData");
-        optVC = new JRadioButton(strVC);
-        optVC.setActionCommand("optVC");
         optXML = new JRadioButton(strXML);
         optXML.setActionCommand("optXML");
+        optVC = new JRadioButton(strVC);
+        optVC.setActionCommand("optVC");
         
         grpOptions = new ButtonGroup();
         grpOptions.add(optNew);
         grpOptions.add(optData);
-        grpOptions.add(optVC);        
         grpOptions.add(optXML);
+        grpOptions.add(optVC);        
         
         optNew.addActionListener(this);
         optData.addActionListener(this);
@@ -89,8 +88,8 @@ public class ValueChartsPlus extends JPanel
         pnlOptions.setBorder(BorderFactory.createEtchedBorder(1));        
         pnlOptions.add(optNew);
         pnlOptions.add(optData);
-        pnlOptions.add(optVC);
         pnlOptions.add(optXML);
+        pnlOptions.add(optVC);
         
         //Set up the File List
         listModel = new DefaultListModel<String>(); 

@@ -81,7 +81,7 @@ class OptionsMenu extends JMenuBar implements ActionListener{
         menu.addSeparator();
         menuItem = new MenuEntry("Save"); 
         menu.add(menuItem);
-        menuItem = new MenuEntry("Save XML"); 
+        menuItem = new MenuEntry("Save VC (obsolete)"); 
         menu.add(menuItem);
         //Added to email the individual VC
         menuItem = new MenuEntry("Send"); 
@@ -251,10 +251,10 @@ class OptionsMenu extends JMenuBar implements ActionListener{
             changeUser();
         }
         
-		if ("Save".equals(ae.getActionCommand())){
+		if ("Save VC (obsolete)".equals(ae.getActionCommand())){
 			saveFile();
 		}	
-		if ("Save XML".equals(ae.getActionCommand())){
+		if ("Save".equals(ae.getActionCommand())){
             saveFileXML();
         }   
 		
