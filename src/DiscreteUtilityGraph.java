@@ -100,6 +100,7 @@ public class DiscreteUtilityGraph extends JPanel implements MouseListener, Mouse
     }
     
     void plotPoints(){
+        if (items.length == 1) return;
         Incre = (width - 120) / (items.length-1); // This is the variable that calculate how far each point should be.
         //Creating all the points of utility
         for(int i = 0; i < items.length; i++){

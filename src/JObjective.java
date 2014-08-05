@@ -204,7 +204,7 @@ public class JObjective extends JLabel{
 		domain_type = AttributeDomainType.CONTINUOUS;
 		double minC = Double.MAX_VALUE;
 		double maxC = Double.MIN_VALUE;
-		if (domain != null) {
+		if (domain != null && domain.getContinuous() != null) {
 		    minC = domain.getContinuous().getMin();
 		    maxC = domain.getContinuous().getMax();
 		}
@@ -266,7 +266,20 @@ public class JObjective extends JLabel{
     	decimalFormat = new DecimalFormat(df);
     }
     
+    public boolean validKeyType(Object o) {
+        if (domain_type == AttributeDomainType.CONTINUOUS
+                && DefineAlternativesPanel.isNumeric(o.toString())) {
+            return true;
+        } else if (domain_type == AttributeDomainType.DISCRETE
+                && !DefineAlternativesPanel.isNumeric(o.toString())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     public void replaceInObjValueMap(Object oldVal, Object newVal) {
+        if (!validKeyType(oldVal) || !validKeyType(newVal)) return;
         if (!objValuesMap.containsKey(oldVal)) 
             return;
         
@@ -283,6 +296,7 @@ public class JObjective extends JLabel{
     }
     
     public void addToObjValueMap(Object val) {
+        if (!validKeyType(val)) return;
         if (objValuesMap.containsKey(val)) {
             objValuesMap.put(val, objValuesMap.get(val)+1);
         } else {

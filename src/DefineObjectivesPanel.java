@@ -126,9 +126,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	    menuRemove = new JMenuItem("Remove");
 	    menuRemove.addActionListener(this);
 	    popObjective.add(menuRemove);
-	    menuItem = new JMenuItem("Delete");
-	    menuItem.addActionListener(this);
-	    popObjective.add(menuItem);
+	    popObjective.add(menuDelete);
 	    popObjective.addSeparator();
 	    menuItem = new JMenuItem("Rename");
 	    menuItem.addActionListener(this);
@@ -136,10 +134,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	    menuDetails = new JMenuItem("Details");
 	    menuDetails.addActionListener(this);
 	    popObjective.add(menuDetails);
-	    menuItem = new JMenuItem("test");
-	    menuItem.addActionListener(this);
-	    popObjective.add(menuItem);
-
+	    
 	    //hidden objective: the key for alternative list
 	    //this must is added to the listed_objectives vector for later alternative use
 		if (type!=FROM_DATAFILE){
@@ -490,6 +485,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 				//If an Objective label is right-clicked, present the popup menu
 	            if(SwingUtilities.isRightMouseButton(me)){
 					if (found_node!=null){
+					    menuDetails.setEnabled(false);
 						if (found_node.isRoot()){
 							menuRemove.setEnabled(false);
 							menuDelete.setEnabled(false);
@@ -497,11 +493,9 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 						else{
 							menuRemove.setEnabled(true);
 							menuDelete.setEnabled(true);
+							if (found_node.isLeaf())
+							    menuDetails.setEnabled(true);
 						}
-						if (found_node.isLeaf())
-							menuDetails.setEnabled(true);
-						else
-							menuDetails.setEnabled(false);
 						popObjective.show(me.getComponent(), me.getX()+5, me.getY()+5);
 					}
 					else{

@@ -308,6 +308,8 @@ public class ConstructionView extends JPanel implements ChangeListener, ActionLi
             public void windowClosing(WindowEvent e) {
                 if (chart != null) {
                     chart.restoreState(true);
+                } else {
+                    System.exit(0);
                 }
             }
         };
