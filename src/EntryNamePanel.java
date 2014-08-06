@@ -25,6 +25,8 @@ public class EntryNamePanel extends JPanel implements ActionListener {
     private static final int ANG_WD = 50;
     static final int ANG_HT = 50;
     Vector<String> labelList;
+    Vector<String> orderedList;
+    HashMap<String, Integer> indexMap;
     int panelHeight = 0;
     int colWidth = 0;
     int numTopBlanks = 0;
@@ -33,9 +35,13 @@ public class EntryNamePanel extends JPanel implements ActionListener {
     JPopupMenu popEntry;
     ValueChart chart;
     JLabel selected_entry;
+    int mousedOver = -1;    // position of mouse
+    int idx = -1;           // actual index of alternative
 
     public EntryNamePanel(Vector<ChartEntry> entryList, int colWidth, int numTopBlanks, boolean main, ValueChart chart) {
         labelList = new Vector<String>();
+        orderedList = new Vector<String>();
+        indexMap = new HashMap<String, Integer>();
 
         int maxheight = 0;
         addMouseListener(mh);
@@ -44,9 +50,12 @@ public class EntryNamePanel extends JPanel implements ActionListener {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(Box.createHorizontalGlue());
 
+        int i = 0;
         for (Iterator<ChartEntry> it = entryList.iterator(); it.hasNext();) {
             ChartEntry entry = it.next();
             labelList.add(entry.name);
+            orderedList.add(entry.name);
+            indexMap.put(entry.name, i++);
         }
 
         setBorder(BorderFactory.createLineBorder(getBackground()));
@@ -64,7 +73,6 @@ public class EntryNamePanel extends JPanel implements ActionListener {
         createPopup();
 
     }
-    int mousedOver = -1;
 
     public void paintComponent(Graphics g) {
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -79,7 +87,8 @@ public class EntryNamePanel extends JPanel implements ActionListener {
             } else {
                 g.setColor(Color.BLACK);
             }
-            g.drawString("(" + (i+1) + ")", (i * colWidth) + ((int) (colWidth) / 2) - LABELFONT.getSize() +1, LABELFONT.getSize());
+            int idx = indexMap.get(labelList.get(i));
+            g.drawString("(" + (idx+1) + ")", (i * colWidth) + ((int) (colWidth) / 2) - LABELFONT.getSize() +1, LABELFONT.getSize());
             g.setColor(Color.GRAY);
             if (i != 0)
                 g.drawLine((i * colWidth), LABELFONT.getSize(), (i * colWidth), 0);
@@ -116,7 +125,7 @@ public class EntryNamePanel extends JPanel implements ActionListener {
 
     public void relabel(Vector<ChartEntry> entryList) {
         labelList.clear();
-
+        
         for (Iterator<ChartEntry> ei = entryList.iterator(); ei.hasNext();) {
             ChartEntry entry = ei.next();
             labelList.add(entry.name);
@@ -270,62 +279,61 @@ public class EntryNamePanel extends JPanel implements ActionListener {
     }
     
     int rightClicked = -1;
-    int idx = -1;
 
     class MouseHandler extends MouseInputAdapter {
         public void mousePressed(MouseEvent me) {
             //(chart.entryList.get(idx)).setShowFlag(true);	
-            if (idx != -1) {
-                chart.showDomainVals(idx);
+            if (mousedOver != -1) {
+                chart.showDomainVals(mousedOver);
             } else {
                 chart.showAlternativeLegend();
             }
             //System.out.println("IDX___________ " + idx);
             chart.updateAll();
             if (SwingUtilities.isRightMouseButton(me)) {
-                if (chart.getEntryList().get(idx).getIsMarked()) {
+                if (chart.getEntryList().get(mousedOver).getIsMarked()) {
                     ((JMenuItem) popEntry.getComponent(0)).setText("Unmark");
                 } else {
                     ((JMenuItem) popEntry.getComponent(0)).setText("Mark");
                 }
-                if (idx != -1) {
-                    if (chart.getEntryList().get(idx).getShowFlag()) {
+                if (mousedOver != -1) {
+                    if (chart.getEntryList().get(mousedOver).getShowFlag()) {
                         ((JMenuItem) popEntry.getComponent(3)).setText("Hide Details");
                     } else {
                         ((JMenuItem) popEntry.getComponent(3)).setText("Show Details");
                     }
-                    if (chart.getEntryList().get(idx).hasDescription()) {
+                    if (chart.getEntryList().get(mousedOver).hasDescription()) {
                         ((JMenuItem) popEntry.getComponent(5)).setEnabled(true);
                     } else {
                         ((JMenuItem) popEntry.getComponent(5)).setEnabled(false);
                     }
                 }
-                rightClicked = idx;
+                rightClicked = mousedOver;
                 popEntry.show(me.getComponent(), me.getX() - 1, me.getY() - 1);
 
             }
         }
 
         public void mouseMoved(MouseEvent me) {
-            int inc = ANG_WD / 4;
-            int y = getHeight() / 4;
+            mousedOver = -1;
+            idx = -1;
             for (int i = 0; i < labelList.size(); i++) {
+                // found
                 if (me.getX() > (i*colWidth) && me.getX() < (i*colWidth) + colWidth) {
-                    idx = i;
+                     idx = indexMap.get(labelList.get(i));
+                     mousedOver = i;
                     
-                    EntryNamePanel.this.setToolTipText("<html><blockquote><left><font size=\"4\">" + labelList.get(i).toString().replace('_', ' ') + "</left></blockquote></html>");
+                    EntryNamePanel.this.setToolTipText("<html><blockquote><left><font size=\"4\">" + orderedList.get(idx).toString().replace('_', ' ') + "</left></blockquote></html>");
                     
                     break;
                 }
-                //no sel
-                idx = -1;
             }
-            mousedOver = idx;
 
             if (me.getY() < 3 || me.getY() > getHeight() - 3) {
                 mousedOver = -1;
             }
-            chart.selectAlternativeLegend(mousedOver);
+            if (idx < orderedList.size() && idx >= 0)
+                chart.selectAlternativeLegend(idx);
 
             repaint();
         }
