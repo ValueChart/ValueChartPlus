@@ -1,4 +1,4 @@
-import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -13,8 +13,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -56,13 +54,13 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
     DefaultTreeModel tree_model; 
 	
 	JPopupMenu popObjective;
-	JPopupMenu popList; 
-	JMenuItem menuRemove;
+	//JPopupMenu popList; 
+	//JMenuItem menuRemove;
 	JMenuItem menuDetails;
 	JMenuItem menuDelete;
 	JMenu menuAdd;
 	JMenu menuRoot;
-	JPanel pnlList;	
+	//JPanel pnlList;	
 	
 	JObjective lblSel;	
 	JObjective lblRoot;
@@ -93,39 +91,41 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		tree_model = new DefaultTreeModel(root_node);
 		
 		//set up panel for objective list
-		pnlList = new JPanel();			
-		pnlList.setLayout(new BoxLayout(pnlList, BoxLayout.PAGE_AXIS));
-		pnlList.setTransferHandler(new ObjectiveTransferHandler());
-		pnlList.setBorder(BorderFactory.createEtchedBorder(1));  
-		pnlList.addMouseListener(mhandler);
+//		pnlList = new JPanel();			
+//		pnlList.setLayout(new BoxLayout(pnlList, BoxLayout.PAGE_AXIS));
+//		pnlList.setTransferHandler(new ObjectiveTransferHandler());
+//		pnlList.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));  
+//	    pnlList.setBorder(BorderFactory.createLineBorder(Color.BLUE, 10));  
+//		pnlList.addMouseListener(mhandler);
 		
 		//create the List popup menu
-		popList = new JPopupMenu();
+//		popList = new JPopupMenu();
 		menuAdd = new JMenu("Add to");
-	    popList.add(menuAdd);
+//	    popList.add(menuAdd);
 	    menuRoot = new JMenu(lblRoot.getName());
 	    menuAdd.add(menuRoot);
 	    createAddMenu(root_node, menuRoot);
 	    
-		menuDelete = new JMenuItem("Delete");
-	    menuDelete.addActionListener(this);
-	    popList.add(menuDelete);
-	    popList.addSeparator();
-		JMenuItem menuItem = new JMenuItem("Rename");
-	    menuItem.addActionListener(this);
-	    popList.add(menuItem);
-		menuItem = new JMenuItem("Details");
-	    menuItem.addActionListener(this);
-	    popList.add(menuItem);
+	    JMenuItem menuItem;
+//	    popList.add(menuDelete);
+//	    popList.addSeparator();
+//		menuItem = new JMenuItem("Rename");
+//	    menuItem.addActionListener(this);
+//	    popList.add(menuItem);
+//		menuItem = new JMenuItem("Details");
+//	    menuItem.addActionListener(this);
+//	    popList.add(menuItem);
 		
 		//create the Tree popup menu
 		popObjective = new JPopupMenu();		
 	    menuItem = new JMenuItem("Add");
 	    menuItem.addActionListener(this);
 	    popObjective.add(menuItem);
-	    menuRemove = new JMenuItem("Remove");
-	    menuRemove.addActionListener(this);
-	    popObjective.add(menuRemove);
+//	    menuRemove = new JMenuItem("Remove");
+//	    menuRemove.addActionListener(this);
+//	    popObjective.add(menuRemove);
+        menuDelete = new JMenuItem("Delete");
+        menuDelete.addActionListener(this);
 	    popObjective.add(menuDelete);
 	    popObjective.addSeparator();
 	    menuItem = new JMenuItem("Rename");
@@ -163,31 +163,31 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		setSize(pnlCon.constPane.getSize());
 		lblRoot.setBounds(10, OBJ_Y, OBJ_WIDTH, getHeight()-50);
 		add(lblRoot);
-		pnlList.setBounds(getWidth() - OBJ_WIDTH - 10, OBJ_Y, 
-				OBJ_WIDTH, getHeight()-50);
-		pnlList.setMinimumSize(new Dimension (OBJ_WIDTH, 450));
-		pnlList.setPreferredSize(new Dimension (OBJ_WIDTH, 450));
-		add(pnlList);	
+//		pnlList.setBounds(getWidth() - OBJ_WIDTH - 10, OBJ_Y, 
+//				OBJ_WIDTH, getHeight()-50);
+//		pnlList.setMinimumSize(new Dimension (OBJ_WIDTH, 450));
+//		pnlList.setPreferredSize(new Dimension (OBJ_WIDTH, 450));
+//		add(pnlList);	
 	}
 
 	void setFileObjectives(Vector<JObjective> obj){		
 		listed_objs = obj;	
-		repaintList();
+//		repaintList();
 	}
 		
-	void repaintList(){	
-		pnlList.removeAll();		
-		//display all objectives except for "name"
-		for (int i=1; i<listed_objs.size(); i++){
-			JObjective lblObj = listed_objs.get(i);
-			lblObj.setMaximumSize(new Dimension(OBJ_WIDTH, OBJ_HEIGHT));
-			pnlList.add(lblObj);
-			lblObj.setTransferHandler(new ObjectiveTransferHandler());			
-			lblObj.addMouseListener(mhandler);
-		}
-		pnlList.setBorder(BorderFactory.createEtchedBorder(1));        		
-		pnlList.repaint();
-	}
+//	void repaintList(){	
+//		pnlList.removeAll();		
+//		//display all objectives except for "name"
+//		for (int i=1; i<listed_objs.size(); i++){
+//			JObjective lblObj = listed_objs.get(i);
+//			lblObj.setMaximumSize(new Dimension(OBJ_WIDTH, OBJ_HEIGHT));
+//			pnlList.add(lblObj);
+//			lblObj.setTransferHandler(new ObjectiveTransferHandler());			
+//			lblObj.addMouseListener(mhandler);
+//		}
+//		pnlList.setBorder(BorderFactory.createEtchedBorder(1));        		
+//		pnlList.repaint();
+//	}
 
 //TREE CONSTRUCTION
 	
@@ -297,7 +297,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 	
 	void addToList(int idx, JObjective obj){
 		listed_objs.add(idx, obj);
-		repaintList();
+//		repaintList();
 	}
 	
 //SUPPORTING	
@@ -319,14 +319,27 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 		while (node != null){
 			JObjective obj = (JObjective)node.getUserObject();
 			prim_obj.add(obj);
-			if (obj.getDomainType() == AttributeDomainType.CONTINUOUS && obj.getUnit().isEmpty())//-
-				ok = false;//-
+			if (obj.getDomainType() == AttributeDomainType.CONTINUOUS && obj.getUnit().isEmpty()) {
+				ok = false;
+				obj.setForeground(Color.red);
+			} else {
+			    obj.setForeground(Color.black);
+			}
 			node = node.getNextLeaf();
 		}
-	//if (ok)//-
-		//pnlCon.btnOK.setEnabled(true);
-	//else
-		//pnlCon.btnOK.setEnabled(false);
+		setAbstractColor();
+	}
+	
+	public void setAbstractColor() {
+	    for (Enumeration en = root_node.breadthFirstEnumeration(); en.hasMoreElements(); ){
+	        Object e = en.nextElement();
+	        if (e instanceof DefaultMutableTreeNode) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) e;
+                if (!node.isLeaf()) {
+                    ((JObjective)node.getUserObject()).setForeground(Color.black);
+                }
+	        }
+        }
 	}
 	
 	public Vector<JObjective> getPrimitiveObjectives(){
@@ -434,31 +447,23 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
   
 //HANDLERS/LISTENERS
 	
-    public void actionPerformed(ActionEvent e){
-    	//PopupMenu listener    
-	    	if ("Add".equals(e.getActionCommand()))
-	    		addObjective();    	
-	    	else if ("Remove".equals(e.getActionCommand())){
-	    		removeObjective();
-	    		addBranchToList();
-	    	}
-	    	else if ("Delete".equals(e.getActionCommand())){
-	    		if (listed_objs.contains(lblSel)){
-	    			listed_objs.remove(listed_objs.indexOf(lblSel));
-	    			repaintList();
-	    		}	    			
-	    		else
-	    			removeObjective();
-	    	}
-	    	else if ("Rename".equals(e.getActionCommand()))
-	    		renameObjective();
-	    	else if ("Details".equals(e.getActionCommand()))
-	    		showDetails();  	    	
-	    	else if ("test".equals(e.getActionCommand())){
-	    		for (Enumeration en = root_node.breadthFirstEnumeration(); en.hasMoreElements(); ){
-	    		}
-	    			
-	    	}
+    public void actionPerformed(ActionEvent e) {
+        // PopupMenu listener
+        if ("Add".equals(e.getActionCommand()))
+            addObjective();
+        else if ("Remove".equals(e.getActionCommand())) {
+            removeObjective();
+            addBranchToList();
+        } else if ("Delete".equals(e.getActionCommand())) {
+            if (listed_objs.contains(lblSel)) {
+                listed_objs.remove(listed_objs.indexOf(lblSel));
+                // repaintList();
+            } else
+                removeObjective();
+        } else if ("Rename".equals(e.getActionCommand()))
+            renameObjective();
+        else if ("Details".equals(e.getActionCommand()))
+            showDetails();
     }	
     
     private class ResizeHandler extends ComponentAdapter{
@@ -487,11 +492,11 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 					if (found_node!=null){
 					    menuDetails.setEnabled(false);
 						if (found_node.isRoot()){
-							menuRemove.setEnabled(false);
+//							menuRemove.setEnabled(false);
 							menuDelete.setEnabled(false);
 						}
 						else{
-							menuRemove.setEnabled(true);
+//							menuRemove.setEnabled(true);
 							menuDelete.setEnabled(true);
 							if (found_node.isLeaf())
 							    menuDetails.setEnabled(true);
@@ -504,7 +509,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 						menuRoot= new JMenu(root.getName());
 						menuAdd.add(menuRoot);
 						createAddMenu(root_node, menuRoot);
-						popList.show(me.getComponent(), me.getX()+5, me.getY()+5);
+//						popList.show(me.getComponent(), me.getX()+5, me.getY()+5);
 					}
 	            }
 	            me = null;
@@ -542,7 +547,7 @@ public class DefineObjectivesPanel extends JPanel implements ActionListener{
 					if (s.equals(listed_objs.get(i).toString())){
 						obj1 = listed_objs.get(i);
 						listed_objs.remove(i); 
-						repaintList();
+//						repaintList();
 						found1 = true; break;
 					}
 				}	
