@@ -22,7 +22,7 @@ public class DiscreteAttributeDomain extends AttributeDomain
 	 { return AttributeDomainType.DISCRETE;
 	 }
 	
-	public Double getEntryWeight (String elem) { 
+	public Double getWeight (String elem) { 
 	    Double e =  entryMap.get(elem);
         if (e == null) {
             throw new IllegalArgumentException("element " + elem + " not found");
@@ -30,7 +30,7 @@ public class DiscreteAttributeDomain extends AttributeDomain
         return e;
 	 }
 	
-	public boolean setEntryWeight(String elem, Double weight) {
+	public boolean setWeight(String elem, Double weight) {
 	    if (!entryMap.containsKey(elem)) return false;
 	    entryMap.put(elem, weight);
 	    return true;
@@ -65,11 +65,11 @@ public class DiscreteAttributeDomain extends AttributeDomain
 	//added for utility graph: so position does not change
 	public void changeWeight(String elem, double wt){
 		if(wt > 1.0)
-		    setEntryWeight(elem, Math.min(wt, 1.0));
+		    setWeight(elem, Math.min(wt, 1.0));
 		else if(wt < 0.0)
-		    setEntryWeight(elem, Math.max(wt, 0.0));
+		    setWeight(elem, Math.max(wt, 0.0));
 		else
-		    setEntryWeight(elem, wt);
+		    setWeight(elem, wt);
 	}
 
     @Override

@@ -22,7 +22,7 @@ public class AttributeValue
 		if (d.getType() != AttributeDomainType.DISCRETE)
 			throw new IllegalArgumentException ("Symbolic values must be associated with discrete domains");	    
 		try{
-			d.getDiscrete().getEntryWeight(s);
+			d.getDiscrete().getWeight(s);
 	    }catch (Exception e){
 	    	throw new IllegalArgumentException ("Attribute value " + s + " unknown"); 
 	    }
@@ -37,7 +37,7 @@ public class AttributeValue
 		if (d.getType() != AttributeDomainType.CONTINUOUS)
 			throw new IllegalArgumentException ("Numeric values must be associated with continous domains");
 		try{
-			d.getContinuous().weight(n);
+			d.getContinuous().getWeight(n);
 		}catch (Exception e){
 			throw new IllegalArgumentException ("Attribute value " + n + " out of range"); 
 		}
@@ -92,9 +92,9 @@ public class AttributeValue
     public double weight() {
         AttributeDomain domain = chart.getDomain(attributeName);
         if (isDiscrete) {
-            return domain.getDiscrete().getEntryWeight(str);
+            return domain.getDiscrete().getWeight(str);
         } else {
-            return domain.getContinuous().weight(num);
+            return domain.getContinuous().getWeight(num);
         }
     }
 }

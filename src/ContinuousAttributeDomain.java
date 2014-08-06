@@ -46,7 +46,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	
         //This function will help you find the weight for a particular element x.
         //In continuous domain, the x-axis is always double which maps to another double value on the y-axis
-    public Double weight(double x) {
+    public Double getWeight(double x) {
         if (knotMap.size() < 2) {
             throw new IllegalStateException("incomplete knot list");
         }
@@ -115,7 +115,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
         knotMap.remove(ord);
     }
 	
-    public void changeWeight(double ord, double val) {
+    public void setWeight(double ord, double val) {
         if (val > 1.0)
             knotMap.put(ord, 1.0);
         else if (val < 0.0)

@@ -56,8 +56,8 @@ public class DiscGraph extends JPanel implements MouseListener, MouseMotionListe
         color = col;
         
         for(int i = 0; i < items.length; i++){
-            undo.addElement(items[i], ddomain.getEntryWeight(items[i]));
-            redo.addElement(items[i], ddomain.getEntryWeight(items[i]));
+            undo.addElement(items[i], ddomain.getWeight(items[i]));
+            redo.addElement(items[i], ddomain.getWeight(items[i]));
         }
      
     	font = new Font ("Arial", Font.BOLD, 7);

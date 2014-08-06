@@ -198,7 +198,7 @@ public class JObjective extends JLabel{
 	            } else {
 	                y = -1/(maxC-minC)*(x-maxC);
 	            }
-	            dom.changeWeight(x, y);
+	            dom.setWeight(x, y);
 	        }
 	    }
 	}
@@ -298,9 +298,10 @@ public class JObjective extends JLabel{
     }
     
     public void replaceInObjValueMap(Object oldVal, Object newVal) {
-        if (!validKeyType(oldVal) || !validKeyType(newVal)) return;
-        if (!objValuesMap.containsKey(oldVal)) 
+        if (!validKeyType(oldVal) || !objValuesMap.containsKey(oldVal)) {
+            addToObjValueMap(newVal);
             return;
+        }
         
         if (objValuesMap.get(oldVal) == 1) {
             objValuesMap.remove(oldVal);

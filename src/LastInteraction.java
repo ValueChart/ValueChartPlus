@@ -61,7 +61,7 @@ public class LastInteraction {
         if (domain != null && type == UTIL) {
             if (domain.getType() == AttributeDomainType.DISCRETE) {
                 DiscreteAttributeDomain d = domain.getDiscrete();
-                last.weight = d.getEntryWeight(elt);
+                last.weight = d.getWeight(elt);
             } else {
                 ContinuousAttributeDomain c = domain.getContinuous();
                 last.weight = c.getValue(knot);
@@ -95,7 +95,7 @@ public class LastInteraction {
             if (pnlUtil instanceof ContGraph) {
                 ContGraph cg = (ContGraph) pnlUtil;
                 ContinuousAttributeDomain cdomain = chart.getDomain(cg.attributeName).getContinuous();
-                cdomain.changeWeight(knot, weight);
+                cdomain.setWeight(knot, weight);
                 cg.plotPoints();
             } else if (pnlUtil instanceof DiscGraph) {
                 DiscGraph dg = (DiscGraph) pnlUtil;
@@ -104,7 +104,7 @@ public class LastInteraction {
             } else if (pnlUtil instanceof ContinuousUtilityGraph) {
                 ContinuousUtilityGraph cug = (ContinuousUtilityGraph) pnlUtil;
                 AttributeDomain domain = chart.getDomain(name);
-                domain.getContinuous().changeWeight(knot, weight);
+                domain.getContinuous().setWeight(knot, weight);
                 if (cug.acell != null && cug.acell.dg != null)
                     cug.acell.cg.plotPoints();
             } else if (pnlUtil instanceof DiscreteUtilityGraph) {

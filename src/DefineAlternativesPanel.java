@@ -144,7 +144,7 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
         return true;
 	}
 	
-	//resets alternative constuction view to reflect any changes in objectives
+	//resets alternative construction view to reflect any changes in objectives
 	public void updateTable(){
 		//add columns
 		columns.clear();
@@ -438,8 +438,15 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
         for (int i = 0; i < tabModel.getColumnCount(); i++) {
             TableCellRenderer ren = table.getColumnModel().getColumn(i).getCellRenderer();
             if (ren instanceof ValidationCellRenderer)
-                if (!((ValidationCellRenderer) ren).valuesValid()) return false;
+                if (!((ValidationCellRenderer) ren).valuesValid()) return false;            
         }
+        
+        Vector<JObjective> all_objs = con.getObjPanel().getPrimitiveObjectives();
+        for (JObjective obj : all_objs) {
+            if (obj.getObjValueMapCount() < 2)
+                return false;
+        }
+        
     	return true;
     }
     
@@ -615,15 +622,12 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 
                             if (!updated) {
                                 JOptionPane.showMessageDialog(
-                                                this, // inform the user that
-                                                      // value function is
-                                                      // affected
+                                                this, 
                                                 "The value function for this objective must be reset.",
                                                 "Reminder",
                                                 JOptionPane.INFORMATION_MESSAGE);
 
-                                obj.resetWeights(); // reset to default value
-                                                    // function
+                                obj.resetWeights(); // reset to default value function
                             }
                         }
                         // a) check if range is smaller
@@ -645,15 +649,12 @@ public class DefineAlternativesPanel extends JPanel implements ActionListener, T
 
                             if (!updated) {
                                 JOptionPane.showMessageDialog(
-                                                this, // inform the user that
-                                                      // value function is
-                                                      // affected
+                                                this, 
                                                 "The value function for this objective must be reset.",
                                                 "Reminder",
                                                 JOptionPane.INFORMATION_MESSAGE);
 
-                                obj.resetWeights(); // reset to default value
-                                                    // function
+                                obj.resetWeights(); // reset to default value function
                             }
 
                         }

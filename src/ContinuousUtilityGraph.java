@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.text.DecimalFormat;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,17 +26,18 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     MoveablePoint moving;
     int xaxis;//This one is needed to keep track of the x-axis. This is used when a point is being dragged, and make sure the dragging only happens along the y-axis.
     ContinuousAttributeDomain cdomain;
+    Stack<ContinuousAttributeDomain> undo;
+    Stack<ContinuousAttributeDomain> redo;
     int discrete_elements;
     double[] items;
     double[] weights;
-    double[] undo; //This is used for undoing purposes
     String unit;
     int clicki; //This is to keep correct track of what is clicked
     String attributeName;
     ValueChart chart;
     DefineValueFunction dvf;
     AttributeCell acell;
-    
+
     JPanel pnl;
     boolean modified = false;
     boolean fromChart = false; // graph opened by clicking on chart interface
@@ -52,10 +54,11 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         weights = we;
         unit = un;
         attributeName = att;
+        undo = new Stack<ContinuousAttributeDomain>();
+        redo = new Stack<ContinuousAttributeDomain>();
         dvf = d;
         acell = ac;
         fromChart = fromCh;
-
         
         setBackground(Color.white);
         p = new MoveablePoint[items.length];
@@ -80,7 +83,8 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     void plotPoints(){
         //Creating all the points of utility
         for(int i = 0; i < items.length; i++){
-        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+50, ((int) ((height-60) - (weights[i] * (height-60)) + 5)));
+        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+50, 
+        	                         ((int) (height - (weights[i] * (height-60)) - 55)));
             //p[i] = new MoveablePoint(((Incre * i) + 50), ((int) (200 - (weights[i] * 200) + 5)));
         }
         
@@ -101,52 +105,40 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     	return(this);
     }
 
-    public void mouseClicked(MouseEvent me) { 
+    public void mouseClicked(MouseEvent me) {
         modified = true;
-        if((me.getX()< 40) && (me.getX() > 0) && (me.getY() > height-20)){
-            for(int i = 0; i < undo.length; i++){
-            cdomain.removeKnot(items[i]);
-            cdomain.addKnot(items[i], undo[i]);
-        }
-       
-         //Updating the weight
-        for(int i = 0; i < items.length; i++){
-        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+50, ((int) (height-60 - (weights[i] * (height-60)) + 5)));
-        }
+        // undo
+        if ((me.getX() < 40) && (me.getX() > 0) && (me.getY() > height - 20) && !undo.isEmpty()) {
+            ContinuousAttributeDomain dom = undo.pop();
+            for (Double val : dom.getKnots()) {
+                Double wt = cdomain.getWeight(val);
+                cdomain.setWeight(val, dom.getWeight(val));
+                dom.setWeight(val, wt);
+            }
+            redo.push(dom);
+
+            weights = cdomain.getWeights();
+            plotPoints();
             
-        //Rejoining the lines
-        for(int i = 0; i < (items.length - 1); i++){
-            lines[i] = new Line2D.Float(p[i], p[i+1]);
+            update();
         }
-        
-        repaint();
-        if (chart != null)
-        	chart.updateAll();
-        }
-        
-        
-        if((me.getX()< width) && (me.getX() > width-65) && (me.getY() > height-20)){
+
+        // redo
+        if ((me.getX() < width) && (me.getX() > width - 40) && (me.getY() > height - 20) && !redo.isEmpty()) {
+            ContinuousAttributeDomain dom = redo.pop();
+            for (Double val : dom.getKnots()) {
+                Double wt = cdomain.getWeight(val);
+                cdomain.setWeight(val, dom.getWeight(val));
+                dom.setWeight(val, wt);
+            }
+            undo.push(dom);
+
+            weights = cdomain.getWeights();
+            plotPoints();
             
-        for(int i = 0; i < undo.length; i++){
-            cdomain.removeKnot(items[i]);
-            cdomain.addKnot(items[i], weights[i]);
+            update();
         }
-       
-         //Updating the weight
-        for(int i = 0; i < items.length; i++){
-        	p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(width-75)))+50, ((int) (height-60 - (weights[i] * (height-60)) + 5)));
-        }
-            
-        //Rejoining the lines
-        for(int i = 0; i < (items.length - 1); i++){
-            lines[i] = new Line2D.Float(p[i], p[i+1]);
-        }
-        
-        repaint();
-        if (chart != null)
-        	chart.updateAll();
-        }
-        
+
     }
     
     public void mouseEntered(MouseEvent me) { }
@@ -179,8 +171,13 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
                         interact.setUndoUtil(this, null, items[i], weights[i], attributeName);
                         chart.addInteraction(interact);
                 	}
-                	movePoint(xaxis, me.getY());  
-                //}                
+                	
+                	ContinuousAttributeDomain dom = cdomain.getDeepCopy().getContinuous();
+                	undo.push(dom);
+                	redo.clear();
+                    movePoint(xaxis, me.getY());
+                    return;
+                //}             
             }
         }
     }
@@ -215,29 +212,33 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         if (moving == null) return;
         modified = true;
         moving.setLocation(x, y);
-        
-        //Updating all the lines
-        for(int i = 0; i < (items.length - 1); i++){
-            lines[i].setLine(p[i].x, p[i].y, p[i+1].x, p[i+1].y);
+
+        // Updating all the lines
+        for (int i = 0; i < (items.length - 1); i++) {
+            lines[i].setLine(p[i].x, p[i].y, p[i + 1].x, p[i + 1].y);
         }
         repaint();
-        
-        cdomain.removeKnot(items[clicki]);
-        cdomain.addKnot(items[clicki],((float) (height-55 - y) / (height-60)));
-        
-        if (acell != null && acell.cg != null)
+
+        cdomain.setWeight(items[clicki], ((float) (height - 55 - y) / (height - 60)));
+
+        // Updating weights
+        weights = cdomain.getWeights();
+        update();
+    }
+    
+    void update() {
+        if (acell != null && acell.cg != null) {
             acell.cg.plotPoints();
-        
-        if (chart!=null){        	
-        	chart.updateAll();
+        }
+        //Update Value Chart
+        if (chart!=null) {  
+            chart.updateAll();
         }
         if (!fromChart) {
-        	dvf.con.validateTabs();
+            dvf.con.validateTabs();
         }
-        
-        //Updating weights
-        weights = cdomain.getWeights();
-      }
+    }
+    
     
     public void paintComponent(Graphics gfx) {
         super.paintComponent(gfx);
@@ -341,9 +342,17 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         }	
         
         //Drawing the Undo and Redo button
-        g.setColor(Color.RED);
         g.setFont(new Font(null, Font.PLAIN, 12));
+        if (undo.isEmpty())
+            g.setColor(Color.GRAY);
+        else
+            g.setColor(Color.RED);
         g.drawString("UNDO", 2, height-5);
+        
+        if (redo.isEmpty())
+            g.setColor(Color.GRAY);
+        else
+            g.setColor(Color.RED);
         g.drawString("REDO", width-40, height-5);
         
     }
@@ -362,13 +371,10 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
         //ContinuousUtilityGraph moving = new ContinuousUtilityGraph();
         //moving
         this.setPreferredSize(new Dimension(width,height));
-//        this.setPreferredSize(new Dimension(500,500));
         
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
-        
-        
     }
         
     class MoveablePoint extends Point2D.Float {

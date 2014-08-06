@@ -144,7 +144,7 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
         
         //Update Value Chart
         //cdomain.removeKnot(items[clicki]);
-        cdomain.changeWeight(items[clicki],(float)((getHeight()-getBottom())-y)  / (getHeight()-getBottom()-TOP));
+        cdomain.setWeight(items[clicki],(float)((getHeight()-getBottom())-y)  / (getHeight()-getBottom()-TOP));
         chart.updateAll();
         //Updating weights
         weights = cdomain.getWeights();     
