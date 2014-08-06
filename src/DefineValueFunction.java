@@ -60,9 +60,9 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 	    menuItem = new JMenuItem("Negative Linear");
 	    menuItem.addActionListener(this);
 	    popValueFunction.add(menuItem);
-	    menuItem = new JMenuItem("Other");
-	    menuItem.addActionListener(this);
-	    popValueFunction.add(menuItem);		
+	    //menuItem = new JMenuItem("Other");
+	    //menuItem.addActionListener(this);
+	    //popValueFunction.add(menuItem);		
 	    popValueFunction.addSeparator();
 	    menuItem = new JMenuItem("Add Point");
 	    menuItem.addActionListener(this);
@@ -196,13 +196,13 @@ public class DefineValueFunction extends JPanel implements ActionListener{
         }
         
 		if ("Default Flat".equals(ae.getActionCommand())){
-			obj_sel.setContinuous();
+			obj_sel.resetWeights();
 		}
 		else if ("Positive Linear".equals(ae.getActionCommand())){
-			obj_sel.setContinuous(true);
+			obj_sel.linearize(true);
 		}
 		else if ("Negative Linear".equals(ae.getActionCommand())){
-			obj_sel.setContinuous(false);
+			obj_sel.linearize(false);
 		}
 		else if ("Other".equals(ae.getActionCommand())){
 			inputBestValue();	
@@ -210,13 +210,10 @@ public class DefineValueFunction extends JPanel implements ActionListener{
 		else if ("Add Point".equals(ae.getActionCommand())){
 			addPoint();	
 		}
-		
 		else if ("Remove Point".equals(ae.getActionCommand())){
 	    	ContinuousAttributeDomain dom = obj_sel.getDomain().getContinuous();
 	    	dom.removeKnot(dom.getKnots()[rem_i]);
 	    	ugraph.repaint();
-
-
 		}		
 
 		showGraph();
@@ -276,7 +273,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
                 double maxC = obj_sel.getDomain().getContinuous().getMax();
         		if (ansd <= maxC && ansd >= minC){	 
         			ContinuousAttributeDomain dom = obj_sel.getDomain().getContinuous();
-        			dom.addKnot(ansd, 0.0);
+        			dom.addKnot(ansd, dom.interpolate(ansd));
         		}
 	        	else{
 	        		JOptionPane.showMessageDialog(this, "Out of range", "Error", JOptionPane.WARNING_MESSAGE);      
@@ -321,7 +318,7 @@ public class DefineValueFunction extends JPanel implements ActionListener{
                     ContinuousAttributeDomain cad = obj_sel.getDomain().getContinuous();
                     double kts[] = cad.getKnots();
                     for (i = 0; i < kts.length; i++) {
-                        int ptx = (int) ((kts[i] - kts[0]) / ((kts[(kts.length) - 1]) - kts[0]) * 200) + 50;
+                        int ptx = ((int)(((kts[i]-kts[0])/((kts[(kts.length)-1])-kts[0]))*(ContinuousUtilityGraph.width-75)))+50;
                         if (me.getX() > (ptx - 5) && me.getX() < (ptx + 5)) {
                             rem_i = i;
                             System.out.println("rem_i " + rem_i);

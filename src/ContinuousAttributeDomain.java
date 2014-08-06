@@ -30,7 +30,7 @@ public class ContinuousAttributeDomain extends AttributeDomain
 	 { return AttributeDomainType.CONTINUOUS;
 	 }
 	
-	private Double interpolate(double x) {
+	public Double interpolate(double x) {
 	    Map.Entry<Double, Double> first = knotMap.floorEntry(x);
 	    Map.Entry<Double, Double> second = knotMap.ceilingEntry(x);
 	    

@@ -185,8 +185,27 @@ public class JObjective extends JLabel{
 			
 		setCDomain(values);
 	}
+	
+	void linearize(boolean positive) {
+	    if (domain != null && domain.getContinuous() != null) {
+	        ContinuousAttributeDomain dom = domain.getContinuous();
+	        double minC = dom.getMin();
+	        double maxC = dom.getMax();
+	        for (Double x : dom.getKnots()) {
+	            double y = 0;
+	            if (positive) {
+	                y = 1/(maxC-minC)*(x-minC);
+	            } else {
+	                y = -1/(maxC-minC)*(x-maxC);
+	            }
+	            dom.changeWeight(x, y);
+	        }
+	    }
+	}
 
-	// TODO needs update depending on what it's used for
+	// TODO not currently working
+	// sets peak value as the max, makes continuous function accordingly
+	// is this actually useful?
 	void setContinuous(double peak){
 		Vector<Double> values = new Vector<Double>();
 		

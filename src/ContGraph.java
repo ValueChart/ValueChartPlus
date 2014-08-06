@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 /**
  * Small version of continuous utility/value/score function graphs in main interface. Points can be moved.
@@ -15,8 +16,8 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
 	private static final int 	BOTTOM = 7, 
 								TOP = 0;
 	private static final int MIN_HEIGHT = 20;
-    MoveablePoint[] p;
-    Line2D.Float[] lines;
+    ArrayList<MoveablePoint> p;
+    ArrayList<Line2D.Float> lines;
     MoveablePoint moving;
     //Line2D.Float line;
     int xaxis;
@@ -51,8 +52,8 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
         
     	font = new Font ("Arial", Font.BOLD, 7);
         setBackground(Color.white);
-        p = new MoveablePoint[items.length];
-        lines = new Line2D.Float[items.length - 1];
+        p = new ArrayList<MoveablePoint>();
+        lines = new ArrayList<Line2D.Float>();
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -71,9 +72,10 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
     	items = cdomain.getKnots();
         int ht = getHeight()-getBottom();
         //Creating all the points of utility
-        
+        p.clear();
         for(int i = 0; i < items.length; i++){
-            p[i] = new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(getWidth()-15)))+5, (int) (ht - (weights[i] * ht)) + TOP);
+            p.add(new MoveablePoint(((int)(((items[i]-items[0])/((items[(items.length)-1])-items[0]))*(getWidth()-15)))+5, 
+                    (int) (ht - (weights[i] * ht)) + TOP));
         }
         repaint();
     }    
@@ -92,10 +94,10 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
     public void mouseMoved(MouseEvent me) { }
     public void mousePressed(MouseEvent me) {
         for (int i = 0; i < items.length; i++) {
-            if (p[i].hit(me.getX(), me.getY())) {
+            if (p.get(i).hit(me.getX(), me.getY())) {
                 undo = cdomain.getWeights();
-                moving = p[i];
-                xaxis = (int)p[i].x;
+                moving = p.get(i);
+                xaxis = (int)p.get(i).x;
                 clicki = i;
                 LastInteraction interact = new LastInteraction(chart);
                 interact.setUndoUtil(this, null, items[i], weights[i], attributeName);
@@ -108,7 +110,7 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
     public void mouseReleased(MouseEvent me) {
          
         for (int i = 0; i < items.length; i++) {
-            if (p[i].hit(me.getX(), me.getY())) {
+            if (p.get(i).hit(me.getX(), me.getY())) {
                 movePoint(xaxis, me.getY());
             }
         }
@@ -136,7 +138,7 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
         
         //Updating all the lines
         for(int i = 0; i < (items.length - 1); i++){
-            lines[i].setLine(p[i].x, p[i].y, p[i+1].x, p[i+1].y);
+            lines.get(i).setLine(p.get(i).x, p.get(i).y, p.get(i+1).x, p.get(i+1).y);
         }
         repaint();
         
@@ -159,15 +161,16 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
         //g.setColor(Color.gray);
         //g.drawRect (0,0,getWidth(), getHeight());
         
+        lines.clear();
         //Joining all the points into lines
         for(int i = 0; i < (items.length - 1); i++){
-            lines[i] = new Line2D.Float(p[i], p[i+1]);
+            lines.add(new Line2D.Float(p.get(i), p.get(i+1)));
         }
         
         //g.setPaint(Color.blue);     
         //Draw all the lines
         for(int i = 0; i < (items.length - 1); i++){
-            g.draw(lines[i]);
+            g.draw(lines.get(i));
         }
 
         Shape[] s;
@@ -179,10 +182,11 @@ public class ContGraph extends JPanel implements MouseListener, MouseMotionListe
                 temp = String.valueOf(weights[i]*100);
                 g.setFont(new Font ("Arial", Font.BOLD, 6));
                 if (getHeight() > 20){
-                	g.drawString(temp.substring(0,3), (p[i].x + 5), p[i].y < getHeight() - BOTTOM - 3 ? p[i].y + 5 : p[i].y);
+                	g.drawString(temp.substring(0,3), (p.get(i).x + 5), p.get(i).y < getHeight() - BOTTOM - 3 
+                	        ? p.get(i).y + 5 : p.get(i).y);
                 }
             }
-            s[i] = p[i].getShape();
+            s[i] = p.get(i).getShape();
         }
         
         g.setColor(color);      

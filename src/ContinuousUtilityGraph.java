@@ -40,8 +40,8 @@ public class ContinuousUtilityGraph extends JPanel implements MouseListener, Mou
     boolean modified = false;
     boolean fromChart = false; // graph opened by clicking on chart interface
     
-    int width = 400;
-    int height = 320;
+    public static int width = 400;
+    public static int height = 320;
 
     public ContinuousUtilityGraph(ValueChart ch, boolean fromCh, ContinuousAttributeDomain dd, double[] it, double[] we, String un, String att, DefineValueFunction d, AttributeCell ac) {
        	
