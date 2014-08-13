@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Vector;
 
@@ -228,8 +229,12 @@ public class XMLWriter {
             
             Element alts = dom.createElement(XMLParser.XML_ALTERNATIVES);
             if (!save) {
+                HashSet<String> crit_map = new HashSet<String>();
+                for (JObjective obj : con.getObjPanel().prim_obj) {
+                    crit_map.add(obj.getName());
+                }
                 for (HashMap<String, Object> entry : con.getAltPanel().alts) {
-                    saveDataAlternative(dom, alts, entry, con.getAltPanel().columns, con.chart);
+                    saveDataAlternative(dom, alts, entry, con.getAltPanel().columns, con.chart, crit_map);
                 }
             } else if (con.chart != null){
                 for (ChartEntry entry : con.chart.getEntryList()) {
@@ -343,15 +348,16 @@ public class XMLWriter {
     }
     
     
-    private static void saveDataAlternative(Document dom, Element parentNode, HashMap<String,Object> alt, Vector<String> columns, ValueChart chart) {
+    private static void saveDataAlternative(Document dom, Element parentNode, HashMap<String,Object> alt, Vector<String> columns, ValueChart chart, HashSet<String> crit_map) {
         if (dom == null || parentNode == null || alt == null) return;
         
         Element elem = dom.createElement(XMLParser.XML_ALTERNATIVE);
         elem.setAttribute("name", alt.get("name").toString());
                     
         for (int j=1; j<columns.size(); j++){
-            Element v = dom.createElement(XMLParser.XML_ALT_VAL);
             String crit = columns.get(j).toString();
+            if (!crit_map.contains(crit)) continue;
+            Element v = dom.createElement(XMLParser.XML_ALT_VAL);
             v.setAttribute("criterion", crit);
             v.setAttribute("value", alt.get(crit).toString());
             elem.appendChild(v);

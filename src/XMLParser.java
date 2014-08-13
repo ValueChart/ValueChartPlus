@@ -280,15 +280,18 @@ public class XMLParser {
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
                         Element e = (Element) node;
                         String critName = e.getAttribute("criterion"); 
-                        AttributeDomain domain = chartData.findAttribute(critName).getPrimitive().getDomain();
-                        if (domain.getType() == AttributeDomainType.CONTINUOUS) {
-                            AttributeValue attrVal = new AttributeValue(Double.parseDouble(e.getAttribute("value")),
-                                                                        domain, critName, vc);
-                            entry.map.put(critName, attrVal);
-                        } else {
-                            AttributeValue attrVal = new AttributeValue(e.getAttribute("value"),
-                                                                        domain, critName, vc);
-                            entry.map.put(critName, attrVal);
+                        AttributeData data = chartData.findAttribute(critName);
+                        if (data != null) {
+                            AttributeDomain domain = data.getPrimitive().getDomain();
+                            if (domain.getType() == AttributeDomainType.CONTINUOUS) {
+                                AttributeValue attrVal = new AttributeValue(Double.parseDouble(e.getAttribute("value")),
+                                                                            domain, critName, vc);
+                                entry.map.put(critName, attrVal);
+                            } else {
+                                AttributeValue attrVal = new AttributeValue(e.getAttribute("value"),
+                                                                            domain, critName, vc);
+                                entry.map.put(critName, attrVal);
+                            }
                         }
                     }
                 } catch (Exception ex) {
