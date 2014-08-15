@@ -107,8 +107,8 @@ public class DefineInitialWeights extends JPanel implements ActionListener, Tabl
 	        private static final long serialVersionUID = 1L;
 
 	        public boolean isCellEditable(int row, int column){
-	            if (column == getColumnCount()-1)
-	                return true;
+//	            if (column == getColumnCount()-1)
+//	                return true;
 	            
 	            return false;
 	        }
