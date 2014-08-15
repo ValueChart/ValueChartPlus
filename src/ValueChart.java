@@ -865,7 +865,8 @@ public class ValueChart extends JPanel {
     }
 
     public void compareDisplay(int type, int colwd) {
-        ValueChart ch = new ValueChart(con, filename, log, getUsername(), type, colwd, false, show_graph, displayUtilityWeights); // TODO
+        XMLWriter.saveFile(this, "TEMP_compare.xml");
+        ValueChart ch = new ValueChart(con, "TEMP_compare.xml", log, getUsername(), type, colwd, false, show_graph, displayUtilityWeights);
         ch.showAbsoluteRatios = this.showAbsoluteRatios;
         ch.pump = pump;
         ch.sort = sort;
